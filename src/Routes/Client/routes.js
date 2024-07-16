@@ -1,6 +1,7 @@
-import About from '../../Pages/Client/About';
-import Home from '../../Pages/Client/Home';
 import ClientConfig from '../../Config/Client';
+
+import Home from '../../Pages/Client/Home';
+import About from '../../Pages/Client/About';
 
 
 
