@@ -6,6 +6,8 @@ import Login from '../../Pages/Client/Authenticator/Login';
 import Register from '../../Pages/Client/Authenticator/Register';
 import ForgotPassword from '../../Pages/Client/Authenticator/ForgotPassword';
 import ChangePassword from '../../Pages/Client/Authenticator/ChangePassword';
+import Contact from '../../Pages/Client/Contact';
+import Menu from '../../Pages/Client/Menu';
 
 
 
@@ -18,6 +20,8 @@ const publicClientRoutes = [
     { path: ClientConfig.routes.register, component: Register },
     { path: ClientConfig.routes.forgotPassword, component: ForgotPassword },
     { path: ClientConfig.routes.changePassword, component: ChangePassword },
+    { path: ClientConfig.routes.contact, component: Contact },
+    { path: ClientConfig.routes.menu, component: Menu },
 
 ];
 

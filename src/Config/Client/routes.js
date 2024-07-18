@@ -5,6 +5,8 @@ const ClientRoutes = {
     register: '/register',
     forgotPassword: '/forgot-password',
     changePassword: '/change-password',
+    contact: '/contact',
+    menu: '/menu',
 
 };
 
