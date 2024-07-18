@@ -30,6 +30,7 @@ export default function ClientHeader() {
           </div>
           <Link to="/contact" className="nav-item nav-link">Contact</Link>
         </div>
+        <Link to="/login" className="nav-item nav-link btn btn-warning rounded-pill me-1" style={{color: 'black'}}>Đăng nhập</Link>
         <Link to="/book-table" className="btn btn-primary py-2 px-4">Book A Table</Link>
       </div>
     </nav>

@@ -1,6 +1,7 @@
 const ClientRoutes = {
     home: '/',
     about: '/about',
+    login: '/login',
 
 };
 
