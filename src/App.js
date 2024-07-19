@@ -5,6 +5,7 @@ import ClientLayout from './Layouts/Client/ClientLayout';
 import ClientConfig from './Config/Client';
 import { publicClientRoutes } from './Routes/Client';
 import Login from './Pages/Client/Authenticator/Login';
+import Register from './Pages/Client/Authenticator/Register';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
 
         {/* Định nghĩa route cho trang Login */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* Client Routes */}
         <Route path="/" element={<ClientLayout />}>

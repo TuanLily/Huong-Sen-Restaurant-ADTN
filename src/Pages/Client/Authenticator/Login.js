@@ -1,67 +1,72 @@
 import React from 'react'
 import '../../../Assets/Client/Styles/AuthenStyle/authen.css'
 import '../../../Assets/Client/Styles/AuthenStyle/util.css'
+import { Link } from 'react-router-dom'
 
 export default function Login() {
     return (
         <div>
-            <div class="limiter">
-                <div class="container-login100">
-                    <div class="wrap-login100">
-                        <div class="login100-pic js-tilt" data-tilt>
-                            <img src="../../../Assets/Client/Images/hero.png" alt="IMG" />
+            <div className="container mt-5">
+                <div className="row justify-content-center">
+                    <div className="col-md-8">
+                        <div className="card shadow">
+                            <div className="card-body">
+                                <div className="d-flex justify-content-center mb-4">
+                                    <img
+                                        src="../../../Assets/Client/Images/hero.png"
+                                        alt="IMG"
+                                        className="img-fluid"
+                                        style={{ width: '40%', height: 'auto' }}
+                                    />
+                                </div>
+                                <form>
+                                    <h2 className="text-center mb-4">Đăng nhập</h2>
+
+                                    <div className="form-group mb-3">
+                                        <label htmlFor="email" className="form-label">Email</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text">
+                                                <i className="fa fa-envelope" aria-hidden="true"></i>
+                                            </span>
+                                            <input type="email" className="form-control" id="email" placeholder="Nhập Email" required />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group mb-3">
+                                        <label htmlFor="password" className="form-label">Mật khẩu</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text">
+                                                <i className="fa fa-lock" aria-hidden="true"></i>
+                                            </span>
+                                            <input type="password" className="form-control" id="password" placeholder="Nhập mật khẩu" required />
+                                        </div>
+                                    </div>
+
+                                    <div className="d-grid gap-2">
+                                        <button type="submit" className="btn btn-primary btn-block rounded-pill">Đăng nhập</button>
+                                    </div>
+
+                                    <div className="text-center mt-3">
+                                        <span>Quên </span>
+                                        <a href="#" className="link-primary">Tài khoản / Mật khẩu?</a>
+                                    </div>
+
+                                    <div className="text-center mt-4">
+                                        <Link to="/" className="link-primary me-3">
+                                            Trở lại
+                                            <i className="fa fa-long-arrow-right ms-2" aria-hidden="true"></i>
+                                        </Link>
+                                        <Link to="/register" className="link-primary">
+                                            Đăng Ký Mới
+                                            <i className="fa fa-long-arrow-right ms-2" aria-hidden="true"></i>
+                                        </Link>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-
-                        <form class="login100-form validate-form">
-                            <span class="login100-form-title">
-                                Đăng nhập
-                            </span>
-
-                            <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
-                                <input class="input100" type="text" name="email" placeholder="Nhập Email" />
-                                <span class="focus-input100"></span>
-                                <span class="symbol-input100">
-                                    <i class="fa fa-envelope" aria-hidden="true"></i>
-                                </span>
-                            </div>
-
-                            <div class="wrap-input100 validate-input" data-validate="Password is required">
-                                <input class="input100" type="password" name="pass" placeholder="Nhập mật khẩu" />
-                                <span class="focus-input100"></span>
-                                <span class="symbol-input100">
-                                    <i class="fa fa-lock" aria-hidden="true"></i>
-                                </span>
-                            </div>
-
-                            <div class="container-login100-form-btn">
-                                <button class="login100-form-btn">
-                                    Đăng nhập
-                                </button>
-                            </div>
-
-                            <div class="text-center p-t-12">
-                                <span class="txt1">
-                                    Quên
-                                </span>
-                                <a class="txt2" href="#">
-                                    Tài khoản / Mật khẩu?
-                                </a>
-                            </div>
-
-                            <div class="text-center p-t-136">
-                                <a class="txt2" href="/">
-                                    Trở lại /
-                                    <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
-                                </a>
-
-                                <a class="txt2" href="/Register">
-                                    Tạo tài khoản mới
-                                    <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
-                                </a>
-                            </div>
-                        </form>
                     </div>
                 </div>
-            </div>        </div>
+            </div>
+        </div>
     )
 }
