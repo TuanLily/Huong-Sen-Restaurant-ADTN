@@ -8,6 +8,8 @@ import ForgotPassword from '../../Pages/Client/Authenticator/ForgotPassword';
 import ChangePassword from '../../Pages/Client/Authenticator/ChangePassword';
 import Contact from '../../Pages/Client/Contact';
 import Menu from '../../Pages/Client/Menu';
+import Service from '../../Pages/Client/Service'
+import Booking from '../../Pages/Client/Booking';
 
 
 
@@ -22,6 +24,8 @@ const publicClientRoutes = [
     { path: ClientConfig.routes.changePassword, component: ChangePassword },
     { path: ClientConfig.routes.contact, component: Contact },
     { path: ClientConfig.routes.menu, component: Menu },
+    { path: ClientConfig.routes.service, component: Service },
+    { path: ClientConfig.routes.booking, component: Booking },
 
 ];
 

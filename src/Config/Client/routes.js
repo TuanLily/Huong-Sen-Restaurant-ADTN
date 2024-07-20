@@ -7,6 +7,8 @@ const ClientRoutes = {
     changePassword: '/change-password',
     contact: '/contact',
     menu: '/menu',
+    service: '/service',
+    booking: '/booking',
 
 };
 

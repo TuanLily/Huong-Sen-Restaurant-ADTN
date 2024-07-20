@@ -17,15 +17,8 @@ export default function ClientHeader() {
             <Link to="/" className="nav-item nav-link">Trang chủ</Link>
             <Link to="/about" className="nav-item nav-link">Về chúng tôi</Link>
             <Link to="/service" className="nav-item nav-link">Service</Link>
+            <Link to="/service" className="nav-item nav-link">Dịch vụ</Link>
             <Link to="/menu" className="nav-item nav-link">Menu</Link>
-            <div className="nav-item dropdown">
-              <Link to="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</Link>
-              <div className="dropdown-menu m-0">
-                <Link to="/booking" className="dropdown-item">Booking</Link>
-                <Link to="/team" className="dropdown-item">Our Team</Link>
-                <Link to="/testimonial" className="dropdown-item">Testimonial</Link>
-              </div>
-            </div>
             <Link to="/contact" className="nav-item nav-link">Contact</Link>
           </div>
           <Link to="/book-table" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1 me-1" style={{ color: 'black' }}>
@@ -35,7 +28,7 @@ export default function ClientHeader() {
             <i class="fa-solid fa-user"></i> Đăng nhập
           </Link>
 
-          {/* Hiển thị sau khi đăng nhập thành công */}
+
           {/* <div className="dropdown ms-2">
             <button className="btn dropdown-toggle d-flex align-items-center rounded-pill" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: 'rgb(254,161,21', border: '1px solid rgb(35,36,50)' }}>
               <img src="../../Assets/Client/Images/testimonial-2.jpg" alt="Avatar" className="rounded-circle me-2" style={{ width: '30px', height: '30px' }} />
@@ -49,9 +42,7 @@ export default function ClientHeader() {
             </ul>
           </div> */}
         </div>
-      </nav>
-
-
-    </div>
+      </nav >
+    </div >
   )
 }
