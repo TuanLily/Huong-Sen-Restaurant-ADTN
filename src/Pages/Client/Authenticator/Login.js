@@ -11,16 +11,16 @@ export default function Login() {
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-8">
-                        <div className="card shadow d-flex flex-row">
-                            <div className="col-md-4 d-flex justify-content-center align-items-center p-3">
+                        <div className="card rounded-3 shadow d-flex flex-column flex-md-row">
+                            <div className="col-12 col-md-4 d-flex justify-content-center align-items-center p-3">
                                 <img
-                                    src="../../../Assets/Client/Images/hero.png"
+                                    src="../../../Assets/Client/Images/huong-sen-logo.png"
                                     alt="IMG"
                                     className="img-fluid"
-                                    style={{ width: '100%', height: 'auto' }}
+                                    style={{ maxWidth: '60%', height: 'auto' }}
                                 />
                             </div>
-                            <div className="col-md-8 p-3">
+                            <div className="col-12 col-md-8 p-3">
                                 <div className="card-body">
                                     <form>
                                         <h2 className="text-center mb-4">Đăng nhập</h2>
@@ -51,13 +51,12 @@ export default function Login() {
 
                                         <div className="text-center mt-3">
                                             <span>Quên </span>
-                                            <a href="#" className="link-primary">Tài khoản / Mật khẩu?</a>
+                                            <a href="/forgot-password" className="link-primary">Tài khoản / Mật khẩu?</a>
                                         </div>
 
                                         <div className="text-center mt-4">
                                             <Link to="/" className="link-primary me-3">
-                                                <i className="fa-solid fa-arrow-left ms-2"></i>
-                                                Trở lại
+                                                <i className="fa-solid fa-arrow-left ms-2"></i>  Trở lại
                                             </Link>
                                             <Link to="/register" className="link-primary">
                                                 Đăng Ký Mới
@@ -70,6 +69,7 @@ export default function Login() {
                         </div>
                     </div>
                 </div>
+
             </div>
 
 

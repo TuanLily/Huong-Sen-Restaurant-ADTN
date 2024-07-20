@@ -1,15 +1,13 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
 
-
-
 export default function ClientHeader() {
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4 px-lg-5 py-3 py-lg-0">
-        <Link to="/" className="navbar-brand p-0">
-          <h1 className="text-primary m-0"><i className="fa fa-utensils me-3"></i>Restoran</h1>
-          {/* <img src="img/logo.png" alt="Logo"> */}
+        <Link to="/" className="navbar-brand p-0 d-flex align-items-center">
+          <img src="../../Assets/Client/Images/huong-sen-logo.png" alt="Logo" className="mr-2" />
+          <h3 className="ff-secondary text-start text-primary fw-normal m-0">Hương Sen</h3>
         </Link>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
           <span className="fa fa-bars"></span>
@@ -30,12 +28,26 @@ export default function ClientHeader() {
             </div>
             <Link to="/contact" className="nav-item nav-link">Contact</Link>
           </div>
-          <Link to="/book-table" className="btn btn-primary py-2 px-4 ms-1 me-1" style={{ color: 'black' }}>
+          <Link to="/book-table" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1 me-1" style={{ color: 'black' }}>
             Đặt bàn
           </Link>
-          <Link to="/login" className="btn btn-primary rounded-pill py-2 px-4 ms-1 rounded-pill" style={{ color: 'black' }}>
+          <Link to="/login" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1" style={{ color: 'black' }}>
             <i class="fa-solid fa-user"></i> Đăng nhập
           </Link>
+
+          {/* Hiển thị sau khi đăng nhập thành công */}
+          {/* <div className="dropdown ms-2">
+            <button className="btn dropdown-toggle d-flex align-items-center rounded-pill" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: 'rgb(254,161,21', border: '1px solid rgb(35,36,50)' }}>
+              <img src="../../Assets/Client/Images/testimonial-2.jpg" alt="Avatar" className="rounded-circle me-2" style={{ width: '30px', height: '30px' }} />
+              Tuan Lily
+            </button>
+            <ul className="dropdown-menu rounded-3" aria-labelledby="dropdownMenuButton">
+              <li><Link className="dropdown-item" to="/profile">Thông tin tài khoản</Link></li>
+              <li><Link className="dropdown-item" to="/my-orders">Đơn hàng của tôi</Link></li>
+              <li><Link className="dropdown-item" to="/my-bookings">Đơn đặt bàn của tôi</Link></li>
+              <li><Link className="dropdown-item" to="/logout">Đăng xuất</Link></li>
+            </ul>
+          </div> */}
         </div>
       </nav>
 

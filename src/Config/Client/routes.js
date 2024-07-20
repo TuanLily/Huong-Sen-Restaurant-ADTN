@@ -3,6 +3,8 @@ const ClientRoutes = {
     about: '/about',
     login: '/login',
     register: '/register',
+    forgotPassword: '/forgot-password',
+    changePassword: '/change-password',
 
 };
 
