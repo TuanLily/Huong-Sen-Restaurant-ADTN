@@ -15,11 +15,17 @@ export default function ClientHeader() {
         <div className="collapse navbar-collapse" id="navbarCollapse">
           <div className="navbar-nav ms-auto py-0 pe-4">
             <Link to="/" className="nav-item nav-link">Trang chủ</Link>
-            <Link to="/about" className="nav-item nav-link">Về chúng tôi</Link>
-            <Link to="/service" className="nav-item nav-link">Service</Link>
+            <Link to="/menu" className="nav-item nav-link">Thực đơn</Link>
             <Link to="/service" className="nav-item nav-link">Dịch vụ</Link>
-            <Link to="/menu" className="nav-item nav-link">Menu</Link>
-            <Link to="/contact" className="nav-item nav-link">Contact</Link>
+            <Link to="/menu" className="nav-item nav-link">Tin tức & Mẹo hay</Link>
+            <div className="nav-item dropdown">
+              <Link to="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">Khác</Link>
+              <div className="dropdown-menu m-0">
+                <Link to="/about" className="dropdown-item">Về chúng tôi</Link>
+                <Link to="/contact" className="dropdown-item">Liên hệ</Link>
+                <Link to="/testimonial" className="dropdown-item">Testimonial</Link>
+              </div>
+            </div>
           </div>
           <Link to="/book-table" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1 me-1" style={{ color: 'black' }}>
             Đặt bàn

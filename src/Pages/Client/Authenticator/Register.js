@@ -1,7 +1,18 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 export default function Register() {
+    const [passwordVisible, setPasswordVisible] = useState(false);
+    const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setPasswordVisible(!passwordVisible);
+    };
+
+    const toggleCofirmPasswordVisibility = () => {
+        setConfirmPasswordVisible(!confirmPasswordVisible);
+    };
+
     return (
         <div>
             <div className="container-xxl py-5 bg-dark hero-header mb-5">
@@ -84,7 +95,16 @@ export default function Register() {
                                                         <span className="input-group-text">
                                                             <i className="fa fa-lock" aria-hidden="true"></i>
                                                         </span>
-                                                        <input type="password" className="form-control" id="password" placeholder="Nhập mật khẩu" required />
+                                                        <input
+                                                            type={passwordVisible ? 'text' : 'password'}
+                                                            className="form-control"
+                                                            id="newPassword"
+                                                            placeholder="Nhập mật khẩu mới"
+                                                            required
+                                                        />
+                                                        <span className="input-group-text" onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
+                                                            <i className={passwordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'} aria-hidden="true"></i>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -95,7 +115,16 @@ export default function Register() {
                                                         <span className="input-group-text">
                                                             <i className="fa fa-lock" aria-hidden="true"></i>
                                                         </span>
-                                                        <input type="password" className="form-control" id="confirm-password" placeholder="Xác nhận mật khẩu" required />
+                                                        <input
+                                                            type={confirmPasswordVisible ? 'text' : 'password'}
+                                                            className="form-control"
+                                                            id="newPassword"
+                                                            placeholder="Nhập mật khẩu xác nhận"
+                                                            required
+                                                        />
+                                                        <span className="input-group-text" onClick={toggleCofirmPasswordVisibility} style={{ cursor: 'pointer' }}>
+                                                            <i className={confirmPasswordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'} aria-hidden="true"></i>
+                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>
