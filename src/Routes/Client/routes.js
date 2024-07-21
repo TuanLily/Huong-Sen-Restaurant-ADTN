@@ -10,6 +10,7 @@ import Contact from '../../Pages/Client/Contact';
 import Menu from '../../Pages/Client/Menu';
 import Service from '../../Pages/Client/Service'
 import Booking from '../../Pages/Client/Booking';
+import DetailProduct from '../../Pages/Client/DetailProduct';
 
 
 
@@ -26,6 +27,7 @@ const publicClientRoutes = [
     { path: ClientConfig.routes.menu, component: Menu },
     { path: ClientConfig.routes.service, component: Service },
     { path: ClientConfig.routes.booking, component: Booking },
+    { path: ClientConfig.routes.detailproduct, component: DetailProduct },
 
 ];
 

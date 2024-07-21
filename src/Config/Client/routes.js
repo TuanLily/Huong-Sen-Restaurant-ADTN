@@ -9,6 +9,7 @@ const ClientRoutes = {
     menu: '/menu',
     service: '/service',
     booking: '/booking',
+    detailproduct: '/detailproduct',
 
 };
 
