@@ -9,8 +9,8 @@ const DetailProduct = () => {
           <h1 className="display-3 text-white mb-3 animated slideInDown">Chi Tiết Sản Phẩm</h1>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb justify-content-center text-uppercase">
-              <li className="breadcrumb-item"><a href="#">Home</a></li>
-              <li className="breadcrumb-item"><a href="#">Pages</a></li>
+              <li className="breadcrumb-item"><a href="#">Trang chủ</a></li>
+              <li className="breadcrumb-item"><a href="#">Thực đơn</a></li>
               <li className="breadcrumb-item text-white active" aria-current="page">Chi Tiết Sản Phẩm</li>
             </ol>
           </nav>
