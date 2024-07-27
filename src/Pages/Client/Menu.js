@@ -5,12 +5,11 @@ export default function Menu() {
     <div>
       <div className="container-xxl py-5 bg-dark hero-header mb-5">
         <div className="container text-center my-5 pt-5 pb-4">
-          <h1 className="display-3 text-white mb-3 animated slideInDown">Food Menu</h1>
+          <h1 className="display-3 text-white mb-3 animated slideInDown">Thực Đơn</h1>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb justify-content-center text-uppercase">
-              <li className="breadcrumb-item"><a href="#">Home</a></li>
-              <li className="breadcrumb-item"><a href="#">Pages</a></li>
-              <li className="breadcrumb-item text-white active" aria-current="page">Menu</li>
+              <li className="breadcrumb-item"><a href="#">Trang Chủ</a></li>
+              <li className="breadcrumb-item text-white active" aria-current="page">Thực Đơn</li>
             </ol>
           </nav>
         </div>
@@ -19,8 +18,8 @@ export default function Menu() {
       <div className="container-xxl py-5">
         <div className="container">
           <div className="text-center wow fadeInUp" data-wow-delay="0.1s">
-            <h5 className="section-title ff-secondary text-center text-primary fw-normal">Food Menu</h5>
-            <h1 className="mb-5">Most Popular Items</h1>
+            <h5 className="section-title ff-secondary text-center text-primary fw-normal">Thực Đơn</h5>
+            <h1 className="mb-5">Món Ăn Phổ Biến Nhất</h1>
           </div>
           <div className="tab-class text-center wow fadeInUp" data-wow-delay="0.1s">
             <ul className="nav nav-pills d-inline-flex justify-content-center border-bottom mb-5">
@@ -28,8 +27,8 @@ export default function Menu() {
                 <a className="d-flex align-items-center text-start mx-3 ms-0 pb-3 active" data-bs-toggle="pill" href="#tab-1">
                   <i className="fa fa-coffee fa-2x text-primary"></i>
                   <div className="ps-3">
-                    <small className="text-body">Popular</small>
-                    <h6 className="mt-n1 mb-0">Breakfast</h6>
+                    <small className="text-body">Phổ Biến</small>
+                    <h6 className="mt-n1 mb-0">Bữa Sáng</h6>
                   </div>
                 </a>
               </li>
@@ -37,8 +36,8 @@ export default function Menu() {
                 <a className="d-flex align-items-center text-start mx-3 pb-3" data-bs-toggle="pill" href="#tab-2">
                   <i className="fa fa-hamburger fa-2x text-primary"></i>
                   <div className="ps-3">
-                    <small className="text-body">Special</small>
-                    <h6 className="mt-n1 mb-0">Launch</h6>
+                    <small className="text-body">Đặc Biệt</small>
+                    <h6 className="mt-n1 mb-0">Bữa Trưa</h6>
                   </div>
                 </a>
               </li>
@@ -46,8 +45,8 @@ export default function Menu() {
                 <a className="d-flex align-items-center text-start mx-3 me-0 pb-3" data-bs-toggle="pill" href="#tab-3">
                   <i className="fa fa-utensils fa-2x text-primary"></i>
                   <div className="ps-3">
-                    <small className="text-body">Lovely</small>
-                    <h6 className="mt-n1 mb-0">Dinner</h6>
+                    <small className="text-body">Yêu Thích</small>
+                    <h6 className="mt-n1 mb-0">Bữa Tối</h6>
                   </div>
                 </a>
               </li>
@@ -61,10 +60,10 @@ export default function Menu() {
                         <img className="flex-shrink-0 img-fluid rounded" src={`img/menu-${i + 1}.jpg`} alt="" style={{ width: "80px" }} />
                         <div className="w-100 d-flex flex-column text-start ps-4">
                           <h5 className="d-flex justify-content-between border-bottom pb-2">
-                            <span>Chicken Burger</span>
+                            <span>Burger Gà</span>
                             <span className="text-primary">$115</span>
                           </h5>
-                          <small className="fst-italic">Ipsum ipsum clita erat amet dolor justo diam</small>
+                          <small className="fst-italic">Bánh mì kẹp thịt gà ngon tuyệt</small>
                         </div>
                       </div>
                     </div>
@@ -79,10 +78,10 @@ export default function Menu() {
                         <img className="flex-shrink-0 img-fluid rounded" src={`img/menu-${i + 1}.jpg`} alt="" style={{ width: "80px" }} />
                         <div className="w-100 d-flex flex-column text-start ps-4">
                           <h5 className="d-flex justify-content-between border-bottom pb-2">
-                            <span>Chicken Burger</span>
+                            <span>Burger Gà</span>
                             <span className="text-primary">$115</span>
                           </h5>
-                          <small className="fst-italic">Ipsum ipsum clita erat amet dolor justo diam</small>
+                          <small className="fst-italic">Bánh mì kẹp thịt gà ngon tuyệt</small>
                         </div>
                       </div>
                     </div>
@@ -97,10 +96,10 @@ export default function Menu() {
                         <img className="flex-shrink-0 img-fluid rounded" src={`img/menu-${i + 1}.jpg`} alt="" style={{ width: "80px" }} />
                         <div className="w-100 d-flex flex-column text-start ps-4">
                           <h5 className="d-flex justify-content-between border-bottom pb-2">
-                            <span>Chicken Burger</span>
+                            <span>Burger Gà</span>
                             <span className="text-primary">$115</span>
                           </h5>
-                          <small className="fst-italic">Ipsum ipsum clita erat amet dolor justo diam</small>
+                          <small className="fst-italic">Bánh mì kẹp thịt gà ngon tuyệt</small>
                         </div>
                       </div>
                     </div>
