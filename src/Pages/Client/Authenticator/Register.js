@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import ImageUploadComponent from '../../../Components/ImageUpload/ImageUpload';
 
 export default function Register() {
     const [passwordVisible, setPasswordVisible] = useState(false);
@@ -50,17 +51,12 @@ export default function Register() {
                                             </div>
                                         </div>
 
-
                                         <div className="form-group mb-3">
-                                            <label htmlFor="avatar" className="form-label">Ảnh đại diện</label>
+                                            <label htmlFor="avatar-upload" className="form-label">Ảnh đại diện</label>
                                             <div className="input-group">
-                                                <span className="input-group-text">
-                                                    <i className="fa fa-image" aria-hidden="true"></i>
-                                                </span>
-                                                <input type="file" className="form-control" id="avatar" />
+                                                <ImageUploadComponent id="avatar-upload" />
                                             </div>
                                         </div>
-
 
 
                                         <div className='row'>

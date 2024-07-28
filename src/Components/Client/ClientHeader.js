@@ -23,11 +23,10 @@ export default function ClientHeader() {
               <div className="dropdown-menu m-0">
                 <Link to="/about" className="dropdown-item">Về chúng tôi</Link>
                 <Link to="/contact" className="dropdown-item">Liên hệ</Link>
-                <Link to="/testimonial" className="dropdown-item">Testimonial</Link>
               </div>
             </div>
           </div>
-          <Link to="/book-table" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1 me-1" style={{ color: 'black' }}>
+          <Link to="/booking" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1 me-1" style={{ color: 'black' }}>
             Đặt bàn
           </Link>
           <Link to="/login" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1" style={{ color: 'black' }}>
