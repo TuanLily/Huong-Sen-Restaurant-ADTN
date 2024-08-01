@@ -1,7 +1,21 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 
 export default function ClientHeader() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
+  };
+
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4 px-lg-5 py-3 py-lg-0">
@@ -29,23 +43,24 @@ export default function ClientHeader() {
           <Link to="/booking" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1 me-1" style={{ color: 'black' }}>
             Đặt bàn
           </Link>
-          <Link to="/login" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1" style={{ color: 'black' }}>
-            <i class="fa-solid fa-user"></i> Đăng nhập
-          </Link>
-
-
-          {/* <div className="dropdown ms-2">
-            <button className="btn dropdown-toggle d-flex align-items-center rounded-pill" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: 'rgb(254,161,21', border: '1px solid rgb(35,36,50)' }}>
-              <img src="../../Assets/Client/Images/testimonial-2.jpg" alt="Avatar" className="rounded-circle me-2" style={{ width: '30px', height: '30px' }} />
-              Tuan Lily
-            </button>
-            <ul className="dropdown-menu rounded-3" aria-labelledby="dropdownMenuButton">
-              <li><Link className="dropdown-item" to="/profile">Thông tin tài khoản</Link></li>
-              <li><Link className="dropdown-item" to="/my-orders">Đơn hàng của tôi</Link></li>
-              <li><Link className="dropdown-item" to="/my-bookings">Đơn đặt bàn của tôi</Link></li>
-              <li><Link className="dropdown-item" to="/logout">Đăng xuất</Link></li>
-            </ul>
-          </div> */}
+          {user ? (
+            <div className="dropdown ms-2">
+              <button className="btn dropdown-toggle d-flex align-items-center rounded-pill" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: 'rgb(254,161,21', border: '1px solid rgb(35,36,50)' }}>
+                <img src={user.avatar} alt="Avatar" className="rounded-circle me-2" style={{ width: '30px', height: '30px' }} />
+                {user.fullname}
+              </button>
+              <ul className="dropdown-menu rounded-3" aria-labelledby="dropdownMenuButton">
+                <li><Link className="dropdown-item" to="/profile">Thông tin tài khoản</Link></li>
+                <li><Link className="dropdown-item" to="/my-orders">Đơn hàng của tôi</Link></li>
+                <li><Link className="dropdown-item" to="/my-bookings">Đơn đặt bàn của tôi</Link></li>
+                <li><button className="dropdown-item" onClick={handleLogout}>Đăng xuất</button></li>
+              </ul>
+            </div>
+          ) : (
+            <Link to="/login" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1" style={{ color: 'black' }}>
+              <i className="fa-solid fa-user"></i> Đăng nhập
+            </Link>
+          )}
         </div>
       </nav >
     </div >

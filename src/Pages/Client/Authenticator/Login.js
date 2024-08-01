@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import '../../../Assets/Client/Styles/AuthenStyle/authen.css'
 import '../../../Assets/Client/Styles/AuthenStyle/util.css'
 import { Link } from 'react-router-dom'
+import GoogleAuth from '../../../Services/GoogleAuth/GoogleAuth';
 
 export default function Login() {
 
@@ -68,6 +69,13 @@ export default function Login() {
                                         <div className="text-center mt-3">
                                             <span>Quên </span>
                                             <a href="/forgot-password" className="link-primary">Tài khoản / Mật khẩu?</a>
+                                        </div>
+
+                                        <div className="text-center mt-3">
+                                            <span>Hoặc đăng nhập bằng</span>
+                                            <div className="mt-2">
+                                                <GoogleAuth />
+                                            </div>
                                         </div>
 
                                         <div className="text-center mt-4">
