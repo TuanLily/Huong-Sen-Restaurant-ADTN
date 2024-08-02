@@ -1,6 +1,6 @@
 const ClientRoutes = {
     home: '/',
-    about: '/about/me',
+    about: '/about',
     login: '/login',
     register: '/register',
     forgotPassword: '/forgot-password',
@@ -9,7 +9,7 @@ const ClientRoutes = {
     menu: '/menu',
     service: '/service',
     booking: '/booking',
-    detailproduct: '/detailproduct',
+    detailproduct: '/detail-product',
 
 };
 
