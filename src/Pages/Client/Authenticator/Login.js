@@ -1,15 +1,37 @@
 import React, { useState } from 'react'
 import '../../../Assets/Client/Styles/AuthenStyle/authen.css'
 import '../../../Assets/Client/Styles/AuthenStyle/util.css'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import GoogleAuth from '../../../Services/GoogleAuth/GoogleAuth';
+import { useForm } from 'react-hook-form';
+import { useDispatch, useSelector } from 'react-redux';
+import Spinner from '../../../Components/Client/Spinner';
+import { fetchLogin } from '../../../Actions/AuthActions';
 
 export default function Login() {
-
+    const { register, handleSubmit, formState: { errors } } = useForm();
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const [serverError, setServerError] = useState(''); // Sử dụng state để lưu trữ lỗi từ máy chủ
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const loginState = useSelector(state => state.auth);
+    const { loading, error } = loginState; // Lấy trạng thái đăng nhập và lỗi từ Redux store
 
     const togglePasswordVisibility = () => {
-        setPasswordVisible(!passwordVisible);
+        setPasswordVisible(!passwordVisible); // Thay đổi trạng thái hiển thị mật khẩu
+    };
+
+    const onSubmit = async (data) => {
+        try {
+            await dispatch(fetchLogin(data.email, data.password)); // Thực hiện đăng nhập với dữ liệu đã được xác thực
+
+            // navigate('/'); // Điều chỉnh URL phù hợp với ứng dụng của bạn
+            window.location.href = '/'; 
+        } catch (err) {
+            setServerError(err.message || 'Đăng nhập thất bại'); // Lưu trữ lỗi từ máy chủ
+        }
     };
 
     return (
@@ -30,17 +52,29 @@ export default function Login() {
                             </div>
                             <div className="col-12 col-md-8 p-3">
                                 <div className="card-body">
-                                    <form>
+                                    <form onSubmit={handleSubmit(onSubmit)}>
                                         <h2 className="text-center mb-4">Đăng nhập</h2>
-
                                         <div className="form-group mb-3">
                                             <label htmlFor="email" className="form-label">Email</label>
                                             <div className="input-group">
                                                 <span className="input-group-text">
                                                     <i className="fa fa-envelope" aria-hidden="true"></i>
                                                 </span>
-                                                <input type="email" className="form-control" id="email" placeholder="Nhập Email" required />
+                                                <input
+                                                    type="email"
+                                                    className="form-control"
+                                                    id="email"
+                                                    placeholder="Nhập Email"
+                                                    {...register('email', {
+                                                        required: 'Email là bắt buộc',
+                                                        pattern: {
+                                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                                                            message: 'Email không hợp lệ'
+                                                        }
+                                                    })}
+                                                />
                                             </div>
+                                            {errors.email && <p className="text-danger">{errors.email.message}</p>}
                                         </div>
 
                                         <div className="form-group mb-3">
@@ -52,15 +86,30 @@ export default function Login() {
                                                 <input
                                                     type={passwordVisible ? 'text' : 'password'}
                                                     className="form-control"
-                                                    id="newPassword"
-                                                    placeholder="Nhập mật khẩu mới"
-                                                    required
+                                                    id="password"
+                                                    placeholder="Nhập mật khẩu"
+                                                    {...register('password', {
+                                                        required: 'Mật khẩu là bắt buộc',
+                                                        minLength: {
+                                                            value: 8,
+                                                            message: 'Mật khẩu phải có ít nhất 8 ký tự'
+                                                        },
+                                                        pattern: {
+                                                            value: /^(?=.*[A-Z])(?=.*[!@#$%^&*])/,
+                                                            message: 'Mật khẩu phải bao gồm ít nhất một chữ in hoa và một ký tự đặc biệt'
+                                                        }
+                                                    })}
                                                 />
                                                 <span className="input-group-text" onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
                                                     <i className={passwordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'} aria-hidden="true"></i>
                                                 </span>
                                             </div>
+                                            {errors.password && <p className="text-danger">{errors.password.message}</p>}
                                         </div>
+
+                                        {loading && <Spinner />}
+                                        {error && <p className="text-danger">{error}</p>}
+                                        {serverError && <p className="text-danger">{serverError}</p>}
 
                                         <div className="d-grid gap-2">
                                             <button type="submit" className="btn btn-primary btn-block rounded-pill">Đăng nhập</button>

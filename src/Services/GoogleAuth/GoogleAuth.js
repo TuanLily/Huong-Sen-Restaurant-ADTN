@@ -14,6 +14,7 @@ const API_KEY = 'AIzaSyBynwFp7WrjoZRIFlirnb71apWgoU4XiiY';
 const GoogleAuth = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [dataLoaded, setDataLoaded] = useState(false);
     const dispatch = useDispatch();
     const authState = useSelector(state => state.auth);
     const navigate = useNavigate();
@@ -51,6 +52,13 @@ const GoogleAuth = () => {
         }
     }, [authState.error]);
 
+    useEffect(() => {
+        if (dataLoaded) {
+            // navigate('/'); // Điều hướng đến trang chủ khi dữ liệu đã tải thành công
+            window.location.href = '/';
+        }
+    }, [dataLoaded, navigate]);
+
     const handleLogin = async () => {
         setLoading(true);
         try {
@@ -67,7 +75,8 @@ const GoogleAuth = () => {
                 dispatch(fetchGoogleAuth(userData));
                 setIsLoggedIn(true);
                 setLoading(false);
-                navigate('/');
+                setDataLoaded(true); // Đánh dấu dữ liệu đã tải thành công
+
             } else {
                 console.error('Google Auth instance not initialized');
                 setLoading(false);
@@ -104,7 +113,6 @@ const GoogleAuth = () => {
         </div>
     );
 };
-
 
 export default GoogleAuth;
 

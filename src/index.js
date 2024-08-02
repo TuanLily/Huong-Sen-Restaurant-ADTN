@@ -10,16 +10,19 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './Store/Store';
+import { UserProvider } from './Context/UserContext';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <Provider store={store}>
-    <React.StrictMode>
+    <UserProvider>
       <Router>
-        <App />
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
       </Router>
-    </React.StrictMode>
+    </UserProvider>
   </Provider>
 );
 

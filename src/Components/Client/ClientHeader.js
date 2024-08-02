@@ -1,20 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
+import { useUser } from '../../Context/UserContext';
 
 export default function ClientHeader() {
-  const [user, setUser] = useState(null);
+  const { user, setUser } = useUser();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-  }, []);
+  }, [setUser]);
 
   const handleLogout = () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('accessToken');
     setUser(null);
   };
+
+  const truncateName = (name, maxLength) => {
+    return name.length > maxLength ? name.slice(0, maxLength) + '...' : name;
+  };
+
 
   return (
     <div>
@@ -47,7 +54,7 @@ export default function ClientHeader() {
             <div className="dropdown ms-2">
               <button className="btn dropdown-toggle d-flex align-items-center rounded-pill" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: 'rgb(254,161,21', border: '1px solid rgb(35,36,50)' }}>
                 <img src={user.avatar} alt="Avatar" className="rounded-circle me-2" style={{ width: '30px', height: '30px' }} />
-                {user.fullname}
+                <span style={{color: 'black'}}> {truncateName(user.fullname, 10)} </span>
               </button>
               <ul className="dropdown-menu rounded-3" aria-labelledby="dropdownMenuButton">
                 <li><Link className="dropdown-item" to="/profile">Thông tin tài khoản</Link></li>

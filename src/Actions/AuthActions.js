@@ -71,6 +71,27 @@ export const fetchGoogleAuth = (userData) => {
     };
 };
 
+export const fetchLogin = (email, password) => {
+    return async dispatch => {
+        dispatch(fetchAuthRequest());
+        try {
+            const response = await axios.post(`${API_ENDPOINT}/auth/login`, { email, password });
+            if (response.status === 200) {
+                const data = response.data;
+                console.log(data)
+                dispatch(fetchAuthSuccess(data));
+                // Lưu thông tin người dùng vào localStorage
+                localStorage.setItem('user', JSON.stringify(data.user)); // Lưu toàn bộ đối tượng data
+                localStorage.setItem('accessToken', data.accessToken);
+            } else {
+                dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
+            }
+        } catch (error) {
+            dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
+        }
+    };
+};
+
 
 // export const addCustomer = (customer) => {
 //     return dispatch => {
