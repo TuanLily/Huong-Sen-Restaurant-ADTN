@@ -92,6 +92,26 @@ export const fetchLogin = (email, password) => {
     };
 };
 
+export const addNewCustomer = (customerData) => {
+    return async dispatch => {
+        dispatch(fetchAuthRequest());
+        try {
+            // Gửi dữ liệu đến API
+            const response = await axios.post(`${API_ENDPOINT}/auth/register`, customerData);
+            if (response.status === 201) { // Đăng ký thành công, thường thì mã trạng thái là 201
+                const data = response.data;
+                console.log(data);
+                dispatch(fetchAuthSuccess(data));
+            } else {
+                dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
+            }
+        } catch (error) {
+            // Xử lý lỗi nếu có
+            dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
+        }
+    };
+};
+
 
 // export const addCustomer = (customer) => {
 //     return dispatch => {

@@ -117,7 +117,7 @@ export default function Login() {
 
                                         <div className="text-center mt-3">
                                             <span>Quên </span>
-                                            <a href="/forgot-password" className="link-primary">Tài khoản / Mật khẩu?</a>
+                                            <Link to="/forgot-password" className="link-primary">Tài khoản / Mật khẩu?</Link>
                                         </div>
 
                                         <div className="text-center mt-3">

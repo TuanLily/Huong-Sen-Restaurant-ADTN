@@ -1,30 +1,72 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import ImageUploadComponent from '../../../Components/ImageUpload/ImageUpload';
+import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { addNewCustomer } from '../../../Actions/AuthActions';
+import { DangerAlert, SuccessAlert } from '../../../Components/Alert/Alert';
+import Spinner from '../../../Components/Client/Spinner';
 
 export default function Register() {
+    const { handleSubmit, register, formState: { errors }, watch } = useForm();
+
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+    const [avatar, setAvatar] = useState('');
+    const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
+    const [openDangerAlert, setOpenDangerAlert] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const password = watch('password');
+
 
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);
     };
 
-    const toggleCofirmPasswordVisibility = () => {
+    const toggleConfirmPasswordVisibility = () => {
         setConfirmPasswordVisible(!confirmPasswordVisible);
+    };
+
+    const handleImageUpload = (fileNames) => {
+        if (fileNames.length > 0) {
+            setAvatar(fileNames[0]);
+        }
+    };
+
+
+    const onSubmit = async (data) => {
+        const customerData = { ...data, avatar };
+
+        setIsSubmitting(true); // Hiển thị spinner
+
+        try {
+            await dispatch(addNewCustomer(customerData));
+            setOpenSuccessAlert(true);
+            setTimeout(() => {
+                navigate('/login'); // Chuyển hướng đến trang đăng nhập
+            }, 3000); // Hiển thị thông báo thành công trong 3 giây
+        } catch (error) {
+            setOpenDangerAlert(true);
+            console.error('Đăng ký thất bại:', error.message);
+        } finally {
+            setIsSubmitting(false); // Ẩn spinner
+        }
     };
 
     return (
         <div>
-            <div className="container-xxl py-5 bg-dark hero-header mb-5">
-            </div>
+            <div className="container-xxl py-5 bg-dark hero-header mb-5"></div>
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-8">
                         <div className="card rounded-3 shadow d-flex flex-row">
                             <div className="col-md-12 p-3">
                                 <div className="card-body">
-                                    <form>
+                                    <form onSubmit={handleSubmit(onSubmit)}>
                                         <h2 className="text-center mb-4">Đăng ký tài khoản thành viên</h2>
                                         <div className='row'>
                                             <div className='col-md-6'>
@@ -34,8 +76,16 @@ export default function Register() {
                                                         <span className="input-group-text">
                                                             <i className="fa fa-user" aria-hidden="true"></i>
                                                         </span>
-                                                        <input type="text" className="form-control" id="fullname" placeholder="Nhập họ và tên" required />
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="fullname"
+                                                            placeholder="Nhập họ và tên"
+                                                            {...register('fullname', { required: 'Họ và tên là bắt buộc' })}
+                                                        />
+
                                                     </div>
+                                                    {errors.fullname && <p className="text-danger">{errors.fullname.message}</p>}
                                                 </div>
                                             </div>
                                             <div className='col-md-6'>
@@ -45,19 +95,35 @@ export default function Register() {
                                                         <span className="input-group-text">
                                                             <i className="fa fa-envelope" aria-hidden="true"></i>
                                                         </span>
-                                                        <input type="email" className="form-control" id="email" placeholder="Nhập Email" required />
+                                                        <input
+                                                            type="email"
+                                                            className="form-control"
+                                                            id="email"
+                                                            placeholder="Nhập Email"
+                                                            {...register('email', {
+                                                                required: 'Email là bắt buộc',
+                                                                pattern: {
+                                                                    value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+                                                                    message: 'Email không hợp lệ',
+                                                                },
+                                                            })}
+                                                        />
+
                                                     </div>
+                                                    {errors.email && <p className="text-danger">{errors.email.message}</p>}
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className="form-group mb-3">
-                                            <label htmlFor="avatar-upload" className="form-label">Ảnh đại diện</label>
+                                            <label htmlFor="avatar" className="form-label">Ảnh đại diện</label>
                                             <div className="input-group">
-                                                <ImageUploadComponent id="avatar-upload" />
+                                                <ImageUploadComponent
+                                                    id="avatar"
+                                                    onImageUpload={handleImageUpload}
+                                                />
                                             </div>
                                         </div>
-
 
                                         <div className='row'>
                                             <div className='col-md-6'>
@@ -67,8 +133,21 @@ export default function Register() {
                                                         <span className="input-group-text">
                                                             <i className="fa fa-phone" aria-hidden="true"></i>
                                                         </span>
-                                                        <input type="tel" className="form-control" id="tel" placeholder="Nhập số điện thoại" required />
+                                                        <input
+                                                            type="tel"
+                                                            className="form-control"
+                                                            id="tel"
+                                                            placeholder="Nhập số điện thoại"
+                                                            {...register('tel', {
+                                                                required: 'Số điện thoại là bắt buộc',
+                                                                pattern: {
+                                                                    value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+                                                                    message: 'Số điện thoại không không đúng định dạng',
+                                                                },
+                                                            })}
+                                                        />
                                                     </div>
+                                                    {errors.tel && <p className="text-danger">{errors.tel.message}</p>}
                                                 </div>
                                             </div>
                                             <div className='col-md-6'>
@@ -78,8 +157,16 @@ export default function Register() {
                                                         <span className="input-group-text">
                                                             <i className="fa fa-home" aria-hidden="true"></i>
                                                         </span>
-                                                        <input type="text" className="form-control" id="address" placeholder="Nhập địa chỉ" required />
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="address"
+                                                            placeholder="Nhập địa chỉ"
+                                                            {...register('address', { required: 'Địa chỉ là bắt buộc' })}
+                                                        />
+
                                                     </div>
+                                                    {errors.address && <p className="text-danger">{errors.address.message}</p>}
                                                 </div>
                                             </div>
                                         </div>
@@ -94,14 +181,26 @@ export default function Register() {
                                                         <input
                                                             type={passwordVisible ? 'text' : 'password'}
                                                             className="form-control"
-                                                            id="newPassword"
+                                                            id="password"
                                                             placeholder="Nhập mật khẩu mới"
-                                                            required
+                                                            {...register('password', {
+                                                                required: 'Mật khẩu là bắt buộc',
+                                                                minLength: {
+                                                                    value: 8,
+                                                                    message: 'Mật khẩu phải có ít nhất 8 ký tự',
+                                                                },
+                                                                pattern: {
+                                                                    value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+                                                                    message: 'Mật khẩu phải bao gồm số và ký tự đặc biệt',
+                                                                },
+                                                            })}
                                                         />
                                                         <span className="input-group-text" onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
                                                             <i className={passwordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'} aria-hidden="true"></i>
                                                         </span>
+
                                                     </div>
+                                                    {errors.password && <p className="text-danger">{errors.password.message}</p>}
                                                 </div>
                                             </div>
                                             <div className='col-md-6'>
@@ -114,13 +213,17 @@ export default function Register() {
                                                         <input
                                                             type={confirmPasswordVisible ? 'text' : 'password'}
                                                             className="form-control"
-                                                            id="newPassword"
+                                                            id="confirm-password"
                                                             placeholder="Nhập mật khẩu xác nhận"
-                                                            required
+                                                            {...register('confirmPassword', {
+                                                                required: 'Mật khẩu xác nhận là bắt buộc',
+                                                                validate: (value) => value === password || 'Mật khẩu xác nhận không khớp',
+                                                            })}
                                                         />
-                                                        <span className="input-group-text" onClick={toggleCofirmPasswordVisibility} style={{ cursor: 'pointer' }}>
+                                                        <span className="input-group-text" onClick={toggleConfirmPasswordVisibility} style={{ cursor: 'pointer' }}>
                                                             <i className={confirmPasswordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'} aria-hidden="true"></i>
                                                         </span>
+                                                        {errors.confirmPassword && <p className="text-danger">{errors.confirmPassword.message}</p>}
                                                     </div>
                                                 </div>
                                             </div>
@@ -146,6 +249,21 @@ export default function Register() {
                     </div>
                 </div>
             </div>
+            <div>
+                {isSubmitting && <Spinner />} {/* Hiển thị spinner nếu đang tải */}
+                <SuccessAlert
+                    open={openSuccessAlert}
+                    onClose={() => setOpenSuccessAlert(false)}
+                    message="Đăng ký thành công!"
+                />
+                <DangerAlert
+                    open={openDangerAlert}
+                    onClose={() => setOpenDangerAlert(false)}
+                    message="Đăng ký thất bại, vui lòng thử lại!"
+                />
+                {/* Các thành phần khác của form đăng ký */}
+            </div>
         </div>
+
     )
 }
