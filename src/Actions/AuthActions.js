@@ -8,6 +8,7 @@ export const SHOW_ERROR_ALERT = 'SHOW_ERROR_ALERT';
 
 import { API_ENDPOINT } from "../Config/Client/APIs";
 import ClientConfigRoute from '../Config/Client/routes';
+import apiIntercepClient from "../Config/Client/Api.Interceptors";
 
 export const fetchAuthRequest = () => ({
     type: FETCH_AUTH_REQUEST
@@ -82,18 +83,41 @@ export const fetchGoogleAuth = (userData) => {
     };
 };
 
+// export const fetchLogin = (email, password) => {
+//     return async dispatch => {
+//         dispatch(fetchAuthRequest());
+//         try {
+//             const response = await axios.post(`${API_ENDPOINT}/auth/login`, { email, password });
+//             if (response.status === 200) {
+//                 const data = response.data;
+//                 console.log(data)
+//                 dispatch(fetchAuthSuccess(data));
+//                 // Lưu thông tin người dùng vào localStorage
+//                 localStorage.setItem('user', JSON.stringify(data.user)); // Lưu toàn bộ đối tượng data
+//                 localStorage.setItem('accessToken', data.accessToken);
+//             } else {
+//                 dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
+//             }
+//         } catch (error) {
+//             dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
+//         }
+//     };
+// };
+
 export const fetchLogin = (email, password) => {
     return async dispatch => {
         dispatch(fetchAuthRequest());
         try {
-            const response = await axios.post(`${API_ENDPOINT}/auth/login`, { email, password });
+            const response = await apiIntercepClient.post('/auth/login', { email, password });
             if (response.status === 200) {
                 const data = response.data;
-                console.log(data)
+                console.log(data);
                 dispatch(fetchAuthSuccess(data));
                 // Lưu thông tin người dùng vào localStorage
                 localStorage.setItem('user', JSON.stringify(data.user)); // Lưu toàn bộ đối tượng data
                 localStorage.setItem('accessToken', data.accessToken);
+                // Kiểm tra lại sau khi lưu
+                console.log("Stored token:", localStorage.getItem('accessToken'));
             } else {
                 dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
             }

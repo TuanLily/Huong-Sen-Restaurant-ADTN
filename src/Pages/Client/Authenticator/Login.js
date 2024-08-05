@@ -12,24 +12,31 @@ export default function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [serverError, setServerError] = useState(''); // Sử dụng state để lưu trữ lỗi từ máy chủ
+    const [loading, setLoading] = useState(false); // Local loading state
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const loginState = useSelector(state => state.auth);
-    const { loading, error } = loginState; // Lấy trạng thái đăng nhập và lỗi từ Redux store
+    const { error } = loginState; // Get error from Redux store
 
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible); // Thay đổi trạng thái hiển thị mật khẩu
     };
 
     const onSubmit = async (data) => {
+        setLoading(true); // Start spinner
         try {
             await dispatch(fetchLogin(data.email, data.password)); // Thực hiện đăng nhập với dữ liệu đã được xác thực
 
-            // navigate('/'); // Điều chỉnh URL phù hợp với ứng dụng của bạn
-            window.location.href = '/'; 
+            // Wait for 2 seconds to show spinner before redirecting
+            setTimeout(() => {
+                setLoading(false); // Stop spinner
+                window.location.href = '/';
+                // navigate('/'); // Redirect to home page
+            }, 2000);
         } catch (err) {
+            setLoading(false); // Stop spinner
             setServerError(err.message || 'Đăng nhập thất bại'); // Lưu trữ lỗi từ máy chủ
         }
     };
@@ -112,7 +119,9 @@ export default function Login() {
                                         {serverError && <p className="text-danger">{serverError}</p>}
 
                                         <div className="d-grid gap-2">
-                                            <button type="submit" className="btn btn-primary btn-block rounded-pill">Đăng nhập</button>
+                                            <button type="submit" className="btn btn-primary btn-block rounded-pill" disabled={loading}>
+                                                {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                                            </button>
                                         </div>
 
                                         <div className="text-center mt-3">
@@ -142,10 +151,7 @@ export default function Login() {
                         </div>
                     </div>
                 </div>
-
             </div>
-
-
         </div>
-    )
+    );
 }

@@ -12,20 +12,16 @@ const CLIENT_ID = '951595549566-p3mihmpipb7go6loejm0hfq7t55chr5r.apps.googleuser
 const API_KEY = 'AIzaSyBynwFp7WrjoZRIFlirnb71apWgoU4XiiY';
 
 const GoogleAuth = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [dataLoaded, setDataLoaded] = useState(false);
     const dispatch = useDispatch();
     const authState = useSelector(state => state.auth);
     const navigate = useNavigate();
     const [alertOpen, setAlertOpen] = useState(false);
 
     useEffect(() => {
-        // Kiểm tra localStorage khi ứng dụng khởi động
         const user = localStorage.getItem('user');
         if (user) {
             dispatch(fetchAuthSuccess(JSON.parse(user)));
-            setIsLoggedIn(true);
         }
 
         const initClient = async () => {
@@ -36,8 +32,6 @@ const GoogleAuth = () => {
                         clientId: CLIENT_ID,
                         scope: 'email'
                     });
-                    const authInstance = gapi.auth2.getAuthInstance();
-                    setIsLoggedIn(authInstance.isSignedIn.get());
                 });
             } catch (error) {
                 console.error('Error initializing Google API client', error);
@@ -49,15 +43,13 @@ const GoogleAuth = () => {
     useEffect(() => {
         if (authState.error) {
             setAlertOpen(true);
-        }
-    }, [authState.error]);
-
-    useEffect(() => {
-        if (dataLoaded) {
-            // navigate('/'); // Điều hướng đến trang chủ khi dữ liệu đã tải thành công
+            setLoading(false);
+        } else if (authState.auth) {
+            setLoading(false); // Dừng spinner khi người dùng đã đăng nhập
             window.location.href = '/';
+            // navigate('/');
         }
-    }, [dataLoaded, navigate]);
+    }, [authState, navigate]);
 
     const handleLogin = async () => {
         setLoading(true);
@@ -72,11 +64,7 @@ const GoogleAuth = () => {
                     avatar: profile.getImageUrl()
                 };
 
-                dispatch(fetchGoogleAuth(userData));
-                setIsLoggedIn(true);
-                setLoading(false);
-                setDataLoaded(true); // Đánh dấu dữ liệu đã tải thành công
-
+                await dispatch(fetchGoogleAuth(userData));
             } else {
                 console.error('Google Auth instance not initialized');
                 setLoading(false);
@@ -96,13 +84,12 @@ const GoogleAuth = () => {
             {loading ? (
                 <Spinner />
             ) : (
-                <button className='google-btn d-flex justify-content-center align-items-center' onClick={handleLogin}>
+                <button className="google-btn d-flex justify-content-center align-items-center" onClick={handleLogin}>
                     <img src={logoGoogle} alt="Google Logo" className="google-icon" />
                     Đăng nhập với Google
                 </button>
             )}
 
-            {/* Sử dụng DangerAlert để hiển thị lỗi */}
             <DangerAlert
                 open={alertOpen}
                 onClose={handleCloseAlert}
