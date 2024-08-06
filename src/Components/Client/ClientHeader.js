@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useUser } from '../../Context/UserContext';
 import normalAvatar from '../../Assets/Client/Images/default-avatar.png';
 
@@ -27,30 +27,30 @@ export default function ClientHeader() {
   return (
     <div>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4 px-lg-5 py-3 py-lg-0">
-        <Link to="/" className="navbar-brand p-0 d-flex align-items-center">
+        <NavLink to="/" className="navbar-brand p-0 d-flex align-items-center">
           <img src="../../Assets/Client/Images/huong-sen-logo.png" alt="Logo" className="mr-2" />
           <h3 className="ff-secondary text-start text-primary fw-normal m-0">Hương Sen</h3>
-        </Link>
+        </NavLink>
         <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
           <span className="fa fa-bars"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarCollapse">
           <div className="navbar-nav ms-auto py-0 pe-4">
-            <Link to="/" className="nav-item nav-link">Trang chủ</Link>
-            <Link to="/menu" className="nav-item nav-link">Thực đơn</Link>
-            <Link to="/service" className="nav-item nav-link">Dịch vụ</Link>
-            <Link to="/menu" className="nav-item nav-link">Tin tức & Mẹo hay</Link>
+            <NavLink to="/" className="nav-item nav-link" activeClassName="active">Trang chủ</NavLink>
+            <NavLink to="/menu" className="nav-item nav-link" activeClassName="active">Thực đơn</NavLink>
+            <NavLink to="/service" className="nav-item nav-link" activeClassName="active">Dịch vụ</NavLink>
+            <NavLink to="/news" className="nav-item nav-link" activeClassName="active">Tin tức & Mẹo hay</NavLink>
             <div className="nav-item dropdown">
               <Link to="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">Khác</Link>
               <div className="dropdown-menu m-0">
-                <Link to="/about" className="dropdown-item">Về chúng tôi</Link>
-                <Link to="/contact" className="dropdown-item">Liên hệ</Link>
+                <NavLink to="/about" className="dropdown-item" activeClassName="active">Về chúng tôi</NavLink>
+                <NavLink to="/contact" className="dropdown-item" activeClassName="active">Liên hệ</NavLink>
               </div>
             </div>
           </div>
-          <Link to="/booking" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1 me-1" style={{ color: 'black' }}>
+          <NavLink to="/booking" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1 me-1" style={{ color: 'black' }}>
             Đặt bàn
-          </Link>
+          </NavLink>
           {user ? (
             <div className="dropdown ms-2">
               <button
@@ -62,7 +62,7 @@ export default function ClientHeader() {
                 style={{
                   backgroundColor: 'rgb(254,161,21)',
                   border: '1px solid rgb(35,36,50)',
-                  padding: 0,  // Bỏ khoảng trống
+                  padding: 0,
                   width: '40px',
                   height: '40px'
                 }}
@@ -75,24 +75,23 @@ export default function ClientHeader() {
                   onError={(e) => (e.target.src = normalAvatar)}
                 />
               </button>
-              <ul className="dropdown-menu dropdown-menu-end rounded-3"
-                aria-labelledby="dropdownMenuButton">
+              <ul className="dropdown-menu dropdown-menu-end rounded-3" aria-labelledby="dropdownMenuButton">
                 <li className="dropdown-header">
                   <strong>{truncateName(user.fullname, 15)}</strong>
                 </li>
-                <li><Link className="dropdown-item" to="/account">Thông tin tài khoản</Link></li>
-                <li><Link className="dropdown-item" to="/my-orders">Đơn hàng của tôi</Link></li>
-                <li><Link className="dropdown-item" to="/my-bookings">Đơn đặt bàn của tôi</Link></li>
+                <li><NavLink className="dropdown-item" to="/account" activeClassName="active">Thông tin tài khoản</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/my-orders" activeClassName="active">Đơn hàng của tôi</NavLink></li>
+                <li><NavLink className="dropdown-item" to="/my-bookings" activeClassName="active">Đơn đặt bàn của tôi</NavLink></li>
                 <li><button className="dropdown-item" onClick={handleLogout}>Đăng xuất</button></li>
               </ul>
             </div>
           ) : (
-            <Link to="/login" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1" style={{ color: 'black' }}>
+            <NavLink to="/login" className="btn btn-primary btn-sm rounded py-2 px-4 ms-1" style={{ color: 'black' }}>
               <i className="fa-solid fa-user"></i> Đăng nhập
-            </Link>
+            </NavLink>
           )}
         </div>
-      </nav >
-    </div >
+      </nav>
+    </div>
   )
 }
