@@ -10,6 +10,7 @@ const ClientRoutes = {
     service: '/service',
     booking: '/booking',
     detailproduct: '/detail-product',
+    account: '/account',
 
 };
 

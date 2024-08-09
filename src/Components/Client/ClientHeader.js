@@ -57,7 +57,7 @@ export default function ClientHeader() {
                 <span style={{color: 'black'}}> {truncateName(user.fullname, 10)} </span>
               </button>
               <ul className="dropdown-menu rounded-3" aria-labelledby="dropdownMenuButton">
-                <li><Link className="dropdown-item" to="/profile">Thông tin tài khoản</Link></li>
+                <li><Link className="dropdown-item" to="/account">Thông tin tài khoản</Link></li>
                 <li><Link className="dropdown-item" to="/my-orders">Đơn hàng của tôi</Link></li>
                 <li><Link className="dropdown-item" to="/my-bookings">Đơn đặt bàn của tôi</Link></li>
                 <li><button className="dropdown-item" onClick={handleLogout}>Đăng xuất</button></li>
