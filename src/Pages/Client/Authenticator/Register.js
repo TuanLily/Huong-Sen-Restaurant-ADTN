@@ -3,12 +3,12 @@ import { Link, useNavigate } from 'react-router-dom'
 import ImageUploadComponent from '../../../Components/ImageUpload/ImageUpload';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { addNewCustomer } from '../../../Actions/AuthActions';
+import { addNewCustomer, checkEmailExists } from '../../../Actions/AuthActions';
 import { DangerAlert, SuccessAlert } from '../../../Components/Alert/Alert';
 import Spinner from '../../../Components/Client/Spinner';
 
 export default function Register() {
-    const { handleSubmit, register, formState: { errors }, watch } = useForm();
+    const { handleSubmit, register, formState: { errors }, watch, setError } = useForm();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
@@ -37,23 +37,44 @@ export default function Register() {
         }
     };
 
+    // Hàm kiểm tra email có tồn tại trên hệ thống chưa.
+    const validateEmailExists = async (email) => {
+        try {
+            const user = await checkEmailExists(email);
+            if (user) {
+                setError('email', {
+                    type: 'manual',
+                    message: 'Email đã tồn tại trên hệ thống',
+                });
+                return false;
+            }
+            return true;
+        } catch (error) {
+            console.error('Error checking email:', error);
+            return false;
+        }
+    };
+
 
     const onSubmit = async (data) => {
+        const emailIsValid = await validateEmailExists(data.email);
+        if (!emailIsValid) return;
+
         const customerData = { ...data, avatar };
 
-        setIsSubmitting(true); // Hiển thị spinner
+        setIsSubmitting(true);
 
         try {
             await dispatch(addNewCustomer(customerData));
             setOpenSuccessAlert(true);
             setTimeout(() => {
-                navigate('/login'); // Chuyển hướng đến trang đăng nhập
-            }, 3000); // Hiển thị thông báo thành công trong 3 giây
+                navigate('/login'); // Điều hướng đến trang đăng nhập
+            }, 3000);
         } catch (error) {
             setOpenDangerAlert(true);
             console.error('Đăng ký thất bại:', error.message);
         } finally {
-            setIsSubmitting(false); // Ẩn spinner
+            setIsSubmitting(false);
         }
     };
 

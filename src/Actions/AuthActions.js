@@ -35,19 +35,7 @@ export const showErrorAlert = (message) => ({
 });
 
 // Hàm để kiểm tra người dùng trong cơ sở dữ liệu
-// const checkUserExists = async (email) => {
-//     try {
-//         const response = await axios.get(`${API_ENDPOINT}/auth/login-google`, {
-//             params: { email }
-//         });
-//         return response.data.user;
-//     } catch (error) {
-//         console.error('Error checking user existence', error);
-//         throw error;
-//     }
-// };
-
-const checkUserExists = async (email) => {
+export const checkEmailExists = async (email) => {
     try {
         const response = await axios.get(`${API_ENDPOINT}/auth/check-email`, { params: { email } });
         return response.data.exists ? response.data.user : null;

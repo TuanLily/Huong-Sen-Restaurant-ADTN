@@ -45,9 +45,11 @@ const GoogleAuth = () => {
             setAlertOpen(true);
             setLoading(false);
         } else if (authState.auth) {
-            setLoading(false); // Dừng spinner khi người dùng đã đăng nhập
-            window.location.href = '/';
-            // navigate('/');
+            setLoading(false);
+            navigate('/');
+            setTimeout(() => {
+                window.location.reload();
+            }, 0);
         }
     }, [authState, navigate]);
 

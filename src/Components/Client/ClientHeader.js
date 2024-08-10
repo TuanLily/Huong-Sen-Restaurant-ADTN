@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { useUser } from '../../Context/UserContext';
+import normalAvatar from '../../Assets/Client/Images/default-avatar.png';
 
 export default function ClientHeader() {
   const { user, setUser } = useUser();
@@ -52,11 +53,33 @@ export default function ClientHeader() {
           </Link>
           {user ? (
             <div className="dropdown ms-2">
-              <button className="btn dropdown-toggle d-flex align-items-center rounded-pill" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style={{ backgroundColor: 'rgb(254,161,21', border: '1px solid rgb(35,36,50)' }}>
-                <img src={user.avatar} alt="Avatar" className="rounded-circle me-2" style={{ width: '30px', height: '30px' }} />
-                <span style={{color: 'black'}}> {truncateName(user.fullname, 10)} </span>
+              <button
+                className="btn dropdown-toggle d-flex align-items-center rounded-circle"
+                type="button"
+                id="dropdownMenuButton"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                style={{
+                  backgroundColor: 'rgb(254,161,21)',
+                  border: '1px solid rgb(35,36,50)',
+                  padding: 0,  // Bỏ khoảng trống
+                  width: '40px',
+                  height: '40px'
+                }}
+              >
+                <img
+                  src={user.avatar || normalAvatar}
+                  alt="Avatar"
+                  className="rounded-circle"
+                  style={{ width: '100%', height: '100%' }}
+                  onError={(e) => (e.target.src = normalAvatar)}
+                />
               </button>
-              <ul className="dropdown-menu rounded-3" aria-labelledby="dropdownMenuButton">
+              <ul className="dropdown-menu dropdown-menu-end rounded-3"
+                aria-labelledby="dropdownMenuButton">
+                <li className="dropdown-header">
+                  <strong>{truncateName(user.fullname, 15)}</strong>
+                </li>
                 <li><Link className="dropdown-item" to="/account">Thông tin tài khoản</Link></li>
                 <li><Link className="dropdown-item" to="/my-orders">Đơn hàng của tôi</Link></li>
                 <li><Link className="dropdown-item" to="/my-bookings">Đơn đặt bàn của tôi</Link></li>
