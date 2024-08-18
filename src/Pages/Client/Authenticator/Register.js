@@ -80,7 +80,7 @@ export default function Register() {
 
     return (
         <div>
-            <div className="container-xxl py-5 bg-dark hero-header mb-5"></div>
+            <div className="container-fluid py-5 bg-dark hero-header mb-5"></div>
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-8">

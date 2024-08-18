@@ -56,7 +56,7 @@ export default function ChangePassword() {
 
     return (
         <div>
-            <div className="container-xxl py-5 bg-dark hero-header mb-5">
+            <div className="container-fluid py-5 bg-dark hero-header mb-5">
             </div>
             <div className="container">
                 <div className="row justify-content-center">
