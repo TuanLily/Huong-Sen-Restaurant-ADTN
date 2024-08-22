@@ -39,7 +39,7 @@ export default function ClientHeader() {
             <NavLink to="/" className="nav-item nav-link" activeClassName="active">Trang chủ</NavLink>
             <NavLink to="/menu" className="nav-item nav-link" activeClassName="active">Thực đơn</NavLink>
             <NavLink to="/service" className="nav-item nav-link" activeClassName="active">Dịch vụ</NavLink>
-            <NavLink to="/news" className="nav-item nav-link" activeClassName="active">Tin tức & Mẹo hay</NavLink>
+            <NavLink to="/blog" className="nav-item nav-link" activeClassName="active">Tin tức & Mẹo hay</NavLink>
             <div className="nav-item dropdown">
               <Link to="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">Khác</Link>
               <div className="dropdown-menu m-0">

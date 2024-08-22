@@ -11,6 +11,7 @@ const ClientRoutes = {
     booking: '/booking',
     detailproduct: '/detail-product',
     account: '/account',
+    blog: '/blog',
 
 };
 
