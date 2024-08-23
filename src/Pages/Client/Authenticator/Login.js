@@ -21,19 +21,23 @@ export default function Login() {
     const { error } = loginState;
 
     const togglePasswordVisibility = () => {
-        setPasswordVisible(!passwordVisible); 
+        setPasswordVisible(!passwordVisible);
     };
 
     const onSubmit = async (data) => {
-        setLoading(true); // Start spinner
+        setLoading(true);
         try {
             await dispatch(fetchLogin(data.email, data.password));
-            setLoading(false); 
+            setLoading(false);
 
-            setTimeout(() => {
+            const user = localStorage.getItem('user');
+            const accessToken = localStorage.getItem('accessToken');
+
+            if (user && accessToken) {
                 window.location.href = '/';
-                // navigate('/'); 
-            }, 2000);
+            } else {
+                setServerError('Thiếu thông tin người dùng hoặc access token. Vui lòng thử lại.');
+            }
         } catch (err) {
             setLoading(false);
             setServerError(err.message || 'Đăng nhập thất bại');

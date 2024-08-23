@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_ENDPOINT } from "../Config/Client/APIs";
+import { API_DATA, API_ENDPOINT } from "../Config/Client/APIs";
 
 export const FETCH_USER_REQUEST = 'FETCH_USER_REQUEST';
 export const FETCH_USER_SUCCESS = 'FETCH_USER_SUCCESS';
@@ -43,7 +43,7 @@ export const checkPasswordFailure = error => ({
 export const fetchUser = () => {
     return dispatch => {
         dispatch(fetchUserRequest());
-        axios.get(`${API_ENDPOINT}/customer`)
+        axios.get(`${API_ENDPOINT}${API_DATA.users}`)
             .then(response => {
                 const user = response.data.results;
                 dispatch(fetchUserSuccess(user));
@@ -58,7 +58,7 @@ export const fetchUser = () => {
 export const checkPassword = (email, currentPassword) => {
     return dispatch => {
         dispatch(checkPasswordRequest());
-        return axios.post(`${API_ENDPOINT}/customer/check-password`, { email, currentPassword })
+        return axios.post(`${API_ENDPOINT}${API_DATA.checkPassword}`, { email, currentPassword })
             .then(response => {
                 dispatch(checkPasswordSuccess(response.data.message));
                 return response.data.message; // Trả về thông báo mật khẩu đúng/sai
@@ -78,7 +78,7 @@ export const updateProfile = (id, data) => {
     return (dispatch) => {
         dispatch(fetchUserRequest());
         console.log('Update profile action ID:', id); // Kiểm tra giá trị id
-        axios.patch(`${API_ENDPOINT}/customer/${id}`, data)
+        axios.patch(`${API_ENDPOINT}${API_DATA.users}/${id}`, data)
             .then((response) => {
                 console.log(response);
                 dispatch(fetchUserSuccess(response.data.data));

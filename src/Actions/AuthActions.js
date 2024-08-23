@@ -6,8 +6,7 @@ export const FETCH_AUTH_FAILURE = 'FETCH_AUTH_FAILURE';
 export const SHOW_SUCCESS_ALERT = 'SHOW_SUCCESS_ALERT';
 export const SHOW_ERROR_ALERT = 'SHOW_ERROR_ALERT';
 
-import { API_ENDPOINT } from "../Config/Client/APIs";
-import apiIntercepClient from "../Config/Client/Api.Interceptors";
+import { API_DATA, API_ENDPOINT } from "../Config/Client/APIs";
 
 export const fetchAuthRequest = () => ({
     type: FETCH_AUTH_REQUEST
@@ -51,60 +50,35 @@ export const fetchGoogleAuth = (userData) => {
     return async dispatch => {
         dispatch(fetchAuthRequest());
         try {
-            // Gọi API để đăng nhập hoặc đăng ký người dùng Google
-            const response = await axios.get(`${API_ENDPOINT}/auth/login-google`, {
-                params: { email: userData.email }
-            });
-
-            const { user, accessToken } = response.data;
-
-            // Lưu thông tin người dùng và accessToken vào localStorage
-            localStorage.setItem('user', JSON.stringify(user));
-            localStorage.setItem('accessToken', accessToken);
-
-            // Dispatch thành công với thông tin người dùng
-            dispatch(fetchAuthSuccess(user));
+            const response = await axios.post(`${API_ENDPOINT}${API_DATA.authOGoogle}`, userData);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchAuthSuccess(data));
+                // Lưu thông tin người dùng vào localStorage
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('accessToken', data.accessToken);
+            } else {
+                dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
+            }
         } catch (error) {
-            dispatch(fetchAuthFailure(error.message));
+            dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
         }
     };
 };
 
-// export const fetchLogin = (email, password) => {
-//     return async dispatch => {
-//         dispatch(fetchAuthRequest());
-//         try {
-//             const response = await axios.post(`${API_ENDPOINT}/auth/login`, { email, password });
-//             if (response.status === 200) {
-//                 const data = response.data;
-//                 console.log(data)
-//                 dispatch(fetchAuthSuccess(data));
-//                 // Lưu thông tin người dùng vào localStorage
-//                 localStorage.setItem('user', JSON.stringify(data.user)); // Lưu toàn bộ đối tượng data
-//                 localStorage.setItem('accessToken', data.accessToken);
-//             } else {
-//                 dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
-//             }
-//         } catch (error) {
-//             dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
-//         }
-//     };
-// };
+
 
 export const fetchLogin = (email, password) => {
     return async dispatch => {
         dispatch(fetchAuthRequest());
         try {
-            const response = await apiIntercepClient.post('/auth/login', { email, password });
+            const response = await axios.post(`${API_ENDPOINT}${API_DATA.login}`, { email, password });
             if (response.status === 200) {
                 const data = response.data;
                 console.log(data);
                 dispatch(fetchAuthSuccess(data));
-                // Lưu thông tin người dùng vào localStorage
-                localStorage.setItem('user', JSON.stringify(data.user)); // Lưu toàn bộ đối tượng data
+                localStorage.setItem('user', JSON.stringify(data.user));
                 localStorage.setItem('accessToken', data.accessToken);
-                // Kiểm tra lại sau khi lưu
-                console.log("Stored token:", localStorage.getItem('accessToken'));
             } else {
                 dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
             }
@@ -119,7 +93,7 @@ export const addNewCustomer = (customerData) => {
         dispatch(fetchAuthRequest());
         try {
             // Gửi dữ liệu đến API
-            const response = await axios.post(`${API_ENDPOINT}/auth/register`, customerData);
+            const response = await axios.post(`${API_ENDPOINT}${API_DATA.register}`, customerData);
             if (response.status === 201) { // Đăng ký thành công, thường thì mã trạng thái là 201
                 const data = response.data;
                 console.log(data);
@@ -139,7 +113,7 @@ export const forgotPassword = (email) => {
         dispatch(fetchAuthRequest());
         try {
             // Gửi dữ liệu đến API
-            const response = await axios.post(`${API_ENDPOINT}/auth/forgot-password`, { email });
+            const response = await axios.post(`${API_ENDPOINT}${API_DATA.forgotPassword}`, { email });
             if (response.status === 200) { // Yêu cầu thành công, mã trạng thái là 200
                 const data = response.data;
                 console.log(data)
@@ -161,7 +135,7 @@ export const changePassword = (token, newPassword) => {
     return async dispatch => {
         dispatch(fetchAuthRequest());
         try {
-            const response = await axios.post(`${API_ENDPOINT}/auth/change-password`, { token, newPassword });
+            const response = await axios.post(`${API_ENDPOINT}${API_DATA.changePassword}`, { token, newPassword });
             if (response.status === 200) {
                 const data = response.data;
                 console.log(data)

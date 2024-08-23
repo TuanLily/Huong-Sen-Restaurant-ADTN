@@ -46,10 +46,6 @@ const GoogleAuth = () => {
             setLoading(false);
         } else if (authState.auth) {
             setLoading(false);
-            navigate('/');
-            setTimeout(() => {
-                window.location.reload();
-            }, 0);
         }
     }, [authState, navigate]);
 
@@ -67,15 +63,25 @@ const GoogleAuth = () => {
                 };
 
                 await dispatch(fetchGoogleAuth(userData));
+
+                const storedUser = localStorage.getItem('user');
+                const accessToken = localStorage.getItem('accessToken');
+
+                if (storedUser && accessToken) {
+                    window.location.href = '/';
+                } else {
+                    console.error('Thiếu thông tin người dùng hoặc access token. Vui lòng thử lại.');
+                }
             } else {
                 console.error('Google Auth instance not initialized');
-                setLoading(false);
             }
         } catch (error) {
             console.error('Error during sign-in', error);
+        } finally {
             setLoading(false);
         }
     };
+
 
     const handleCloseAlert = () => {
         setAlertOpen(false);

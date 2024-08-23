@@ -178,7 +178,6 @@ function Account() {
                     severity: 'success'
                 });
 
-                navigate(0);
             }
         } catch (error) {
             console.error(error);
