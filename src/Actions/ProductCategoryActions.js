@@ -1,10 +1,10 @@
-import axios from "axios";
 
 export const FETCH_PRODUCT_CATEGORY_REQUEST = 'FETCH_PRODUCT_CATEGORY_REQUEST';
 export const FETCH_PRODUCT_CATEGORY_SUCCESS = 'FETCH_PRODUCT_CATEGORY_SUCCESS';
 export const FETCH_PRODUCT_CATEGORY_FAILURE = 'FETCH_PRODUCT_CATEGORY_FAILURE';
 
 import { API_ENDPOINT, API_DATA } from "../Config/Client/APIs";
+import http from "../Utils/Http";
 
 export const fetchProductCategoryRequest = () => ({
     type: FETCH_PRODUCT_CATEGORY_REQUEST
@@ -23,7 +23,7 @@ export const fetchProductCategoryFailure = error => ({
 export const fetchProductCategory = () => {
     return dispatch => {
         dispatch(fetchProductCategoryRequest());
-        axios.get(`${API_ENDPOINT}/${API_DATA.categoryProduct}`)
+        http.get(`${API_ENDPOINT}/${API_DATA.categoryProduct}`)
             .then(response => {
                 const product_category = response.data.results;
                 dispatch(fetchProductCategorySuccess(product_category));

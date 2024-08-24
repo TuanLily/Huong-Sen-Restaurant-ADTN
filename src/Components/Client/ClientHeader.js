@@ -80,7 +80,6 @@ export default function ClientHeader() {
                   <strong>{truncateName(user.fullname, 15)}</strong>
                 </li>
                 <li><NavLink className="dropdown-item" to="/account" activeClassName="active">Thông tin tài khoản</NavLink></li>
-                <li><NavLink className="dropdown-item" to="/my-orders" activeClassName="active">Đơn hàng của tôi</NavLink></li>
                 <li><NavLink className="dropdown-item" to="/my-bookings" activeClassName="active">Đơn đặt bàn của tôi</NavLink></li>
                 <li><button className="dropdown-item" onClick={handleLogout}>Đăng xuất</button></li>
               </ul>

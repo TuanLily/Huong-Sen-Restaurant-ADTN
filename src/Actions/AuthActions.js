@@ -1,5 +1,3 @@
-import axios from "axios";
-
 export const FETCH_AUTH_REQUEST = 'FETCH_AUTH_REQUEST';
 export const FETCH_AUTH_SUCCESS = 'FETCH_AUTH_SUCCESS';
 export const FETCH_AUTH_FAILURE = 'FETCH_AUTH_FAILURE';
@@ -7,6 +5,7 @@ export const SHOW_SUCCESS_ALERT = 'SHOW_SUCCESS_ALERT';
 export const SHOW_ERROR_ALERT = 'SHOW_ERROR_ALERT';
 
 import { API_DATA, API_ENDPOINT } from "../Config/Client/APIs";
+import http from "../Utils/Http";
 
 export const fetchAuthRequest = () => ({
     type: FETCH_AUTH_REQUEST
@@ -36,7 +35,7 @@ export const showErrorAlert = (message) => ({
 // Hàm để kiểm tra người dùng trong cơ sở dữ liệu
 export const checkEmailExists = async (email) => {
     try {
-        const response = await axios.get(`${API_ENDPOINT}/auth/check-email`, { params: { email } });
+        const response = await http.get(`${API_ENDPOINT}/auth/check-email`, { params: { email } });
         return response.data.exists ? response.data.user : null;
     } catch (error) {
         console.error('Error checking user existence:', error);
@@ -50,7 +49,7 @@ export const fetchGoogleAuth = (userData) => {
     return async dispatch => {
         dispatch(fetchAuthRequest());
         try {
-            const response = await axios.post(`${API_ENDPOINT}${API_DATA.authOGoogle}`, userData);
+            const response = await http.post(`${API_ENDPOINT}${API_DATA.authOGoogle}`, userData);
             if (response.status === 200) {
                 const data = response.data;
                 dispatch(fetchAuthSuccess(data));
@@ -72,7 +71,7 @@ export const fetchLogin = (email, password) => {
     return async dispatch => {
         dispatch(fetchAuthRequest());
         try {
-            const response = await axios.post(`${API_ENDPOINT}${API_DATA.login}`, { email, password });
+            const response = await http.post(`${API_ENDPOINT}${API_DATA.login}`, { email, password });
             if (response.status === 200) {
                 const data = response.data;
                 console.log(data);
@@ -93,7 +92,7 @@ export const addNewCustomer = (customerData) => {
         dispatch(fetchAuthRequest());
         try {
             // Gửi dữ liệu đến API
-            const response = await axios.post(`${API_ENDPOINT}${API_DATA.register}`, customerData);
+            const response = await http.post(`${API_ENDPOINT}${API_DATA.register}`, customerData);
             if (response.status === 201) { // Đăng ký thành công, thường thì mã trạng thái là 201
                 const data = response.data;
                 console.log(data);
@@ -113,7 +112,7 @@ export const forgotPassword = (email) => {
         dispatch(fetchAuthRequest());
         try {
             // Gửi dữ liệu đến API
-            const response = await axios.post(`${API_ENDPOINT}${API_DATA.forgotPassword}`, { email });
+            const response = await http.post(`${API_ENDPOINT}${API_DATA.forgotPassword}`, { email });
             if (response.status === 200) { // Yêu cầu thành công, mã trạng thái là 200
                 const data = response.data;
                 console.log(data)
@@ -135,7 +134,7 @@ export const changePassword = (token, newPassword) => {
     return async dispatch => {
         dispatch(fetchAuthRequest());
         try {
-            const response = await axios.post(`${API_ENDPOINT}${API_DATA.changePassword}`, { token, newPassword });
+            const response = await http.post(`${API_ENDPOINT}${API_DATA.changePassword}`, { token, newPassword });
             if (response.status === 200) {
                 const data = response.data;
                 console.log(data)
