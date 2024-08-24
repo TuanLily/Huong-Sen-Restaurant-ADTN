@@ -13,6 +13,7 @@ import Booking from '../../Pages/Client/Booking';
 import DetailProduct from '../../Pages/Client/DetailProduct';
 import Account from '../../Pages/Client/Account';
 import Blog from '../../Pages/Client/Blog';
+import DetailBlog from '../../Pages/Client/DetailBlog';
 
 
 
@@ -32,6 +33,7 @@ const publicClientRoutes = [
     { path: ClientConfig.routes.detailproduct, component: DetailProduct },
     { path: ClientConfig.routes.account, component: Account },
     { path: ClientConfig.routes.blog, component: Blog },
+    { path: ClientConfig.routes.detailblog, component: DetailBlog },
 
 ];
 

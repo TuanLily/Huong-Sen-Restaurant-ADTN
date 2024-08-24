@@ -12,7 +12,7 @@ const ClientRoutes = {
     detailproduct: '/detail-product',
     account: '/account',
     blog: '/blog',
-
+    detailblog: '/detail-blog'
 };
 
 export default ClientRoutes;
