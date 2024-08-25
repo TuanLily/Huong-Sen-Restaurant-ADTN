@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProduct } from '../../Actions/ProductActions';
+import { fetchProductHoatDong } from '../../Actions/ProductActions';
 import { Link } from 'react-router-dom';
 
 import ImageGallery from '../../Components/Client/ImageGallery';
@@ -10,7 +10,7 @@ function Home() {
     const productState = useSelector(state => state.product);
 
     useEffect(() => {
-        dispatch(fetchProduct());
+        dispatch(fetchProductHoatDong());
     }, [dispatch]);
 
     const formatPrice = (price) => {

@@ -34,3 +34,18 @@ export const fetchProduct = () => {
             });
     };
 };
+
+export const fetchProductHoatDong = () => {
+    return dispatch => {
+        dispatch(fetchProductRequest());
+        http.get(`${API_ENDPOINT}/${API_DATA.product}/hoat_dong`)
+            .then(response => {
+                const product = response.data.results;
+                dispatch(fetchProductSuccess(product));
+            })
+            .catch(error => {
+                const errorMsg = error.message;
+                dispatch(fetchProductFailure(errorMsg));
+            });
+    };
+};

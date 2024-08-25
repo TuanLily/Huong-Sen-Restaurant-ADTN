@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProductCategory } from '../../Actions/ProductCategoryActions';
-import { fetchProduct } from '../../Actions/ProductActions';
+import { fetchProductCategoryHoatDong } from '../../Actions/ProductCategoryActions';
+import { fetchProductHoatDong } from '../../Actions/ProductActions';
+import { Link } from 'react-router-dom';
 
 export default function Menu() {
   const dispatch = useDispatch();
@@ -9,8 +10,8 @@ export default function Menu() {
   const productState = useSelector(state => state.product);
 
   useEffect(() => {
-    dispatch(fetchProductCategory());
-    dispatch(fetchProduct());
+    dispatch(fetchProductCategoryHoatDong());
+    dispatch(fetchProductHoatDong());
   }, [dispatch]);
 
   const formatPrice = (price) => {
@@ -74,7 +75,11 @@ export default function Menu() {
                                   <span className="text-primary">{formatPrice(product.price - product.sale_price)}</span>
                                 </h5>
                                 <div className="d-flex justify-content-between">
-                                  <small className="fst-italic">{product.description}</small>
+                                  <Link
+                                    to="/detail-product"
+                                    className="btn btn-primary btn-sm py-2 px-3 me-3 animated slideInLeft">
+                                    Chi tiết
+                                  </Link>
                                   <span className="text-danger text-decoration-line-through">{formatPrice(product.price)}</span>
                                 </div>
                               </div>
@@ -85,7 +90,11 @@ export default function Menu() {
                                   <span className="text-primary">{formatPrice(product.price)}</span>
                                 </h5>
                                 <div className="d-flex justify-content-between">
-                                  <small className="fst-italic">{product.description}</small>
+                                  <Link
+                                    to="/detail-product"
+                                    className="btn btn-primary btn-sm py-2 px-3 me-3 animated slideInLeft">
+                                    Chi tiết
+                                  </Link>
                                 </div>
                               </div>
                             )}

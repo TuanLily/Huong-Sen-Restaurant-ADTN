@@ -34,3 +34,18 @@ export const fetchProductCategory = () => {
             });
     };
 };
+
+export const fetchProductCategoryHoatDong = () => {
+    return dispatch => {
+        dispatch(fetchProductCategoryRequest());
+        http.get(`${API_ENDPOINT}/${API_DATA.categoryProduct}/hoat_dong`)
+            .then(response => {
+                const product_category = response.data.results;
+                dispatch(fetchProductCategorySuccess(product_category));
+            })
+            .catch(error => {
+                const errorMsg = error.message;
+                dispatch(fetchProductCategoryFailure(errorMsg));
+            });
+    };
+};
