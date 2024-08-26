@@ -6,6 +6,7 @@ import Navbar from '../../Components/Client/Navbar';
 import ClientFooter from '../../Components/Client/ClientFooter';
 import BackToTop from '../../Components/Client/BackToTop';
 import Spinner from '../../Components/Client/Spinner';
+import ChatPopup from '../../Components/ChatPopup/ChatPopup';
 
 
 export default function ClientLayout() {
@@ -16,6 +17,7 @@ export default function ClientLayout() {
             <div className="content">
                 <Outlet />
             </div>
+            <ChatPopup/>
             <BackToTop/>
             <ClientFooter />
         </div>
