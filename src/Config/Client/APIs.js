@@ -1,6 +1,7 @@
 export const API_ENDPOINT = "http://localhost:6969/api";
 
 export const API_DATA = {
+  
     product: '/public/product',
     categoryProduct: '/public/category-product',
     users: '/users',
@@ -11,4 +12,5 @@ export const API_DATA = {
     forgotPassword: '/auth/forgot-password',
     changePassword: '/auth/change-password',
 
+    blog: '/public/blogs'
 }
