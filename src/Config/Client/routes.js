@@ -9,7 +9,7 @@ const ClientRoutes = {
     menu: '/menu',
     service: '/service',
     booking: '/booking',
-    detailproduct: '/detail-product',
+    detailproduct: '/product-detail/:slug.html',
     account: '/account',
     blog: '/blog',
     detailblog: '/detail-blog'

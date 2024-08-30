@@ -23,7 +23,7 @@ export const fetchBlogFailure = error => ({
 export const fetchBlog = () => {
     return dispatch => {
         dispatch(fetchBlogRequest());
-        axios.get(`${API_ENDPOINT}/${API_DATA.blog}`)
+        axios.get(`${API_ENDPOINT}${API_DATA.blog}`)
             .then(response => {
                 const blog = response.data.results;
                 dispatch(fetchBlogSuccess(blog));
