@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   IconButton,
@@ -8,41 +8,167 @@ import {
   Paper,
   Avatar,
   Slide,
+  Popover,
 } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
 import { deepOrange } from "@mui/material/colors";
+import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
+
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  serverTimestamp,
+  addDoc,
+  limit,
+  where,
+  onSnapshot,
+} from "firebase/firestore";
+import { db } from "../../Config/Client/Firebase";
+import UserInfoForm from "./UserInforForm";
+import EmojiPicker from "emoji-picker-react";
 
 function ChatPopup() {
   const [isOpen, setIsOpen] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  const [messages, setMessages] = useState([
-    {
-      text: "Tựu trường deal cực chiến, giảm sốc tới 60% cho S-student. Chat với e ngay hoặc xem chi tiết tại https://cps.onl/back-to-school",
-      timestamp: new Date(),
-      role: "admin",
-    },
-    {
-      text: "XIN CHÀO",
-      timestamp: new Date(),
-      role: "customer",
-    },
-  ]);
+  const [messages, setMessages] = useState([]);
+  const [userInfo, setUserInfo] = useState(() => {
+    const savedUserInfo = localStorage.getItem("userInfo");
+    return savedUserInfo ? JSON.parse(savedUserInfo) : null;
+  });
+  const [anchorEl, setAnchorEl] = useState(null);
 
-  const handleSendMessage = () => {
+  useEffect(() => {
+    let unsubscribe;
+
+    const fetchMessages = () => {
+      if (userInfo) {
+        const { fullname, tel } = userInfo;
+        const chatId = `${fullname}_${tel}`; // Tạo chatId duy nhất
+
+        const messagesCollection = collection(db, "messages");
+        const q = query(
+          messagesCollection,
+          where("chatId", "==", chatId),
+          orderBy("timestamp"),
+          limit(50)
+        );
+
+        unsubscribe = onSnapshot(q, (querySnapshot) => {
+          const fetchedMessages = querySnapshot.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+            timestamp: doc.data().timestamp?.toDate() || new Date(),
+          }));
+          setMessages(fetchedMessages);
+        });
+      }
+    };
+
+    fetchMessages();
+
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [userInfo]);
+
+  const formatMessageTimestamp = (timestamp) => {
+    const now = new Date();
+    const timeDifference = now - timestamp;
+    const minutesDifference = Math.floor(timeDifference / (1000 * 60));
+
+    if (minutesDifference < 1) {
+      return "Mới nhất";
+    } else if (minutesDifference < 60) {
+      return `${minutesDifference} phút trước`;
+    } else if (timeDifference < 24 * 60 * 60 * 1000) {
+      const hoursDifference = Math.floor(minutesDifference / 60);
+      return `${hoursDifference} giờ trước`;
+    } else {
+      return timestamp.toLocaleString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+    }
+  };
+
+  const handleSendMessage = async () => {
     if (newMessage.trim()) {
-      setMessages([
-        ...messages,
-        { text: newMessage, timestamp: new Date(), role: "customer" },
-      ]);
+      const chatId = `${userInfo.fullname}_${userInfo.tel}`;
+
+      const newMessageData = {
+        text: newMessage,
+        timestamp: new Date(),
+        role: "customer",
+        fullname: userInfo?.fullname || "Khách hàng",
+        tel: userInfo?.tel || "",
+        title: userInfo?.title || "Anh/Chị",
+        status: "sending",
+        uid: userInfo?.uid || "", // Thêm uid vào newMessageData
+        chatId: chatId,
+      };
+
+      setMessages((prevMessages) => [...prevMessages, newMessageData]);
       setNewMessage("");
+
+      try {
+        const docRef = await addDoc(collection(db, "messages"), {
+          ...newMessageData,
+          timestamp: serverTimestamp(),
+          status: "sent",
+        });
+
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.timestamp === newMessageData.timestamp
+              ? { ...msg, status: "sent", id: docRef.id }
+              : msg
+          )
+        );
+      } catch (error) {
+        console.error("Error sending message: ", error);
+      }
     }
   };
 
   const sortedMessages = [...messages].sort(
     (a, b) => b.timestamp - a.timestamp
   );
+
+  // *Hàm sử lý submit form nhập thông tin chat
+  const handleFormSubmit = (userData) => {
+    setUserInfo(userData);
+    setIsOpen(true);
+  };
+
+  //* Hàm để hủy hộp thoại nhập thông tin khi không muốn nhắn tin nữa
+  const handleCancel = () => {
+    setIsOpen(false);
+  };
+
+  const handleEmojiClick = (emojiObject) => {
+    setNewMessage((prevMessage) => prevMessage + emojiObject.emoji);
+  };
+
+  const handleEmojiButtonClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseEmoji = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  const id = open ? "emoji-popover" : undefined;
 
   return (
     <>
@@ -73,14 +199,36 @@ function ChatPopup() {
               color: "#000000",
             }}
           >
-            {" "}
-            {/* Giảm kích thước font */}
             Chat với nhân viên tư vấn
           </Typography>
         </Box>
       )}
 
-      {isOpen && (
+      {isOpen && !userInfo && (
+        <Slide direction="up" in={isOpen} mountOnEnter unmountOnExit>
+          <Box
+            sx={{
+              position: "fixed",
+              bottom: 0,
+              right: 0,
+              width: "350px",
+              height: "auto",
+              padding: "20px",
+              backgroundColor: "#fff",
+              borderRadius: "8px 8px 0 0",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              zIndex: 1000,
+            }}
+          >
+            <UserInfoForm
+              onFormSubmit={handleFormSubmit}
+              onCancel={handleCancel}
+            />
+          </Box>
+        </Slide>
+      )}
+
+      {isOpen && userInfo && (
         <Slide direction="up" in={isOpen} mountOnEnter unmountOnExit>
           <Paper
             sx={{
@@ -109,9 +257,11 @@ function ChatPopup() {
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Avatar sx={{ bgcolor: deepOrange[500], marginRight: "10px" }}>
-                  OP
-                </Avatar>
+                <Avatar
+                  sx={{ marginRight: "10px" }}
+                  src="../../Assets/Client/Images/huong-sen-logo.png"
+                />
+
                 <Box sx={{ display: "flex", flexDirection: "column" }}>
                   <Typography
                     variant="h6"
@@ -127,12 +277,14 @@ function ChatPopup() {
                   </Typography>
                 </Box>
               </Box>
-              <IconButton
-                sx={{ color: "white" }}
-                onClick={() => setIsOpen(false)}
-              >
-                <CloseIcon />
-              </IconButton>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
+                <IconButton
+                  sx={{ color: "white" }}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Box>
             </Box>
             <Box
               className="messages"
@@ -157,7 +309,7 @@ function ChatPopup() {
                       message.role === "admin" ? "#f0f0f0" : "#FEA115",
                     alignSelf:
                       message.role === "admin" ? "flex-start" : "flex-end",
-                    textAlign: message.role === "admin" ? "left" : "right",
+                    textAlign: message.role === "admin" ? "left" : "left",
                     maxWidth: "80%",
                     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                     position: "relative",
@@ -175,13 +327,9 @@ function ChatPopup() {
                       }}
                     >
                       <Avatar
-                        sx={{
-                          bgcolor: deepOrange[500],
-                          mr: 1,
-                        }}
-                      >
-                        OP
-                      </Avatar>
+                        sx={{ marginRight: "10px", mr: 1 }}
+                        src="../../Assets/Client/Images/huong-sen-logo.png"
+                      />
                       <Typography
                         variant="body1"
                         sx={{ fontWeight: "bold", color: "#ffa724" }}
@@ -192,7 +340,10 @@ function ChatPopup() {
                   )}
                   <Typography
                     variant="body1"
-                    sx={{ wordBreak: "break-word", overflowWrap: "break-word" }}
+                    sx={{
+                      wordBreak: "break-word",
+                      overflowWrap: "break-word",
+                    }}
                   >
                     {message.text}
                   </Typography>
@@ -204,26 +355,20 @@ function ChatPopup() {
                       bottom: -30,
                       right: 2,
                       color: "gray",
-                      width: "80px",
+                      width: "300px",
                       textAlign: "right",
                     }}
                   >
-                    {message.timestamp.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                    })}
+                    {`${
+                      message.status === "sending" ? "Đang gửi" : "Đã gửi"
+                    } • `}
+                    {formatMessageTimestamp(message.timestamp)}
                   </Typography>
                 </Box>
               ))}
             </Box>
-            <Box
-              sx={{
-                display: "flex",
-                padding: "10px",
-                borderTop: "1px solid #ddd",
-              }}
-            >
+            <hr />
+            <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
               <TextField
                 fullWidth
                 variant="outlined"
@@ -236,22 +381,32 @@ function ChatPopup() {
                     handleSendMessage();
                   }
                 }}
-                sx={{ mr: 1 }}
-              />
-              <Button
-                variant="contained"
                 sx={{
-                  backgroundColor: "#FEA115",
-                  color: "#000000",
-                  "&:hover": {
-                    backgroundColor: "#ffcb70",
+                  mr: 1,
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    border: "none",
                   },
-                  borderRadius: "8px",
                 }}
-                onClick={handleSendMessage}
+              />
+              <IconButton onClick={handleEmojiButtonClick} sx={{ mr: 1 }}>
+                <EmojiEmotionsIcon />
+              </IconButton>
+              <Popover
+                id={id}
+                open={open}
+                anchorEl={anchorEl}
+                onClose={handleCloseEmoji}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                transformOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
               >
-                <SendIcon sx={{ color: "#000000" }} />
-              </Button>
+                <EmojiPicker onEmojiClick={handleEmojiClick} />
+              </Popover>
             </Box>
           </Paper>
         </Slide>
