@@ -144,15 +144,19 @@ function ChatPopup() {
     (a, b) => b.timestamp - a.timestamp
   );
 
-  // *Hàm sử lý submit form nhập thông tin chat
-  const handleFormSubmit = (userData) => {
-    setUserInfo(userData);
+  const handleOpen = () => {
     setIsOpen(true);
   };
 
   //* Hàm để hủy hộp thoại nhập thông tin khi không muốn nhắn tin nữa
-  const handleCancel = () => {
+  const handleClose = () => {
     setIsOpen(false);
+  };
+
+  // *Hàm sử lý submit form nhập thông tin chat
+  const handleFormSubmit = (userData) => {
+    setUserInfo(userData);
+    setIsOpen(true);
   };
 
   const handleEmojiClick = (emojiObject) => {
@@ -189,7 +193,7 @@ function ChatPopup() {
             alignItems: "center",
             padding: "10px 15px",
           }}
-          onClick={() => setIsOpen(true)}
+          onClick={handleOpen}
         >
           <ChatIcon sx={{ mr: 1, fontSize: "15px" }} />
           <Typography
@@ -204,213 +208,206 @@ function ChatPopup() {
         </Box>
       )}
 
-      {isOpen && !userInfo && (
-        <Slide direction="up" in={isOpen} mountOnEnter unmountOnExit>
-          <Box
-            sx={{
-              position: "fixed",
-              bottom: 0,
-              right: 0,
-              width: "350px",
-              height: "auto",
-              padding: "20px",
-              backgroundColor: "#fff",
-              borderRadius: "8px 8px 0 0",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-              zIndex: 1000,
-            }}
-          >
-            <UserInfoForm
-              onFormSubmit={handleFormSubmit}
-              onCancel={handleCancel}
-            />
-          </Box>
-        </Slide>
-      )}
-
-      {isOpen && userInfo && (
-        <Slide direction="up" in={isOpen} mountOnEnter unmountOnExit>
-          <Paper
-            sx={{
-              position: "fixed",
-              bottom: 0,
-              right: 0,
-              width: "350px",
-              height: "500px",
-              borderRadius: "8px 8px 0 0",
-              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-              zIndex: 999,
-              display: "flex",
-              flexDirection: "column",
-              overflow: "hidden",
-            }}
-            elevation={3}
-          >
-            <Box
+      <Slide direction="up" in={isOpen} mountOnEnter unmountOnExit>
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 0,
+            right: 0,
+            width: "350px",
+            height: userInfo ? "500px" : "auto",
+            maxHeight: "80vh",
+            backgroundColor: "#fff",
+            borderRadius: "8px 8px 0 0",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2) !important",
+            zIndex: 1000,
+            overflow: "hidden",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {!userInfo ? (
+            <Box sx={{ padding: "20px" }}>
+              <UserInfoForm
+                onFormSubmit={handleFormSubmit}
+                onCancel={handleClose}
+              />
+            </Box>
+          ) : (
+            <Paper
               sx={{
-                backgroundColor: "#FEA115",
-                color: "white",
-                padding: "10px",
+                height: "100%",
                 display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                flexDirection: "column",
+                overflow: "hidden",
               }}
+              elevation={3}
             >
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Avatar
-                  sx={{ marginRight: "10px" }}
-                  src="../../Assets/Client/Images/huong-sen-logo.png"
-                />
+              <Box
+                sx={{
+                  backgroundColor: "#FEA115",
+                  color: "white",
+                  padding: "10px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Avatar
+                    sx={{ marginRight: "10px" }}
+                    src="../../Assets/Client/Images/huong-sen-logo.png"
+                  />
 
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <Typography
-                    variant="h6"
-                    sx={{ fontWeight: "bold", color: "white" }}
-                  >
-                    Xin chào!
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "black", fontSize: "12px" }}
-                  >
-                    Mình cần nhà hàng hỗ trợ gì ạ?
-                  </Typography>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: "bold", color: "white" }}
+                    >
+                      Xin chào!
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "black", fontSize: "12px" }}
+                    >
+                      Mình cần nhà hàng hỗ trợ gì ạ?
+                    </Typography>
+                  </Box>
+                </Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
+                  <IconButton sx={{ color: "white" }} onClick={handleClose}>
+                    <CloseIcon />
+                  </IconButton>
                 </Box>
               </Box>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0 }}>
-                <IconButton
-                  sx={{ color: "white" }}
-                  onClick={() => setIsOpen(false)}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </Box>
-            </Box>
-            <Box
-              className="messages"
-              sx={{
-                flexGrow: 1,
-                overflowY: "auto",
-                padding: "10px",
-                display: "flex",
-                flexDirection: "column-reverse",
-              }}
-            >
-              {sortedMessages.map((message, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    mb: 4,
-                    p: 2,
-                    borderRadius: 1,
-                    backgroundColor:
-                      message.role === "admin" ? "#f0f0f0" : "#FEA115",
-                    alignSelf:
-                      message.role === "admin" ? "flex-start" : "flex-end",
-                    textAlign: message.role === "admin" ? "left" : "left",
-                    maxWidth: "80%",
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                    position: "relative",
-                    wordBreak: "break-word",
-                    overflowWrap: "break-word",
-                  }}
-                >
-                  {message.role === "admin" && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        mb: 1,
-                        alignSelf: "flex-start",
-                      }}
-                    >
-                      <Avatar
-                        sx={{ marginRight: "10px", mr: 1 }}
-                        src="../../Assets/Client/Images/huong-sen-logo.png"
-                      />
-                      <Typography
-                        variant="body1"
-                        sx={{ fontWeight: "bold", color: "#ffa724" }}
-                      >
-                        Nhà Hàng Hương Sen
-                      </Typography>
-                    </Box>
-                  )}
-                  <Typography
-                    variant="body1"
+              <Box
+                className="messages"
+                sx={{
+                  flexGrow: 1,
+                  overflowY: "auto",
+                  padding: "10px",
+                  display: "flex",
+                  flexDirection: "column-reverse",
+                }}
+              >
+                {sortedMessages.map((message, index) => (
+                  <Box
+                    key={index}
                     sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      mb: 4,
+                      p: 2,
+                      borderRadius: 1,
+                      backgroundColor:
+                        message.role === "admin" ? "#f0f0f0" : "#FEA115",
+                      alignSelf:
+                        message.role === "admin" ? "flex-start" : "flex-end",
+                      textAlign: message.role === "admin" ? "left" : "left",
+                      maxWidth: "80%",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                      position: "relative",
                       wordBreak: "break-word",
                       overflowWrap: "break-word",
                     }}
                   >
-                    {message.text}
-                  </Typography>
+                    {message.role === "admin" && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          mb: 1,
+                          alignSelf: "flex-start",
+                        }}
+                      >
+                        <Avatar
+                          sx={{ marginRight: "10px", mr: 1 }}
+                          src="../../Assets/Client/Images/huong-sen-logo.png"
+                        />
+                        <Typography
+                          variant="body1"
+                          sx={{ fontWeight: "bold", color: "#ffa724" }}
+                        >
+                          Nhà Hàng Hương Sen
+                        </Typography>
+                      </Box>
+                    )}
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                      }}
+                    >
+                      {message.text}
+                    </Typography>
 
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      position: "absolute",
-                      bottom: -30,
-                      right: 2,
-                      color: "gray",
-                      width: "300px",
-                      textAlign: "right",
-                    }}
-                  >
-                    {`${
-                      message.status === "sending" ? "Đang gửi" : "Đã gửi"
-                    } • `}
-                    {formatMessageTimestamp(message.timestamp)}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-            <hr />
-            <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-              <TextField
-                fullWidth
-                variant="outlined"
-                size="small"
-                placeholder="Nhập nội dung..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleSendMessage();
-                  }
-                }}
-                sx={{
-                  mr: 1,
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    border: "none",
-                  },
-                }}
-              />
-              <IconButton onClick={handleEmojiButtonClick} sx={{ mr: 1 }}>
-                <EmojiEmotionsIcon />
-              </IconButton>
-              <Popover
-                id={id}
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handleCloseEmoji}
-                anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "right",
-                }}
-                transformOrigin={{
-                  vertical: "bottom",
-                  horizontal: "right",
-                }}
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        position: "absolute",
+                        bottom: -30,
+                        right: 2,
+                        color: "gray",
+                        width: "300px",
+                        textAlign: "right",
+                      }}
+                    >
+                      {`${
+                        message.status === "sending" ? "Đang gửi" : "Đã gửi"
+                      } • `}
+                      {formatMessageTimestamp(message.timestamp)}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+              <hr />
+              <Box
+                sx={{ display: "flex", alignItems: "center", width: "100%" }}
               >
-                <EmojiPicker onEmojiClick={handleEmojiClick} />
-              </Popover>
-            </Box>
-          </Paper>
-        </Slide>
-      )}
+                <TextField
+                  fullWidth
+                  variant="outlined"
+                  size="small"
+                  placeholder="Nhập nội dung..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSendMessage();
+                    }
+                  }}
+                  sx={{
+                    mr: 1,
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      border: "none",
+                    },
+                  }}
+                />
+                <IconButton onClick={handleEmojiButtonClick} sx={{ mr: 1 }}>
+                  <EmojiEmotionsIcon />
+                </IconButton>
+                <Popover
+                  id={id}
+                  open={open}
+                  anchorEl={anchorEl}
+                  onClose={handleCloseEmoji}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  transformOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right",
+                  }}
+                >
+                  <EmojiPicker onEmojiClick={handleEmojiClick} />
+                </Popover>
+              </Box>
+            </Paper>
+          )}
+        </Box>
+      </Slide>
     </>
   );
 }

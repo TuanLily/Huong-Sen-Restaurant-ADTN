@@ -113,17 +113,22 @@ function Account() {
             await dispatch(updateProfile(userId, updatedProfile));
             localStorage.setItem('user', JSON.stringify(updatedProfile));
 
-            // Lưu trạng thái thông báo vào localStorage
-            localStorage.setItem('profileUpdateStatus', 'success');
+            setAlert({
+                open: true,
+                message: 'Cập nhật thông tin thành công!',
+                severity: 'success'
+            });
 
-            navigate(0);
+            // Cập nhật state profile
+            setProfile(updatedProfile);
 
         } catch (error) {
             console.error('Error updating profile:', error);
-            // Lưu trạng thái thông báo lỗi vào localStorage
-            localStorage.setItem('profileUpdateStatus', 'error');
-            navigate(0);
-
+            setAlert({
+                open: true,
+                message: 'Cập nhật thông tin thất bại!',
+                severity: 'error'
+            });
         }
     };
 
