@@ -5,8 +5,7 @@ import {
     fetchWards,
 } from "../../Services/LocationService/LocationService";
 
-const AddressSelector = ({ onChange }) => {
-    // State cho các danh sách và giá trị đã chọn
+const AddressSelector = ({ onChange, initialAddress }) => {
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
@@ -21,6 +20,39 @@ const AddressSelector = ({ onChange }) => {
             setProvinces(data);
         }).catch(console.error);
     }, []);
+
+    // Handle initialAddress
+    useEffect(() => {
+        if (initialAddress && typeof initialAddress === 'string') {
+            const addressParts = initialAddress.split(', ').reverse();
+            if (addressParts.length >= 4) {
+                const [province, district, ward, ...streetParts] = addressParts;
+                setStreetAddress(streetParts.reverse().join(', '));
+
+                // Tìm và set province
+                const foundProvince = provinces.find(p => p.name === province);
+                if (foundProvince) {
+                    setSelectedProvince(foundProvince.code);
+                    // Fetch districts sau khi tìm thấy province
+                    fetchDistricts(foundProvince.code).then(districtData => {
+                        setDistricts(districtData);
+                        const foundDistrict = districtData.find(d => d.name === district);
+                        if (foundDistrict) {
+                            setSelectedDistrict(foundDistrict.code);
+                            // Fetch wards sau khi tìm thấy district
+                            fetchWards(foundDistrict.code).then(wardData => {
+                                setWards(wardData);
+                                const foundWard = wardData.find(w => w.name === ward);
+                                if (foundWard) {
+                                    setSelectedWard(foundWard.code);
+                                }
+                            }).catch(console.error);
+                        }
+                    }).catch(console.error);
+                }
+            }
+        }
+    }, [initialAddress, provinces]);
 
     // Fetch danh sách quận/huyện khi tỉnh/thành phố thay đổi
     useEffect(() => {
@@ -46,17 +78,24 @@ const AddressSelector = ({ onChange }) => {
 
     // Cập nhật địa chỉ đầy đủ khi có bất kỳ thay đổi nào
     useEffect(() => {
-        const province = provinces.find(p => p.code.toString() === selectedProvince.toString())?.name || "";
-        const district = districts.find(d => d.code.toString() === selectedDistrict.toString())?.name || "";
-        const ward = wards.find(w => w.code.toString() === selectedWard.toString())?.name || "";
+        const getNameFromCode = (array, code) => array.find(item => item.code.toString() === code?.toString())?.name || "";
+
+        const province = getNameFromCode(provinces, selectedProvince);
+        const district = getNameFromCode(districts, selectedDistrict);
+        const ward = getNameFromCode(wards, selectedWard);
+
+        const fullAddress = [streetAddress, ward, district, province]
+            .filter(Boolean)
+            .join(", ")
+            .trim();
 
         // Gọi hàm onChange để cập nhật giá trị trong component cha
         onChange({
-            province,
-            district,
-            ward,
+            province: selectedProvince,
+            district: selectedDistrict,
+            ward: selectedWard,
             streetAddress,
-            fullAddress: `${streetAddress}, ${ward}, ${district}, ${province}`.replace(/^,\s*/, "").replace(/,\s*,/g, ",").trim()
+            fullAddress
         });
     }, [selectedProvince, selectedDistrict, selectedWard, streetAddress, onChange, provinces, districts, wards]);
 
@@ -65,12 +104,9 @@ const AddressSelector = ({ onChange }) => {
         <>
             {/* Dropdown cho tỉnh/thành phố */}
             <select
-                className="form-select mb-2"
+                className="form-select mb-1"
                 value={selectedProvince}
-                onChange={(e) => {
-                    const newValue = e.target.value;
-                    setSelectedProvince(newValue);
-                }}
+                onChange={(e) => setSelectedProvince(e.target.value)}
             >
                 <option value="">Chọn Tỉnh/Thành phố</option>
                 {provinces.map((province) => (
@@ -82,12 +118,9 @@ const AddressSelector = ({ onChange }) => {
 
             {/* Dropdown cho quận/huyện */}
             <select
-                className="form-select mb-2"
+                className="form-select mb-1"
                 value={selectedDistrict}
-                onChange={(e) => {
-                    const newValue = e.target.value;
-                    setSelectedDistrict(newValue);
-                }}
+                onChange={(e) => setSelectedDistrict(e.target.value)}
             >
                 <option value="">Chọn Quận/Huyện</option>
                 {districts.map((district) => (
@@ -99,12 +132,9 @@ const AddressSelector = ({ onChange }) => {
 
             {/* Dropdown cho phường/xã */}
             <select
-                className="form-select mb-2"
+                className="form-select mb-1"
                 value={selectedWard}
-                onChange={(e) => {
-                    const newValue = e.target.value;
-                    setSelectedWard(newValue);
-                }}
+                onChange={(e) => setSelectedWard(e.target.value)}
             >
                 <option value="">Chọn Phường/Xã</option>
                 {wards.map((ward) => (

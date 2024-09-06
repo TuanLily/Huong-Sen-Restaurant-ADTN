@@ -8,6 +8,8 @@ import Spinner from '../../Components/Client/Spinner';
 
 import { jwtDecode as jwt_decode } from 'jwt-decode';
 import { DangerAlert, SuccessAlert } from '../../Components/Alert/Alert';
+import AddressSelector from '../../Components/Location/AddressSelector';
+import normalAvatar from '../../Assets/Client/Images/default-avatar.png';
 
 
 function Account() {
@@ -43,7 +45,18 @@ function Account() {
     const [initialAvatar, setInitialAvatar] = useState(null);
     const [initialPassword, setInitialPassword] = useState('');
 
+    const [fullAddress, setFullAddress] = useState('');
 
+
+    useEffect(() => {
+        if (profile.address) {
+            setFullAddress(profile.address);
+        }
+    }, [profile.address]);
+
+    const handleAddressChange = (newAddress) => {
+        setFullAddress(newAddress.fullAddress);
+    };
 
     const togglePasswordVisibility = (field) => {
         setShowPassword((prevState) => ({
@@ -102,11 +115,8 @@ function Account() {
         }
 
         const updatedProfile = {
-            fullname: data.fullname || profile.fullname,
-            email: data.email || profile.email,
-            tel: data.tel || profile.tel,
-            address: data.address || profile.address,
-            avatar: data.avatar || profile.avatar
+            ...data,
+            address: fullAddress // Sử dụng fullAddress thay vì data.address
         };
 
         try {
@@ -224,7 +234,7 @@ function Account() {
                             <div className="row g-4">
                                 <div className="col-md-4">
                                     <div className="bg-white p-4 rounded text-center">
-                                        <img src={profile.avatar} alt="Avatar" className="img-fluid rounded-circle mb-3" width={140} />
+                                        <img src={profile.avatar || normalAvatar} alt="Avatar" className="img-fluid rounded-circle mb-3" width={140} />
                                         <br />
                                         <h5 className="section-title ff-secondary fw-normal text-primary">Họ và Tên</h5>
                                         <p>{profile.fullname}</p>
@@ -232,6 +242,8 @@ function Account() {
                                         <p>{profile.email}</p>
                                         <h5 className="section-title ff-secondary fw-normal text-primary">Số Điện Thoại</h5>
                                         <p>{profile.tel}</p>
+                                        <h5 className="section-title ff-secondary fw-normal text-primary">Địa chỉ</h5>
+                                        <p>{profile.address}</p>
                                         <button className="btn btn-danger w-100 mt-3" onClick={() => handleLogout()}>Đăng Xuất</button>
                                     </div>
                                 </div>
@@ -257,10 +269,9 @@ function Account() {
                                     <div className="tab-content p-4 bg-white rounded-bottom">
                                         {activeTab === 'updateInfo' && (
                                             <form onSubmit={handleSubmit(handleUpdateProfile)}>
-                                                <div className="row g-3">
-
+                                                <div className="row">
                                                     <div className="col-md-6">
-                                                        <div className="form-floating">
+                                                        <div className="form-floating mb-3">
                                                             <input
                                                                 type="text"
                                                                 className="form-control"
@@ -271,23 +282,18 @@ function Account() {
                                                             <label htmlFor="fullname">Họ và Tên</label>
                                                             {errors.fullname && <span className="text-danger">{errors.fullname.message}</span>}
                                                         </div>
-                                                    </div>
-                                                    <div className="col-md-6">
-                                                        <div className="form-floating">
+                                                        <div className="form-floating mb-3">
                                                             <input
                                                                 type="email"
                                                                 className="form-control"
                                                                 id="email"
                                                                 placeholder="Email"
-                                                                defaultValue={profile.email}
                                                                 {...register('email', { required: "Email là bắt buộc" })}
                                                             />
                                                             <label htmlFor="email">Email</label>
                                                             {errors.email && <span className="text-danger">{errors.email.message}</span>}
                                                         </div>
-                                                    </div>
-                                                    <div className="col-md-6">
-                                                        <div className="form-floating">
+                                                        <div className="form-floating mb-3">
                                                             <input
                                                                 type="tel"
                                                                 className="form-control"
@@ -304,33 +310,29 @@ function Account() {
                                                             <label htmlFor="tel">Số Điện Thoại</label>
                                                             {errors.tel && <p className="text-danger">{errors.tel.message}</p>}
                                                         </div>
-                                                    </div>
-                                                    <div className="col-md-6">
-                                                        <div className="form-floating">
-                                                            <input
-                                                                type="text"
-                                                                className="form-control"
-                                                                id="address"
-                                                                placeholder="Địa Chỉ"
-                                                                {...register('address', { required: 'Địa chỉ là bắt buộc' })}
-                                                            />
-                                                            <label htmlFor="address">Địa Chỉ</label>
-                                                            {errors.address && <p className="text-danger">{errors.address.message}</p>}
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-md-8">
-                                                        <div className="form-floating">
-                                                            <label htmlFor="avatar">Avatar</label>
+                                                        <div className="mb-3">
+                                                            <label htmlFor="avatar">Ảnh đại diện</label>
                                                             <ImageUploadComponent
                                                                 id="avatar"
                                                                 onImageUpload={handleImageUpload}
                                                             />
                                                         </div>
                                                     </div>
-                                                    <div className="col-12">
+                                                    <div className="col-md-6">
+                                                        <div className='form-floating'>
+                                                            <label htmlFor="address" style={{ marginTop: -10, opacity: '50%' }}>Địa chỉ</label>
+                                                            <AddressSelector
+                                                                onChange={handleAddressChange}
+                                                                initialAddress={profile.address}
+                                                            />
+                                                            {errors.address && <p className="text-danger">{errors.address.message}</p>}
+                                                        </div>
+
+                                                    </div>
+                                                    <div className="col-12 mt-3">
                                                         <button className="btn btn-primary w-100 py-3 rounded-pill" type="submit">Cập Nhật</button>
                                                     </div>
-                                                    <div className="col-12">
+                                                    <div className="col-12 mt-2">
                                                         <button className="btn btn-secondary w-100 py-3 rounded-pill" type="reset">Đặt Lại</button>
                                                     </div>
                                                 </div>

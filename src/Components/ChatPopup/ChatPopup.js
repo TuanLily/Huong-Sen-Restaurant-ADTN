@@ -30,6 +30,7 @@ import {
 import { db } from "../../Config/Client/Firebase";
 import UserInfoForm from "./UserInforForm";
 import EmojiPicker from "emoji-picker-react";
+import { Link } from "react-router-dom";
 
 function ChatPopup() {
   const [isOpen, setIsOpen] = useState(false);
@@ -138,6 +139,32 @@ function ChatPopup() {
         console.error("Error sending message: ", error);
       }
     }
+  };
+
+  // Hàm mới để chuyển đổi URL thành link có thể nhấp được
+  const convertLinksToJSX = (text) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, index) => {
+      if (part.match(urlRegex)) {
+        return (
+          <Link
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              wordBreak: "break-all",
+              color: "#003b9c",
+              textDecoration: "underline",
+            }}
+          >
+            {part}
+          </Link>
+        );
+      }
+      return part;
+    });
   };
 
   const sortedMessages = [...messages].sort(
@@ -339,7 +366,7 @@ function ChatPopup() {
                         overflowWrap: "break-word",
                       }}
                     >
-                      {message.text}
+                      {convertLinksToJSX(message.text)}
                     </Typography>
 
                     <Typography
@@ -353,9 +380,8 @@ function ChatPopup() {
                         textAlign: "right",
                       }}
                     >
-                      {`${
-                        message.status === "sending" ? "Đang gửi" : "Đã gửi"
-                      } • `}
+                      {`${message.status === "sending" ? "Đang gửi" : "Đã gửi"
+                        } • `}
                       {formatMessageTimestamp(message.timestamp)}
                     </Typography>
                   </Box>
