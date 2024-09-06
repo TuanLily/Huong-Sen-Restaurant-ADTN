@@ -1,18 +1,26 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import ImageUploadComponent from '../../../Components/ImageUpload/ImageUpload';
-import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { addNewCustomer, checkEmailExists } from '../../../Actions/AuthActions';
-import { DangerAlert, SuccessAlert } from '../../../Components/Alert/Alert';
-import Spinner from '../../../Components/Client/Spinner';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import ImageUploadComponent from "../../../Components/ImageUpload/ImageUpload";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { addNewCustomer, checkEmailExists } from "../../../Actions/AuthActions";
+import { DangerAlert, SuccessAlert } from "../../../Components/Alert/Alert";
+import Spinner from "../../../Components/Client/Spinner";
+import AddressSelector from "../../../Components/Location/AddressSelector";
 
 export default function Register() {
-    const { handleSubmit, register, formState: { errors }, watch, setError } = useForm();
+    const {
+        handleSubmit,
+        register,
+        formState: { errors },
+        watch,
+        setValue,
+        setError,
+    } = useForm();
 
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-    const [avatar, setAvatar] = useState('');
+    const [avatar, setAvatar] = useState("");
     const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
     const [openDangerAlert, setOpenDangerAlert] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,8 +28,7 @@ export default function Register() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const password = watch('password');
-
+    const password = watch("password");
 
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);
@@ -42,25 +49,32 @@ export default function Register() {
         try {
             const user = await checkEmailExists(email);
             if (user) {
-                setError('email', {
-                    type: 'manual',
-                    message: 'Email đã tồn tại trên hệ thống',
+                setError("email", {
+                    type: "manual",
+                    message: "Email đã tồn tại trên hệ thống",
                 });
                 return false;
             }
             return true;
         } catch (error) {
-            console.error('Error checking email:', error);
+            console.error("Error checking email:", error);
             return false;
         }
     };
-
+    // *Hàm sử lý chọn địa chỉ
+    const handleAddressChange = (addressData) => {
+        setValue("address", addressData.fullAddress);
+    };
 
     const onSubmit = async (data) => {
         const emailIsValid = await validateEmailExists(data.email);
         if (!emailIsValid) return;
 
-        const customerData = { ...data, avatar };
+        const customerData = {
+            ...data,
+            avatar,
+            address: data.address,
+        };
 
         setIsSubmitting(true);
 
@@ -68,11 +82,11 @@ export default function Register() {
             await dispatch(addNewCustomer(customerData));
             setOpenSuccessAlert(true);
             setTimeout(() => {
-                navigate('/login'); // Điều hướng đến trang đăng nhập
+                navigate("/login"); 
             }, 3000);
         } catch (error) {
             setOpenDangerAlert(true);
-            console.error('Đăng ký thất bại:', error.message);
+            console.error("Đăng ký thất bại:", error.message);
         } finally {
             setIsSubmitting(false);
         }
@@ -88,11 +102,15 @@ export default function Register() {
                             <div className="col-md-12 p-3">
                                 <div className="card-body">
                                     <form onSubmit={handleSubmit(onSubmit)}>
-                                        <h2 className="text-center mb-4">Đăng ký tài khoản thành viên</h2>
-                                        <div className='row'>
-                                            <div className='col-md-6'>
+                                        <h2 className="text-center mb-4">
+                                            Đăng ký tài khoản thành viên
+                                        </h2>
+                                        <div className="row">
+                                            <div className="col-md-6">
                                                 <div className="form-group mb-3">
-                                                    <label htmlFor="fullname" className="form-label">Họ và Tên</label>
+                                                    <label htmlFor="fullname" className="form-label">
+                                                        Họ và Tên
+                                                    </label>
                                                     <div className="input-group">
                                                         <span className="input-group-text">
                                                             <i className="fa fa-user" aria-hidden="true"></i>
@@ -102,42 +120,57 @@ export default function Register() {
                                                             className="form-control"
                                                             id="fullname"
                                                             placeholder="Nhập họ và tên"
-                                                            {...register('fullname', { required: 'Họ và tên là bắt buộc' })}
+                                                            {...register("fullname", {
+                                                                required: "Họ và tên là bắt buộc",
+                                                            })}
                                                         />
-
                                                     </div>
-                                                    {errors.fullname && <p className="text-danger">{errors.fullname.message}</p>}
+                                                    {errors.fullname && (
+                                                        <p className="text-danger">
+                                                            {errors.fullname.message}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
-                                            <div className='col-md-6'>
+                                            <div className="col-md-6">
                                                 <div className="form-group mb-3">
-                                                    <label htmlFor="email" className="form-label">Email</label>
+                                                    <label htmlFor="email" className="form-label">
+                                                        Email
+                                                    </label>
                                                     <div className="input-group">
                                                         <span className="input-group-text">
-                                                            <i className="fa fa-envelope" aria-hidden="true"></i>
+                                                            <i
+                                                                className="fa fa-envelope"
+                                                                aria-hidden="true"
+                                                            ></i>
                                                         </span>
                                                         <input
                                                             type="email"
                                                             className="form-control"
                                                             id="email"
                                                             placeholder="Nhập Email"
-                                                            {...register('email', {
-                                                                required: 'Email là bắt buộc',
+                                                            {...register("email", {
+                                                                required: "Email là bắt buộc",
                                                                 pattern: {
                                                                     value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
-                                                                    message: 'Email không hợp lệ',
+                                                                    message: "Email không hợp lệ",
                                                                 },
                                                             })}
                                                         />
-
                                                     </div>
-                                                    {errors.email && <p className="text-danger">{errors.email.message}</p>}
+                                                    {errors.email && (
+                                                        <p className="text-danger">
+                                                            {errors.email.message}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className="form-group mb-3">
-                                            <label htmlFor="avatar" className="form-label">Ảnh đại diện</label>
+                                            <label htmlFor="avatar" className="form-label">
+                                                Ảnh đại diện
+                                            </label>
                                             <div className="input-group">
                                                 <ImageUploadComponent
                                                     id="avatar"
@@ -146,10 +179,12 @@ export default function Register() {
                                             </div>
                                         </div>
 
-                                        <div className='row'>
-                                            <div className='col-md-6'>
+                                        <div className="row">
+                                            <div className="col-md-6">
                                                 <div className="form-group mb-3">
-                                                    <label htmlFor="tel" className="form-label">Số điện thoại</label>
+                                                    <label htmlFor="tel" className="form-label">
+                                                        Số điện thoại
+                                                    </label>
                                                     <div className="input-group">
                                                         <span className="input-group-text">
                                                             <i className="fa fa-phone" aria-hidden="true"></i>
@@ -159,99 +194,155 @@ export default function Register() {
                                                             className="form-control"
                                                             id="tel"
                                                             placeholder="Nhập số điện thoại"
-                                                            {...register('tel', {
-                                                                required: 'Số điện thoại là bắt buộc',
+                                                            {...register("tel", {
+                                                                required: "Số điện thoại là bắt buộc",
                                                                 pattern: {
-                                                                    value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
-                                                                    message: 'Số điện thoại không không đúng định dạng',
+                                                                    value:
+                                                                        /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+                                                                    message:
+                                                                        "Số điện thoại không không đúng định dạng",
                                                                 },
                                                             })}
                                                         />
                                                     </div>
-                                                    {errors.tel && <p className="text-danger">{errors.tel.message}</p>}
+                                                    {errors.tel && (
+                                                        <p className="text-danger">{errors.tel.message}</p>
+                                                    )}
                                                 </div>
-                                            </div>
-                                            <div className='col-md-6'>
-                                                <div className="form-group mb-3">
-                                                    <label htmlFor="address" className="form-label">Địa chỉ</label>
-                                                    <div className="input-group">
-                                                        <span className="input-group-text">
-                                                            <i className="fa fa-home" aria-hidden="true"></i>
-                                                        </span>
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            id="address"
-                                                            placeholder="Nhập địa chỉ"
-                                                            {...register('address', { required: 'Địa chỉ là bắt buộc' })}
-                                                        />
 
-                                                    </div>
-                                                    {errors.address && <p className="text-danger">{errors.address.message}</p>}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className='row'>
-                                            <div className='col-md-6'>
                                                 <div className="form-group mb-3">
-                                                    <label htmlFor="password" className="form-label">Mật khẩu</label>
+                                                    <label htmlFor="password" className="form-label">
+                                                        Mật khẩu
+                                                    </label>
                                                     <div className="input-group">
                                                         <span className="input-group-text">
                                                             <i className="fa fa-lock" aria-hidden="true"></i>
                                                         </span>
                                                         <input
-                                                            type={passwordVisible ? 'text' : 'password'}
+                                                            type={passwordVisible ? "text" : "password"}
                                                             className="form-control"
                                                             id="password"
                                                             placeholder="Nhập mật khẩu mới"
-                                                            {...register('password', {
-                                                                required: 'Mật khẩu là bắt buộc',
+                                                            {...register("password", {
+                                                                required: "Mật khẩu là bắt buộc",
                                                                 minLength: {
                                                                     value: 8,
-                                                                    message: 'Mật khẩu phải có ít nhất 8 ký tự',
+                                                                    message: "Mật khẩu phải có ít nhất 8 ký tự",
                                                                 },
                                                                 pattern: {
-                                                                    value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-                                                                    message: 'Mật khẩu phải bao gồm số và ký tự đặc biệt',
+                                                                    value:
+                                                                        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+                                                                    message:
+                                                                        "Mật khẩu phải bao gồm ít nhất chữ in hoa, số và ký tự đặc biệt",
                                                                 },
                                                             })}
                                                         />
-                                                        <span className="input-group-text" onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
-                                                            <i className={passwordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'} aria-hidden="true"></i>
+                                                        <span
+                                                            className="input-group-text"
+                                                            onClick={togglePasswordVisibility}
+                                                            style={{ cursor: "pointer" }}
+                                                        >
+                                                            <i
+                                                                className={
+                                                                    passwordVisible
+                                                                        ? "fa fa-eye-slash"
+                                                                        : "fa fa-eye"
+                                                                }
+                                                                aria-hidden="true"
+                                                            ></i>
                                                         </span>
-
                                                     </div>
-                                                    {errors.password && <p className="text-danger">{errors.password.message}</p>}
+                                                    {errors.password && (
+                                                        <p className="text-danger">
+                                                            {errors.password.message}
+                                                        </p>
+                                                    )}
                                                 </div>
-                                            </div>
-                                            <div className='col-md-6'>
+
                                                 <div className="form-group mb-3">
-                                                    <label htmlFor="confirm-password" className="form-label">Xác nhận mật khẩu</label>
+                                                    <label
+                                                        htmlFor="confirm-password"
+                                                        className="form-label"
+                                                    >
+                                                        Xác nhận mật khẩu
+                                                    </label>
                                                     <div className="input-group">
                                                         <span className="input-group-text">
                                                             <i className="fa fa-lock" aria-hidden="true"></i>
                                                         </span>
                                                         <input
-                                                            type={confirmPasswordVisible ? 'text' : 'password'}
+                                                            type={
+                                                                confirmPasswordVisible ? "text" : "password"
+                                                            }
                                                             className="form-control"
                                                             id="confirm-password"
                                                             placeholder="Nhập mật khẩu xác nhận"
-                                                            {...register('confirmPassword', {
-                                                                required: 'Mật khẩu xác nhận là bắt buộc',
-                                                                validate: (value) => value === password || 'Mật khẩu xác nhận không khớp',
+                                                            {...register("confirmPassword", {
+                                                                required: "Mật khẩu xác nhận là bắt buộc",
+                                                                validate: (value) =>
+                                                                    value === password ||
+                                                                    "Mật khẩu xác nhận không khớp",
                                                             })}
                                                         />
-                                                        <span className="input-group-text" onClick={toggleConfirmPasswordVisibility} style={{ cursor: 'pointer' }}>
-                                                            <i className={confirmPasswordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'} aria-hidden="true"></i>
+                                                        <span
+                                                            className="input-group-text"
+                                                            onClick={toggleConfirmPasswordVisibility}
+                                                            style={{ cursor: "pointer" }}
+                                                        >
+                                                            <i
+                                                                className={
+                                                                    confirmPasswordVisible
+                                                                        ? "fa fa-eye-slash"
+                                                                        : "fa fa-eye"
+                                                                }
+                                                                aria-hidden="true"
+                                                            ></i>
                                                         </span>
-                                                        {errors.confirmPassword && <p className="text-danger">{errors.confirmPassword.message}</p>}
                                                     </div>
+                                                    {errors.confirmPassword && (
+                                                        <p className="text-danger">
+                                                            {errors.confirmPassword.message}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="col-md-6">
+                                                <div className="form-group mb-3">
+                                                    <label htmlFor="address" className="form-label">
+                                                        Địa chỉ
+                                                    </label>
+                                                    <AddressSelector onChange={handleAddressChange} />
+                                                </div>
+
+                                                <div className="form-group mb-3">
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        readOnly
+                                                        {...register("address", {
+                                                            required: "Địa chỉ là bắt buộc",
+                                                            validate: (value) =>
+                                                                value.split(",").filter((part) => part.trim())
+                                                                    .length >= 4 ||
+                                                                "Vui lòng điền đầy đủ thông tin địa chỉ",
+                                                        })}
+                                                    />
+                                                    {errors.address && (
+                                                        <p className="text-danger">
+                                                            {errors.address.message}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className="d-grid gap-2">
-                                            <button type="submit" className="btn btn-primary btn-block rounded-pill">Đăng ký</button>
+                                            <button
+                                                type="submit"
+                                                className="btn btn-primary btn-block rounded-pill"
+                                            >
+                                                Đăng ký
+                                            </button>
                                         </div>
 
                                         <div className="text-center mt-4">
@@ -260,7 +351,10 @@ export default function Register() {
                                             </Link>
                                             <Link to="/Login" className="link-primary">
                                                 Bạn đã có tài khoản?
-                                                <i className="fa fa-long-arrow-right ms-2" aria-hidden="true"></i>
+                                                <i
+                                                    className="fa fa-long-arrow-right ms-2"
+                                                    aria-hidden="true"
+                                                ></i>
                                             </Link>
                                         </div>
                                     </form>
@@ -271,7 +365,7 @@ export default function Register() {
                 </div>
             </div>
             <div>
-                {isSubmitting && <Spinner />} {/* Hiển thị spinner nếu đang tải */}
+                {isSubmitting && <Spinner />} 
                 <SuccessAlert
                     open={openSuccessAlert}
                     onClose={() => setOpenSuccessAlert(false)}
@@ -282,9 +376,7 @@ export default function Register() {
                     onClose={() => setOpenDangerAlert(false)}
                     message="Đăng ký thất bại, vui lòng thử lại!"
                 />
-                {/* Các thành phần khác của form đăng ký */}
             </div>
         </div>
-
-    )
+    );
 }
