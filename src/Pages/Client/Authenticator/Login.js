@@ -35,9 +35,7 @@ export default function Login() {
 
             if (user && accessToken) {
                 window.location.href = '/';
-            } else {
-                setServerError('Thiếu thông tin người dùng hoặc access token. Vui lòng thử lại.');
-            }
+            } 
         } catch (err) {
             setLoading(false);
             setServerError(err.message || 'Đăng nhập thất bại');

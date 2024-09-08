@@ -32,6 +32,8 @@ import UserInfoForm from "./UserInforForm";
 import EmojiPicker from "emoji-picker-react";
 import { Link } from "react-router-dom";
 
+import threeDot from "../../Assets/Client/Images/three-dot.gif";
+
 function ChatPopup() {
   const [isOpen, setIsOpen] = useState(false);
   const [newMessage, setNewMessage] = useState("");
@@ -41,6 +43,8 @@ function ChatPopup() {
     return savedUserInfo ? JSON.parse(savedUserInfo) : null;
   });
   const [anchorEl, setAnchorEl] = useState(null);
+  const [adminTyping, setAdminTyping] = useState(false);
+
 
   useEffect(() => {
     let unsubscribe;
@@ -64,7 +68,15 @@ function ChatPopup() {
             id: doc.id,
             timestamp: doc.data().timestamp?.toDate() || new Date(),
           }));
-          setMessages(fetchedMessages);
+
+          // Tìm tin nhắn adminTyping gần nhất
+          const latestAdminTypingMessage = fetchedMessages.find(msg => msg.adminTyping === true);
+
+          setAdminTyping(!!latestAdminTypingMessage);
+
+          // Lọc bỏ tin nhắn adminTyping khỏi danh sách hiển thị
+          const displayMessages = fetchedMessages.filter(msg => !msg.adminTyping);
+          setMessages(displayMessages);
         });
       }
     };
@@ -317,6 +329,27 @@ function ChatPopup() {
                   flexDirection: "column-reverse",
                 }}
               >
+                {adminTyping && (
+                  <Box sx={{ alignSelf: "flex-start", display: "flex", alignItems: "center" }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                        marginRight: "5px",
+                        fontStyle: "italic",
+                        color: "gray",
+                      }}
+                    >
+                      Đang nhắn tin
+                    </Typography>
+                    <img
+                      src={threeDot}
+                      alt="typing"
+                      style={{ width: "20px", height: "20px" }}
+                    />
+                  </Box>
+                )}
                 {sortedMessages.map((message, index) => (
                   <Box
                     key={index}
