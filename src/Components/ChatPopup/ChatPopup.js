@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import axios from 'axios';
 import {
   Box,
   IconButton,
@@ -44,7 +45,8 @@ function ChatPopup() {
   });
   const [anchorEl, setAnchorEl] = useState(null);
   const [adminTyping, setAdminTyping] = useState(false);
-
+  const [botTyping, setBotTyping] = useState(false);
+  const [chatMode, setChatMode] = useState('bot'); // 'bot' hoặc 'human'
 
   useEffect(() => {
     let unsubscribe;
@@ -126,7 +128,7 @@ function ChatPopup() {
         tel: userInfo?.tel || "",
         title: userInfo?.title || "Anh/Chị",
         status: "sending",
-        uid: userInfo?.uid || "", // Thêm uid vào newMessageData
+        uid: userInfo?.uid || "",
         chatId: chatId,
       };
 
@@ -134,6 +136,7 @@ function ChatPopup() {
       setNewMessage("");
 
       try {
+        // Gửi tin nhắn của người dùng
         const docRef = await addDoc(collection(db, "messages"), {
           ...newMessageData,
           timestamp: serverTimestamp(),
@@ -147,8 +150,69 @@ function ChatPopup() {
               : msg
           )
         );
+
+        if (chatMode === 'bot') {
+          setBotTyping(true);
+          // Gọi API chatbot
+          const response = await axios.post('http://localhost:6969/api/chatbot', { message: newMessageData.text });
+
+          // Thêm một chút delay để tạo cảm giác tự nhiên
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          // Tạo tin nhắn cho bot
+          const botMessageData = {
+            text: response.data.response.response,
+            timestamp: new Date(),
+            role: "admin",
+            fullname: "Chatbot",
+            status: "sending",
+            chatId: chatId,
+          };
+
+          // Thêm tin nhắn của bot vào state
+          setMessages((prevMessages) => [...prevMessages, botMessageData]);
+
+          // Gửi tin nhắn của bot lên Firestore
+          const botDocRef = await addDoc(collection(db, "messages"), {
+            ...botMessageData,
+            timestamp: serverTimestamp(),
+            status: "sent",
+          });
+
+          // Cập nhật state với id của tin nhắn bot
+          setMessages((prevMessages) =>
+            prevMessages.map((msg) =>
+              msg.timestamp === botMessageData.timestamp
+                ? { ...msg, status: "sent", id: botDocRef.id }
+                : msg
+            )
+          );
+
+          // Kiểm tra nếu cần kết thúc cuộc trò chuyện với bot
+          if (response.data.response.endConversation) {
+            setChatMode('human');
+            // Thêm một tin nhắn thông báo chuyển sang chat với nhân viên
+            const switchMessage = {
+              text: "Bạn đang được chuyển sang chat với nhân viên hỗ trợ. Vui lòng đợi trong giây lát.",
+              timestamp: new Date(),
+              role: "admin",
+              fullname: "Hệ thống",
+              status: "sent",
+              chatId: chatId,
+            };
+            setMessages((prevMessages) => [...prevMessages, switchMessage]);
+            await addDoc(collection(db, "messages"), {
+              ...switchMessage,
+              timestamp: serverTimestamp(),
+            });
+          }
+        }
+        // Nếu đang ở chế độ 'human', không cần xử lý gì thêm vì tin nhắn đã được gửi lên Firestore
       } catch (error) {
         console.error("Error sending message: ", error);
+        // Xử lý lỗi...
+      } finally {
+        setBotTyping(false);
       }
     }
   };
@@ -329,19 +393,36 @@ function ChatPopup() {
                   flexDirection: "column-reverse",
                 }}
               >
-                {adminTyping && (
+                {chatMode === 'bot' && botTyping && (
                   <Box sx={{ alignSelf: "flex-start", display: "flex", alignItems: "center" }}>
                     <Typography
                       variant="body2"
                       sx={{
-                        wordBreak: "break-word",
-                        overflowWrap: "break-word",
                         marginRight: "5px",
                         fontStyle: "italic",
                         color: "gray",
                       }}
                     >
-                      Đang nhắn tin
+                      Chatbot đang trả lời
+                    </Typography>
+                    <img
+                      src={threeDot}
+                      alt="typing"
+                      style={{ width: "20px", height: "20px" }}
+                    />
+                  </Box>
+                )}
+                {chatMode === 'human' && adminTyping && (
+                  <Box sx={{ alignSelf: "flex-start", display: "flex", alignItems: "center" }}>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        marginRight: "5px",
+                        fontStyle: "italic",
+                        color: "gray",
+                      }}
+                    >
+                      Nhân viên đang trả lời
                     </Typography>
                     <img
                       src={threeDot}
@@ -428,7 +509,7 @@ function ChatPopup() {
                   fullWidth
                   variant="outlined"
                   size="small"
-                  placeholder="Nhập nội dung..."
+                  placeholder={chatMode === 'bot' ? "Nhập câu hỏi cho chatbot..." : "Nhập tin nhắn cho nhân viên..."}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => {
