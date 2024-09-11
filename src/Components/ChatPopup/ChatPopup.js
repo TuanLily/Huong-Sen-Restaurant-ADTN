@@ -36,6 +36,7 @@ import { Link } from "react-router-dom";
 import threeDot from "../../Assets/Client/Images/three-dot.gif";
 
 function ChatPopup() {
+  // * Khai báo các state
   const [isOpen, setIsOpen] = useState(false);
   const [newMessage, setNewMessage] = useState("");
   const [messages, setMessages] = useState([]);
@@ -47,14 +48,16 @@ function ChatPopup() {
   const [adminTyping, setAdminTyping] = useState(false);
   const [botTyping, setBotTyping] = useState(false);
   const [chatMode, setChatMode] = useState('bot'); // 'bot' hoặc 'human'
+  const [humanChatStatus, setHumanChatStatus] = useState('inactive'); // 'inactive', 'active', 'ended'
 
+  // * Effect để lấy và lắng nghe tin nhắn mới
   useEffect(() => {
     let unsubscribe;
 
     const fetchMessages = () => {
       if (userInfo) {
         const { fullname, tel } = userInfo;
-        const chatId = `${fullname}_${tel}`; // Tạo chatId duy nhất
+        const chatId = `${fullname}_${tel}`;
 
         const messagesCollection = collection(db, "messages");
         const q = query(
@@ -71,12 +74,9 @@ function ChatPopup() {
             timestamp: doc.data().timestamp?.toDate() || new Date(),
           }));
 
-          // Tìm tin nhắn adminTyping gần nhất
           const latestAdminTypingMessage = fetchedMessages.find(msg => msg.adminTyping === true);
-
           setAdminTyping(!!latestAdminTypingMessage);
 
-          // Lọc bỏ tin nhắn adminTyping khỏi danh sách hiển thị
           const displayMessages = fetchedMessages.filter(msg => !msg.adminTyping);
           setMessages(displayMessages);
         });
@@ -92,6 +92,26 @@ function ChatPopup() {
     };
   }, [userInfo]);
 
+  // * Effect để xác định trạng thái chat hiện tại dựa trên tin nhắn
+  useEffect(() => {
+    const determineCurrentChatState = () => {
+      if (messages.length > 0) {
+        const lastMessage = messages[messages.length - 1];
+        if (lastMessage.text.includes("Bạn đang được chuyển sang chat với nhân viên hỗ trợ")) {
+          setChatMode('human');
+          setHumanChatStatus('active');
+        } else if (lastMessage.text.includes("Cuộc trò chuyện với nhân viên đã kết thúc") ||
+          lastMessage.text.includes("Bạn đang chat với bot")) {
+          setChatMode('bot');
+          setHumanChatStatus('inactive');
+        }
+      }
+    };
+
+    determineCurrentChatState();
+  }, [messages]);
+
+  // * Hàm định dạng thời gian tin nhắn
   const formatMessageTimestamp = (timestamp) => {
     const now = new Date();
     const timeDifference = now - timestamp;
@@ -116,6 +136,7 @@ function ChatPopup() {
     }
   };
 
+  // * Hàm xử lý gửi tin nhắn
   const handleSendMessage = async () => {
     if (newMessage.trim()) {
       const chatId = `${userInfo.fullname}_${userInfo.tel}`;
@@ -188,10 +209,8 @@ function ChatPopup() {
             )
           );
 
-          // Kiểm tra nếu cần kết thúc cuộc trò chuyện với bot
+          // Kiểm tra nếu cần chuyển sang chat với nhân viên
           if (response.data.response.endConversation) {
-            setChatMode('human');
-            // Thêm một tin nhắn thông báo chuyển sang chat với nhân viên
             const switchMessage = {
               text: "Bạn đang được chuyển sang chat với nhân viên hỗ trợ. Vui lòng đợi trong giây lát.",
               timestamp: new Date(),
@@ -217,7 +236,29 @@ function ChatPopup() {
     }
   };
 
-  // Hàm mới để chuyển đổi URL thành link có thể nhấp được
+  // * Hàm xử lý khi nhân viên kết thúc cuộc trò chuyện
+  const handleHumanChatEnd = async () => {
+    const endMessage = {
+      text: "Cuộc trò chuyện với nhân viên đã kết thúc. Bạn đang chat với bot.",
+      timestamp: new Date(),
+      role: "admin",
+      fullname: "Hệ thống",
+      status: "sent",
+      chatId: `${userInfo.fullname}_${userInfo.tel}`,
+    };
+
+    setMessages((prevMessages) => [...prevMessages, endMessage]);
+    await addDoc(collection(db, "messages"), {
+      ...endMessage,
+      timestamp: serverTimestamp(),
+    });
+
+    // Đảm bảo trạng thái được cập nhật ngay lập tức
+    setChatMode('bot');
+    setHumanChatStatus('inactive');
+  };
+
+  // * Hàm chuyển đổi URL thành link có thể nhấp được
   const convertLinksToJSX = (text) => {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const parts = text.split(urlRegex);
@@ -247,29 +288,33 @@ function ChatPopup() {
     (a, b) => b.timestamp - a.timestamp
   );
 
+  // * Hàm mở cửa sổ chat
   const handleOpen = () => {
     setIsOpen(true);
   };
 
-  //* Hàm để hủy hộp thoại nhập thông tin khi không muốn nhắn tin nữa
+  // * Hàm đóng cửa sổ chat
   const handleClose = () => {
     setIsOpen(false);
   };
 
-  // *Hàm sử lý submit form nhập thông tin chat
+  // * Hàm xử lý khi submit form nhập thông tin chat
   const handleFormSubmit = (userData) => {
     setUserInfo(userData);
     setIsOpen(true);
   };
 
+  // * Hàm xử lý khi chọn emoji
   const handleEmojiClick = (emojiObject) => {
     setNewMessage((prevMessage) => prevMessage + emojiObject.emoji);
   };
 
+  // * Hàm xử lý khi nhấn nút emoji
   const handleEmojiButtonClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
+  // * Hàm đóng bảng chọn emoji
   const handleCloseEmoji = () => {
     setAnchorEl(null);
   };
@@ -412,7 +457,7 @@ function ChatPopup() {
                     />
                   </Box>
                 )}
-                {chatMode === 'human' && adminTyping && (
+                {chatMode === 'human' && humanChatStatus === 'active' && adminTyping && (
                   <Box sx={{ alignSelf: "flex-start", display: "flex", alignItems: "center" }}>
                     <Typography
                       variant="body2"
@@ -441,10 +486,10 @@ function ChatPopup() {
                       p: 2,
                       borderRadius: 1,
                       backgroundColor:
-                        message.role === "admin" ? "#f0f0f0" : "#FEA115",
+                        message.role === "customer" ? "#FEA115" : "#f0f0f0",
                       alignSelf:
-                        message.role === "admin" ? "flex-start" : "flex-end",
-                      textAlign: message.role === "admin" ? "left" : "left",
+                        message.role === "customer" ? "flex-end" : "flex-start",
+                      textAlign: message.role === "customer" ? "left" : "left",
                       maxWidth: "80%",
                       boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
                       position: "relative",
@@ -509,7 +554,13 @@ function ChatPopup() {
                   fullWidth
                   variant="outlined"
                   size="small"
-                  placeholder={chatMode === 'bot' ? "Nhập câu hỏi cho chatbot..." : "Nhập tin nhắn cho nhân viên..."}
+                  placeholder={
+                    chatMode === 'bot'
+                      ? "Nhập câu hỏi cho chatbot..."
+                      : humanChatStatus === 'active'
+                        ? "Nhập tin nhắn cho nhân viên..."
+                        : "Đang chờ nhân viên..."
+                  }
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={(e) => {
@@ -517,6 +568,7 @@ function ChatPopup() {
                       handleSendMessage();
                     }
                   }}
+                  disabled={chatMode === 'human' && humanChatStatus !== 'active'}
                   sx={{
                     mr: 1,
                     "& .MuiOutlinedInput-notchedOutline": {
@@ -547,7 +599,7 @@ function ChatPopup() {
             </Paper>
           )}
         </Box>
-      </Slide>
+      </Slide >
     </>
   );
 }
