@@ -3,7 +3,9 @@ import {
     FETCH_AUTH_REQUEST,
     FETCH_AUTH_SUCCESS,
     SHOW_SUCCESS_ALERT,
-    SHOW_ERROR_ALERT
+    SHOW_ERROR_ALERT,
+    CHECK_AUTH_STATUS,
+
 } from "../Actions/AuthActions";
 
 const initialState = {
@@ -11,7 +13,8 @@ const initialState = {
     errorAlert: null,
     loading: false,
     auth: null,
-    error: ''
+    error: '',
+    isAuthenticated: false // Thêm trạng thái này
 };
 
 const authReducer = (state = initialState, action) => {
@@ -25,13 +28,15 @@ const authReducer = (state = initialState, action) => {
             return {
                 loading: false,
                 auth: Array.isArray(action.payload) ? action.payload : [],
-                error: ''
+                error: '',
+                isAuthenticated: true // Cập nhật khi đăng nhập thành công
             };
         case FETCH_AUTH_FAILURE:
             return {
                 loading: false,
                 auth: null,
-                error: action.payload
+                error: action.payload,
+                isAuthenticated: false // Cập nhật khi đăng nhập thất bại
             };
         case SHOW_SUCCESS_ALERT:
             return {
@@ -42,6 +47,13 @@ const authReducer = (state = initialState, action) => {
             return {
                 ...state,
                 errorAlert: action.payload,
+            };
+        case CHECK_AUTH_STATUS:
+            return {
+                ...state,
+                isAuthenticated: action.payload.isAuthenticated,
+                auth: action.payload.user,
+                loading: false
             };
         default:
             return state;

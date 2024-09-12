@@ -3,6 +3,7 @@ export const FETCH_AUTH_SUCCESS = 'FETCH_AUTH_SUCCESS';
 export const FETCH_AUTH_FAILURE = 'FETCH_AUTH_FAILURE';
 export const SHOW_SUCCESS_ALERT = 'SHOW_SUCCESS_ALERT';
 export const SHOW_ERROR_ALERT = 'SHOW_ERROR_ALERT';
+export const CHECK_AUTH_STATUS = 'CHECK_AUTH_STATUS';
 
 import { API_DATA, API_ENDPOINT } from "../Config/Client/APIs";
 import http from "../Utils/Http";
@@ -83,6 +84,19 @@ export const fetchLogin = (email, password) => {
             }
         } catch (error) {
             dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
+        }
+    };
+};
+
+export const checkAuthStatus = () => {
+    return dispatch => {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const token = localStorage.getItem('accessToken');
+
+        if (user && token) {
+            dispatch({ type: CHECK_AUTH_STATUS, payload: { isAuthenticated: true, user } });
+        } else {
+            dispatch({ type: CHECK_AUTH_STATUS, payload: { isAuthenticated: false, user: null } });
         }
     };
 };

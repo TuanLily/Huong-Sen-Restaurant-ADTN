@@ -148,7 +148,7 @@ const AddressSelector = ({ onChange, initialAddress }) => {
             <input
                 type="text"
                 className="form-control"
-                placeholder="Số nhà, tên đường"
+                placeholder={"Số nhà, tên đường"}
                 value={streetAddress}
                 onChange={(e) => setStreetAddress(e.target.value)}
             />
