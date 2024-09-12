@@ -14,6 +14,9 @@ import DetailProduct from '../../Pages/Client/DetailProduct';
 import Account from '../../Pages/Client/Account';
 import Blog from '../../Pages/Client/Blog';
 import DetailBlog from '../../Pages/Client/DetailBlog';
+import Order from '../../Pages/Client/Order';
+import Pay from '../../Pages/Client/pay';
+import Confirm from '../../Pages/Client/ConfirmPay';
 
 
 
@@ -34,6 +37,9 @@ const publicClientRoutes = [
     { path: ClientConfig.routes.account, component: Account },
     { path: ClientConfig.routes.blog, component: Blog },
     { path: ClientConfig.routes.detailblog, component: DetailBlog },
+    { path: ClientConfig.routes.order, component: Order },
+    { path: ClientConfig.routes.pay, component: Pay },
+    { path: ClientConfig.routes.confirm, component: Confirm },
 
 ];
 
