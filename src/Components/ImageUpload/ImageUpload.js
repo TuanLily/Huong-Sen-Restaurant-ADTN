@@ -50,7 +50,7 @@ const ImageUploadComponent = ({ id, onImageUpload }) => {
                 withIcon={true}
                 buttonText='Chọn ảnh'
                 onChange={onDrop}
-                imgExtension={['.jpg', '.gif', '.png', '.gif']}
+                imgExtension={['.jpg', '.gif', '.png', '.jpeg']}
                 maxFileSize={5242880}
                 withPreview={true}
                 singleImage={true}

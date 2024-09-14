@@ -97,11 +97,10 @@ function ChatPopup() {
     const determineCurrentChatState = () => {
       if (messages.length > 0) {
         const lastMessage = messages[messages.length - 1];
-        if (lastMessage.text.includes("Bạn đang được chuyển sang chat với nhân viên hỗ trợ")) {
+        if (lastMessage.text.includes("Cuộc trò chuyện đã được tiếp tục.") || lastMessage.text.includes("Bạn đang được chuyển sang chat với nhân viên hỗ trợ")) {
           setChatMode('human');
           setHumanChatStatus('active');
-        } else if (lastMessage.text.includes("Cuộc trò chuyện với nhân viên đã kết thúc") ||
-          lastMessage.text.includes("Bạn đang chat với bot")) {
+        } else if (lastMessage.text.includes("Cuộc trò chuyện đã kết thúc.")) {
           setChatMode('bot');
           setHumanChatStatus('inactive');
         }

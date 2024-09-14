@@ -82,7 +82,7 @@ export default function Register() {
             await dispatch(addNewCustomer(customerData));
             setOpenSuccessAlert(true);
             setTimeout(() => {
-                navigate("/login"); 
+                navigate("/login");
             }, 3000);
         } catch (error) {
             setOpenDangerAlert(true);
@@ -365,7 +365,7 @@ export default function Register() {
                 </div>
             </div>
             <div>
-                {isSubmitting && <Spinner />} 
+                {isSubmitting && <Spinner />}
                 <SuccessAlert
                     open={openSuccessAlert}
                     onClose={() => setOpenSuccessAlert(false)}
