@@ -1,11 +1,9 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchProductCategory,
   fetchProductCategoryHoatDong,
 } from "../../Actions/ProductCategoryActions";
 import {
-  fetchProduct,
   fetchProductHoatDong,
 } from "../../Actions/ProductActions";
 import unidecode from "unidecode";
@@ -102,7 +100,10 @@ export default function Menu() {
                 >
                   <div className="tab-content">
                     <div id="tab-1" className="tab-pane fade show p-0 active">
-                      <div className="row g-4">
+                      <div
+                        className="row" // Removed the g-4 class here
+                        style={{ rowGap: "20px" }} // Added custom gap to reduce vertical spacing
+                      >
                         {productsInCategory.map((product) => (
                           <div className="col-lg-6" key={product.id}>
                             <div
@@ -114,23 +115,35 @@ export default function Menu() {
                                 className="flex-shrink-0 img-fluid rounded"
                                 src={product.image}
                                 alt={product.name}
-                                style={{ width: "80px" }}
+                                style={{
+                                  width: "150px", // Đặt chiều rộng cố định
+                                  height: "150px", // Đặt chiều cao cố định
+                                  objectFit: "cover", // Đảm bảo ảnh không bị méo
+                                  borderRadius: "10px", // Bo góc ảnh
+                                }}
                               />
                               {product.sale_price > 0 ? (
                                 <div className="w-100 d-flex flex-column text-start ps-4">
                                   <h5 className="d-flex justify-content-between border-bottom pb-2">
                                     <span>{product.name}</span>
-                                    <span className="text-primary">
+                                    <span
+                                      className="text-primary"
+                                      style={{
+                                        fontSize: "1rem", // Giảm kích thước giá
+                                      }}
+                                    >
                                       {formatPrice(
                                         product.price - product.sale_price
                                       )}
                                     </span>
                                   </h5>
-                                  <div className="d-flex justify-content-between">
-                                    <small className="fst-italic">
-                                      {product.description}
-                                    </small>
-                                    <span className="text-danger text-decoration-line-through">
+                                  <div className="d-flex justify-content-end">
+                                    <span
+                                      className="text-secondary text-decoration-line-through"
+                                      style={{
+                                        fontSize: "0.85rem",
+                                      }}
+                                    >
                                       {formatPrice(product.price)}
                                     </span>
                                   </div>
@@ -139,15 +152,15 @@ export default function Menu() {
                                 <div className="w-100 d-flex flex-column text-start ps-4">
                                   <h5 className="d-flex justify-content-between border-bottom pb-2">
                                     <span>{product.name}</span>
-                                    <span className="text-primary">
+                                    <span
+                                      className="text-primary"
+                                      style={{
+                                        fontSize: "1rem", // Giảm kích thước giá
+                                      }}
+                                    >
                                       {formatPrice(product.price)}
                                     </span>
                                   </h5>
-                                  <div className="d-flex justify-content-between">
-                                    <small className="fst-italic">
-                                      {product.description}
-                                    </small>
-                                  </div>
                                 </div>
                               )}
                             </div>
