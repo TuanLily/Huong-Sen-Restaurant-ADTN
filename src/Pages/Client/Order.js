@@ -55,23 +55,23 @@ export default function Booking() {
         data-wow-delay="0.1s"
       >
         <div className="row g-0">
-          <div className="col-md-6 bg-warning p-5 text-center">
-            <h1 className="text-white section-title ff-secondary">
-              Thông tin đặt bàn
-            </h1>
-            <p>
+          <div className="col-md-6 bg-warning p-5">
+            <div className="text-center mb-4">
+              <h1 className="text-white section-title ff-secondary">Thông tin đặt bàn</h1>
+            </div>
+            <p className="mb-4 mt-4 text-dark text-start">
               <strong>Họ tên:</strong> Nguyễn Văn A
             </p>
-            <p>
+            <p className="mb-4 text-dark text-start">
               <strong>Email:</strong> anv@gmail.com
             </p>
-            <p>
+            <p className="mb-4 text-dark text-start">
               <strong>Số điện thoại:</strong> 065789311
             </p>
-            <p>
+            <p className="mb-4 text-dark text-start">
               <strong>Thời gian đặt bàn:</strong> 18/08/2024 20:00
             </p>
-            <p>
+            <p className="mb-4 text-dark text-start">
               <strong>Số người:</strong> 02 người
             </p>
           </div>
@@ -138,11 +138,7 @@ export default function Booking() {
                 </div>
                 <div className="menu-item d-flex justify-content-between align-items-center mb-3">
                   <div className="d-flex align-items-center">
-                    <input
-                      type="checkbox"
-                      id="main1"
-                      className="me-2"
-                    />
+                    <input type="checkbox" id="main1" className="me-2" />
                     <label htmlFor="main1" className="mb-0 flex-grow-1">
                       Cá chiên nước mắm
                     </label>

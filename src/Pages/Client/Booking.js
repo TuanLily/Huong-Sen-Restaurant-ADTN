@@ -62,7 +62,7 @@ export default function Booking() {
               <h5 className="section-title ff-secondary text-start text-primary fw-normal">
                 Đặt chỗ
               </h5>
-              <h1 className="text-white mb-4">Đặt bàn trực tuyến</h1>
+              <h1 className="text-white mb-4">Điền thông tin khách hàng</h1>
               <form>
                 <div className="row g-3">
                   <div className="col-md-6">
@@ -103,12 +103,24 @@ export default function Booking() {
                   </div>
                   <div className="col-md-6">
                     <div className="form-floating">
-                      <select className="form-select" id="select1">
-                        <option value="1">1 Người</option>
-                        <option value="2">2 Người</option>
-                        <option value="3">3 Người</option>
-                      </select>
-                      <label htmlFor="select1">Số người ăn</label>
+                    <input
+                        type="number"
+                        className="form-control"
+                        id="quantity"
+                        placeholder="Quantity"
+                      />
+                      <label htmlFor="quantity">Số người ăn</label>
+                    </div>
+                  </div>
+                  <div className="col-12">
+                    <div className="form-floating">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Special Request"
+                        id="phone"
+                      />
+                      <label htmlFor="phone">Số điện thoại</label>
                     </div>
                   </div>
                   <div className="col-12">
@@ -122,14 +134,10 @@ export default function Booking() {
                       <label htmlFor="message">Ghi chú thêm</label>
                     </div>
                   </div>
-                  <div className="col-12">
-                    <NavLink
-                     className="btn btn-primary w-100 py-3"
-                      to="/order"
-                    >
-                      Tiếp theo
-                    </NavLink>
-                  </div>
+                  <div className="d-flex justify-content-between align-items-center mt-3">
+  <NavLink to="/confirm" className="btn btn-primary py-2 px-4">Hoàn tất đặt bàn</NavLink>
+  <NavLink to="/order" className="btn btn-primary py-2 px-5">Tiếp theo</NavLink>
+</div>
                 </div>
               </form>
             </div>
