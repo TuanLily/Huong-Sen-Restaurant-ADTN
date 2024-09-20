@@ -477,3 +477,9 @@
     padding-right: 0;
     border-right: none;
 }
+
+.blog-content img {
+    width: 100%; /* Đảm bảo ảnh không vượt quá chiều rộng của container */
+    max-height: 500px; /* Giới hạn chiều cao ảnh tối đa */
+    object-fit: cover; /* Đảm bảo giữ tỉ lệ ảnh */
+  }

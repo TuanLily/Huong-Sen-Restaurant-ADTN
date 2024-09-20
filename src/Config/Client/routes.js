@@ -12,7 +12,7 @@ const ClientRoutes = {
     detailproduct: '/product-detail/:slug.html',
     account: '/account',
     blog: '/blog',
-    detailblog: '/detail-blog',
+    detailblog: '/blog-detail/:slug.html',
     order: '/order',
     pay: '/pay',
     confirm: '/confirm',
