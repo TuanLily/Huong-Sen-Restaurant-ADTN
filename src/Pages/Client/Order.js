@@ -55,7 +55,7 @@ export default function Booking() {
         data-wow-delay="0.1s"
       >
         <div className="row g-0">
-          <div className="col-md-6 bg-warning p-5">
+          <div className="col-4 bg-warning p-5">
             <div className="text-center mb-4">
               <h1 className="text-white section-title ff-secondary">Thông tin đặt bàn</h1>
             </div>
@@ -76,7 +76,7 @@ export default function Booking() {
             </p>
           </div>
 
-          <div className="col-md-6 bg-light p-5">
+          <div className="col-8 bg-light p-5">
             <ul className="nav nav-tabs">
               <li className="nav-item">
                 <a className="nav-link active" href="#">
