@@ -483,3 +483,35 @@
     max-height: 500px; /* Giới hạn chiều cao ảnh tối đa */
     object-fit: cover; /* Đảm bảo giữ tỉ lệ ảnh */
   }
+.blog-more h5 {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.blog-more h6 {
+    font-size: 16px;
+    color: #333;
+}
+
+.list-group:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .card:hover, .list-group:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .card-text {
+    font-size: 14px;
+    color: #666;
+  }
+  
