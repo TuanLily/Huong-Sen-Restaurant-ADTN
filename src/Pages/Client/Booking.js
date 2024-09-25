@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 export default function Booking() {
   return (
@@ -12,7 +12,7 @@ export default function Booking() {
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb justify-content-center text-uppercase">
               <li className="breadcrumb-item">
-                <a href="/">Trang chủ</a>
+                <Link to="/">Trang chủ</Link>
               </li>
               <li className="breadcrumb-item text-white active" aria-current="page">
                 Đặt bàn
@@ -23,29 +23,29 @@ export default function Booking() {
       </div>
 
       <div className="container text-center my-5">
-  <div className="row justify-content-center">
-    <div className="col-lg-8">
-      <div className="progress-steps d-flex justify-content-between">
-        <div className="step">
-          <span className="circle active">1</span>
-          <p>Điền thông tin</p>
-        </div>
-        <div className="step">
-          <span className="circle">2</span>
-          <p>Chọn món</p>
-        </div>
-        <div className="step">
-          <span className="circle">3</span>
-          <p>Thanh toán</p>
-        </div>
-        <div className="step">
-          <span className="circle">4</span>
-          <p>Xác nhận</p>
+        <div className="row justify-content-center">
+          <div className="col-lg-8">
+            <div className="progress-steps d-flex justify-content-between">
+              <div className="step">
+                <span className="circle active">1</span>
+                <p>Điền thông tin</p>
+              </div>
+              <div className="step">
+                <span className="circle">2</span>
+                <p>Chọn món</p>
+              </div>
+              <div className="step">
+                <span className="circle">3</span>
+                <p>Thanh toán</p>
+              </div>
+              <div className="step">
+                <span className="circle">4</span>
+                <p>Xác nhận</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
 
 
       <div
@@ -103,7 +103,7 @@ export default function Booking() {
                   </div>
                   <div className="col-md-6">
                     <div className="form-floating">
-                    <input
+                      <input
                         type="number"
                         className="form-control"
                         id="quantity"
@@ -135,9 +135,9 @@ export default function Booking() {
                     </div>
                   </div>
                   <div className="d-flex justify-content-between align-items-center mt-3">
-  <NavLink to="/confirm" className="btn btn-primary py-2 px-4">Hoàn tất đặt bàn</NavLink>
-  <NavLink to="/order" className="btn btn-primary py-2 px-5">Tiếp theo</NavLink>
-</div>
+                    <NavLink to="/confirm" className="btn btn-primary py-2 px-4">Hoàn tất đặt bàn</NavLink>
+                    <NavLink to="/order" className="btn btn-primary py-2 px-5">Tiếp theo</NavLink>
+                  </div>
                 </div>
               </form>
             </div>

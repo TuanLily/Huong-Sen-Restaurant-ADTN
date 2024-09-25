@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 export default function Booking() {
   return (
@@ -12,7 +12,7 @@ export default function Booking() {
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb justify-content-center text-uppercase">
               <li className="breadcrumb-item">
-                <a href="/">Trang chủ</a>
+                <Link to="/">Trang chủ</Link>
               </li>
               <li className="breadcrumb-item text-white active" aria-current="page">
                 Đặt bàn

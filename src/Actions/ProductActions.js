@@ -49,3 +49,18 @@ export const fetchProductHoatDong = () => {
             });
     };
 };
+
+export const fetchProductWithNewDate = () => {
+    return dispatch => {
+        dispatch(fetchProductRequest());
+        http.get(`${API_ENDPOINT}/${API_DATA.product}/new`)
+            .then(response => {
+                const product = response.data.results;
+                dispatch(fetchProductSuccess(product));
+            })
+            .catch(error => {
+                const errorMsg = error.message;
+                dispatch(fetchProductFailure(errorMsg));
+            });
+    };
+}

@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { addNewContact } from "../../Actions/ContactActions";
 import Spinner from "../../Components/Client/Spinner";
 import { DangerAlert, SuccessAlert } from "../../Components/Alert/Alert";
+import { Link } from "react-router-dom";
 
 
 export default function Contact() {
@@ -44,7 +45,7 @@ export default function Contact() {
               <nav aria-label="breadcrumb">
                 <ol className="breadcrumb justify-content-center text-uppercase">
                   <li className="breadcrumb-item">
-                    <a href="/">Trang chủ</a>
+                    <Link to="/">Trang chủ</Link>
                   </li>
                   <li
                     className="breadcrumb-item text-white active"

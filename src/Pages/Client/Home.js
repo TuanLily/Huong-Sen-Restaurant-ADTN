@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProductHoatDong } from "../../Actions/ProductActions";
+import { fetchProductHoatDong, fetchProductWithNewDate } from "../../Actions/ProductActions";
 import { Link, useNavigate } from "react-router-dom";
 import ImageGallery from "../../Components/Client/ImageGallery";
 import unidecode from "unidecode";
@@ -11,7 +11,7 @@ function Home() {
   const productState = useSelector((state) => state.product);
 
   useEffect(() => {
-    dispatch(fetchProductHoatDong());
+    dispatch(fetchProductWithNewDate());
   }, [dispatch]);
 
   const formatPrice = (price) => {
@@ -244,9 +244,9 @@ function Home() {
         <div className="container">
           <div className="text-center wow fadeInUp" data-wow-delay="0.1s">
             <h5 className="section-title ff-secondary text-center text-primary fw-normal">
-              Food Menu
+              Nhà Hàng Hương Sen
             </h5>
-            <h1 className="mb-5">Bán Chạy Nhất</h1>
+            <h1 className="mb-5">Món ăn mới</h1>
           </div>
           <div
             className="tab-class text-center wow fadeInUp"

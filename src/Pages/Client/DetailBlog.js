@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBlogDetailBySlug } from "../../Actions/BlogDetailActions"; // Import actions for fetching blogs
-import { useParams } from "react-router-dom"; // To get the slug from the URL
+import { Link, useParams } from "react-router-dom"; // To get the slug from the URL
 import { fetchBlog } from "../../Actions/BlogActions";
 
 const DetailBlog = () => {
@@ -25,16 +25,16 @@ const DetailBlog = () => {
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb justify-content-center text-uppercase">
               <li className="breadcrumb-item">
-                <a href="/">Home</a>
+                <Link to="/">Trang chủ</Link>
               </li>
               <li className="breadcrumb-item">
-                <a href="/blog">Blogs</a>
+                <Link to="/blog">Bài viết & mẹo hay</Link>
               </li>
               <li
                 className="breadcrumb-item text-white active"
                 aria-current="page"
               >
-                Chi Tiết Blog
+                Chi Tiết Bài Viết
               </li>
             </ol>
           </nav>

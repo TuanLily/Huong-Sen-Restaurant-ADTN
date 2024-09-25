@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBlog } from '../../Actions/BlogActions';
 import unidecode from 'unidecode';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Blog() {
   const dispatch = useDispatch();
@@ -37,9 +37,10 @@ export default function Blog() {
           <h1 className="display-3 text-white mb-3 animated slideInDown">Tin tức và mẹo hay</h1>
           <nav aria-label="breadcrumb">
             <ol className="breadcrumb justify-content-center text-uppercase">
-              <li className="breadcrumb-item"><a href="#">Home</a></li>
-              <li className="breadcrumb-item"><a href="#">Pages</a></li>
-              <li className="breadcrumb-item text-white active" aria-current="page">Blog</li>
+              <li className="breadcrumb-item">
+                <Link to="/">Trang chủ</Link>
+              </li>
+              <li className="breadcrumb-item text-white active" aria-current="page">Tin tức & mẹo hay</li>
             </ol>
           </nav>
         </div>
@@ -54,16 +55,16 @@ export default function Blog() {
               {/* Show loading or error state */}
               {blogState.loading && <div>Loading...</div>}
               {blogState.error && <div>Error: {blogState.error}</div>}
-              
+
               {/* Map over the blog posts */}
               {!blogState.loading && blogState.blog?.length > 0 && blogState.blog.map((blog) => (
                 <div className="col-md-4 mb-4" key={blog.id}>
                   <div className="card" onClick={() => handleBlogClick(blog.title)} style={{ cursor: 'pointer' }}>
-                    <img 
-                      src={blog.poster || 'https://cdn.tgdd.vn/Files/2022/01/25/1412805/cach-nau-pho-bo-nam-dinh-chuan-vi-thom-ngon-nhu-hang-quan-202201250313281452.jpg'} 
-                      className="card-img-top" 
-                      alt={blog.title} 
-                      style={{ height: '150px', objectFit: 'cover' }} 
+                    <img
+                      src={blog.poster || 'https://cdn.tgdd.vn/Files/2022/01/25/1412805/cach-nau-pho-bo-nam-dinh-chuan-vi-thom-ngon-nhu-hang-quan-202201250313281452.jpg'}
+                      className="card-img-top"
+                      alt={blog.title}
+                      style={{ height: '150px', objectFit: 'cover' }}
                     />
                     <div className="card-body">
                       <h5 className="card-title">{blog.title.slice(0, 50)}</h5>
@@ -72,7 +73,7 @@ export default function Blog() {
                   </div>
                 </div>
               ))}
-              
+
               {/* If no blogs are found */}
               {!blogState.loading && blogState.blog?.length === 0 && (
                 <div>No blogs found.</div>
@@ -90,11 +91,11 @@ export default function Blog() {
                     <div className="d-flex w-100 justify-content-between">
                       <h6 className="mb-1">{blog.title}</h6>
                     </div>
-                    <img 
-                      src={blog.poster || 'https://cdn.tgdd.vn/Files/2022/01/25/1412805/cach-nau-pho-bo-nam-dinh-chuan-vi-thom-ngon-nhu-hang-quan-202201250313281452.jpg'} 
-                      className="img-fluid mt-2" 
-                      alt={blog.title} 
-                      style={{ height: '100px', objectFit: 'cover' }} 
+                    <img
+                      src={blog.poster || 'https://cdn.tgdd.vn/Files/2022/01/25/1412805/cach-nau-pho-bo-nam-dinh-chuan-vi-thom-ngon-nhu-hang-quan-202201250313281452.jpg'}
+                      className="img-fluid mt-2"
+                      alt={blog.title}
+                      style={{ height: '100px', objectFit: 'cover' }}
                     />
                   </a>
                 </div>
