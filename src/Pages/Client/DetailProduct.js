@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductDetailBySlug } from "../../Actions/ProductDetailActions";
 import { fetchProduct } from "../../Actions/ProductActions";
@@ -9,6 +9,8 @@ const DetailProduct = () => {
   const dispatch = useDispatch();
   const productDetailState = useSelector((state) => state.product_detail);
   const productState = useSelector((state) => state.product);
+
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     dispatch(fetchProductDetailBySlug(slug));
@@ -22,12 +24,27 @@ const DetailProduct = () => {
     }).format(price);
   };
 
+  const handleIncreaseQuantity = () => {
+    setQuantity((prevQuantity) => prevQuantity + 1);
+  };
+
+  const handleDecreaseQuantity = () => {
+    setQuantity((prevQuantity) => (prevQuantity > 1 ? prevQuantity - 1 : 1));
+  };
+
   const relatedProducts = productState.product.filter(
     (product) =>
       product.categories_id ===
         productDetailState.productDetail?.categories_id &&
-      product.id !== productDetailState.productDetail?.id
+      product.id !== productDetailState.productDetail?.id &&
+      product.status === 1 // Filter related products with status 1
   );
+
+  const featuredProducts = productState.product
+    .filter((product) => product.status === 1) // Filter featured products with status 1
+    .sort(() => Math.random() - 0.5); // Shuffle the array randomly
+
+  const randomFeaturedProducts = featuredProducts.slice(0, 4); // Select first 4 random products
 
   return (
     <>
@@ -90,17 +107,24 @@ const DetailProduct = () => {
                       style={{ width: "100px" }}
                     >
                       <div className="input-group-btn">
-                        <button className="btn btn-sm btn-minus rounded-circle bg-light border">
+                        <button
+                          className="btn btn-sm btn-minus rounded-circle bg-light border"
+                          onClick={handleDecreaseQuantity}
+                        >
                           <i className="fa fa-minus"></i>
                         </button>
                       </div>
                       <input
                         type="text"
                         className="form-control form-control-sm text-center border-0"
-                        value="1"
+                        value={quantity}
+                        readOnly
                       />
                       <div className="input-group-btn">
-                        <button className="btn btn-sm btn-plus rounded-circle bg-light border">
+                        <button
+                          className="btn btn-sm btn-plus rounded-circle bg-light border"
+                          onClick={handleIncreaseQuantity}
+                        >
                           <i className="fa fa-plus"></i>
                         </button>
                       </div>
@@ -142,7 +166,7 @@ const DetailProduct = () => {
               <div className="row g-4">
                 <div className="col-lg-12">
                   <h4 className="mb-4">Sản phẩm nổi bật</h4>
-                  {productState.product.slice(0, 4).map((product) => (
+                  {randomFeaturedProducts.map((product) => (
                     <div
                       className="d-flex align-items-center justify-content-start mb-4"
                       key={product.id}
@@ -159,23 +183,13 @@ const DetailProduct = () => {
                       </div>
                       <div className="ms-3">
                         <h6 className="mb-2">{product.name}</h6>
-                        <div className="d-flex mb-2">
-                          {[...Array(5)].map((_, i) => (
-                            <i
-                              key={i}
-                              className={`fa fa-star ${
-                                i < product.rating ? "text-secondary" : ""
-                              }`}
-                            ></i>
-                          ))}
-                        </div>
+
                         <div className="d-flex mb-2">
                           <h5 className="fw-bold me-2">
                             {formatPrice(
                               product.price - (product.sale_price || 0)
                             )}
                           </h5>
-                          
                         </div>
                       </div>
                     </div>
@@ -203,14 +217,10 @@ const DetailProduct = () => {
                 />
                 <div className="p-3">
                   <h4>{product.name}</h4>
-                  <p>{product.description}</p>
                   <div className="d-flex justify-content-between align-items-center">
                     <p className="text-dark fs-5 fw-bold">
                       {formatPrice(product.price - (product.sale_price || 0))}
                     </p>
-                    <button className="btn-add-to-cart">
-                      <i className="fa fa-shopping-cart"></i>
-                    </button>
                   </div>
                 </div>
               </div>

@@ -1,7 +1,40 @@
-import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { NavLink } from "react-router-dom";
 
 export default function Booking() {
+  // State để lưu thông tin khách hàng
+  const [customerInfo, setCustomerInfo] = useState({
+    name: "",
+    email: "",
+    datetime: "",
+    quantity: "",
+    phone: "",
+    message: ""
+  });
+
+  // Tải dữ liệu đã lưu từ local storage khi component được tải
+  useEffect(() => {
+    const savedData = localStorage.getItem("customerInfo");
+    if (savedData) {
+      setCustomerInfo(JSON.parse(savedData));
+    }
+  }, []);
+
+  // Xử lý thay đổi input
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setCustomerInfo((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
+  // Lưu dữ liệu hiện tại của form vào local storage khi nhấn "Tiếp theo"
+  const handleNext = () => {
+    localStorage.setItem("customerInfo", JSON.stringify(customerInfo));
+    console.log(JSON.parse(localStorage.getItem("customerInfo")));    
+  };
+
   return (
     <div>
       <div className="container-fluid p-0 py-5 bg-dark hero-header mb-5">
@@ -14,7 +47,10 @@ export default function Booking() {
               <li className="breadcrumb-item">
                 <Link to="/">Trang chủ</Link>
               </li>
-              <li className="breadcrumb-item text-white active" aria-current="page">
+              <li
+                className="breadcrumb-item text-white active"
+                aria-current="page"
+              >
                 Đặt bàn
               </li>
             </ol>
@@ -47,15 +83,10 @@ export default function Booking() {
         </div>
       </div>
 
-
-      <div
-        className="container-xxl py-5 px-0 wow fadeInUp"
-        data-wow-delay="0.1s"
-      >
+      <div className="container-xxl py-5 px-0 wow fadeInUp" data-wow-delay="0.1s">
         <div className="row g-0">
           <div className="col-md-6">
-            <div className="video">
-            </div>
+            <div className="video"></div>
           </div>
           <div className="col-md-6 bg-dark d-flex align-items-center">
             <div className="p-5 wow fadeInUp" data-wow-delay="0.2s">
@@ -72,6 +103,8 @@ export default function Booking() {
                         className="form-control"
                         id="name"
                         placeholder="Your Name"
+                        value={customerInfo.name}
+                        onChange={handleChange}
                       />
                       <label htmlFor="name">Họ và tên bạn</label>
                     </div>
@@ -83,22 +116,23 @@ export default function Booking() {
                         className="form-control"
                         id="email"
                         placeholder="Your Email"
+                        value={customerInfo.email}
+                        onChange={handleChange}
                       />
                       <label htmlFor="email">Email của bạn</label>
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div
-                      className="form-floating date"
-                      id="date3"
-                    >
+                    <div className="form-floating date" id="date3">
                       <input
                         type="datetime-local"
                         className="form-control datetimepicker-input"
                         id="datetime"
                         placeholder="Date & Time"
+                        value={customerInfo.datetime}
+                        onChange={handleChange}
                       />
-                      <label htmlFor="datetime">Thời gian đặt bàn</label>
+                      <label htmlFor="datetime">Thời gian dùng bữa</label>
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -108,6 +142,8 @@ export default function Booking() {
                         className="form-control"
                         id="quantity"
                         placeholder="Quantity"
+                        value={customerInfo.quantity}
+                        onChange={handleChange}
                       />
                       <label htmlFor="quantity">Số người ăn</label>
                     </div>
@@ -119,6 +155,8 @@ export default function Booking() {
                         className="form-control"
                         placeholder="Special Request"
                         id="phone"
+                        value={customerInfo.phone}
+                        onChange={handleChange}
                       />
                       <label htmlFor="phone">Số điện thoại</label>
                     </div>
@@ -130,13 +168,26 @@ export default function Booking() {
                         placeholder="Special Request"
                         id="message"
                         style={{ height: "100px" }}
+                        value={customerInfo.message}
+                        onChange={handleChange}
                       ></textarea>
                       <label htmlFor="message">Ghi chú thêm</label>
                     </div>
                   </div>
                   <div className="d-flex justify-content-between align-items-center mt-3">
-                    <NavLink to="/confirm" className="btn btn-primary py-2 px-4">Hoàn tất đặt bàn</NavLink>
-                    <NavLink to="/order" className="btn btn-primary py-2 px-5">Tiếp theo</NavLink>
+                    <NavLink
+                      to="/confirm"
+                      className="btn btn-primary py-2 px-4"
+                    >
+                      Hoàn tất đặt bàn
+                    </NavLink>
+                    <NavLink
+                      to="/order"
+                      className="btn btn-primary py-2 px-5"
+                      onClick={handleNext}
+                    >
+                      Tiếp theo
+                    </NavLink>
                   </div>
                 </div>
               </form>

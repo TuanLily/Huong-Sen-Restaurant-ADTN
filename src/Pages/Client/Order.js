@@ -1,7 +1,96 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react"; 
+import { NavLink } from "react-router-dom"; 
+import { useDispatch, useSelector } from "react-redux"; 
+import { fetchProductHoatDong } from "../../Actions/ProductActions";
 
-export default function Booking() {
+export default function Order() {
+  const dispatch = useDispatch();
+  const products = useSelector((state) => state.product.product);
+  const loading = useSelector((state) => state.product.loading);
+  const error = useSelector((state) => state.product.error);
+
+  const [customerInfo, setCustomerInfo] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    datetime: "",
+    quantity: "",
+  });
+
+  const [selectedProducts, setSelectedProducts] = useState({});
+
+  useEffect(() => {
+    dispatch(fetchProductHoatDong());
+
+    const savedData = localStorage.getItem("customerInfo");
+    if (savedData) {
+      setCustomerInfo(JSON.parse(savedData));
+    }
+
+    const savedProducts = localStorage.getItem("selectedProducts");
+    if (savedProducts) {
+      setSelectedProducts(JSON.parse(savedProducts));
+    }
+  }, [dispatch]);
+
+  const handleProductChange = (productId, price, image, name) => {
+    setSelectedProducts((prev) => {
+      const newSelection = { ...prev };
+      if (newSelection[productId]) {
+        // Nếu sản phẩm đã được chọn, bỏ chọn nó
+        delete newSelection[productId];
+      } else {
+        // Nếu sản phẩm chưa được chọn, thêm nó vào
+        newSelection[productId] = {
+          id: productId,
+          price: price,
+          quantity: 1,
+          image: image, // Lưu ảnh vào selection
+          name: name, // Lưu tên sản phẩm vào selection
+        };
+      }
+      localStorage.setItem("selectedProducts", JSON.stringify(newSelection));
+      return newSelection;
+    });
+  };
+
+  const handleQuantityChange = (productId, change, price, image, name) => {
+    setSelectedProducts((prev) => {
+      const currentProduct = prev[productId] || { quantity: 0 };
+      const newQuantity = Math.max(currentProduct.quantity + change, 0); // Ngăn không cho số lượng âm
+      
+      // Nếu số lượng lớn hơn 0, tick sản phẩm; nếu về 0, bỏ tick
+      if (newQuantity > 0) {
+        return {
+          ...prev,
+          [productId]: {
+            id: productId,
+            price: price,
+            quantity: newQuantity,
+            image: image, // Lưu ảnh sản phẩm
+            name: name, // Lưu tên sản phẩm
+          },
+        };
+      } else {
+        const newSelection = { ...prev };
+        delete newSelection[productId]; // Bỏ tick khi số lượng là 0
+        return newSelection;
+      }
+    });
+  };
+
+  const handleNext = () => {
+    const filteredProducts = Object.entries(selectedProducts).reduce((acc, [id, product]) => {
+      if (product.quantity > 0) {
+        acc[id] = product; // Chỉ bao gồm sản phẩm có số lượng lớn hơn 0
+      }
+      return acc;
+    }, {});
+  
+    localStorage.setItem("selectedProducts", JSON.stringify(filteredProducts));
+    console.log(filteredProducts); // Log sản phẩm đã lọc để kiểm tra    
+  };
+
   return (
     <div>
       <div className="container-fluid p-0 py-5 bg-dark hero-header mb-5">
@@ -50,29 +139,28 @@ export default function Booking() {
         </div>
       </div>
 
-      <div
-        className="container-xxl py-5 px-0 wow fadeInUp"
-        data-wow-delay="0.1s"
-      >
+      <div className="container-xxl py-5 px-0">
         <div className="row g-0">
           <div className="col-4 bg-warning p-5">
             <div className="text-center mb-4">
-              <h1 className="text-white section-title ff-secondary">Thông tin đặt bàn</h1>
+              <h1 className="text-white section-title ff-secondary">
+                Thông tin đặt bàn
+              </h1>
             </div>
             <p className="mb-4 mt-4 text-dark text-start">
-              <strong>Họ tên:</strong> Nguyễn Văn A
+              <strong>Họ tên:</strong> {customerInfo.name}
             </p>
             <p className="mb-4 text-dark text-start">
-              <strong>Email:</strong> anv@gmail.com
+              <strong>Email:</strong> {customerInfo.email}
             </p>
             <p className="mb-4 text-dark text-start">
-              <strong>Số điện thoại:</strong> 065789311
+              <strong>Số điện thoại:</strong> {customerInfo.phone}
             </p>
             <p className="mb-4 text-dark text-start">
-              <strong>Thời gian đặt bàn:</strong> 18/08/2024 20:00
+              <strong>Thời gian đặt bàn:</strong> {customerInfo.datetime}
             </p>
             <p className="mb-4 text-dark text-start">
-              <strong>Số người:</strong> 02 người
+              <strong>Số người:</strong> {customerInfo.quantity} người
             </p>
           </div>
 
@@ -102,141 +190,71 @@ export default function Booking() {
 
             <div className="col-md-12 bg-light p-4">
               <form>
-                <div className="menu-item d-flex justify-content-between align-items-center mb-3">
-                  <div className="d-flex align-items-center">
-                    <input
-                      type="checkbox"
-                      id="main1"
-                      checked
-                      className="me-2"
-                    />
-                    <label htmlFor="main1" className="mb-0 flex-grow-1">
-                      Cá chiên nước mắm
-                    </label>
-                    <img
-                      src="../../Assets/Client/Images/huong-sen-logo.png"
-                      style={{ width: "50px" }}
-                      alt="Cá chiên"
-                      className="img-fluid ms-3"
-                    />
+                {loading && <p>Loading...</p>}
+                {error && <p>Error: {error}</p>}
+                {products.map((product) => (
+                  <div
+                    className="menu-item d-flex justify-content-between align-items-center mb-3"
+                    key={product.id}
+                  >
+                    <div className="d-flex align-items-center">
+                      <input
+                        type="checkbox"
+                        id={`product-${product.id}`}
+                        className="me-2"
+                        checked={!!selectedProducts[product.id]} // Chuyển về boolean
+                        onChange={() => handleProductChange(product.id, product.price, product.image, product.name)}
+                      />
+                      <label
+                        htmlFor={`product-${product.id}`}
+                        className="mb-0 flex-grow-1"
+                      >
+                        {product.name}
+                      </label>
+                      <img
+                        src={product.image}
+                        style={{ width: "50px" }}
+                        alt={product.name}
+                        className="img-fluid ms-3"
+                      />
+                    </div>
+                    <div className="quantity-control d-flex align-items-center">
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() => handleQuantityChange(product.id, -1, product.price, product.image, product.name)}
+                      >
+                        -
+                      </button>
+                      <input
+                        type="text"
+                        value={selectedProducts[product.id]?.quantity || 0}
+                        className="form-control text-center mx-2"
+                        style={{ width: "50px" }}
+                        readOnly
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() => handleQuantityChange(product.id, 1, product.price, product.image, product.name)}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <p className="text-primary mb-0 ms-3">{product.price}đ</p>
                   </div>
-                  <div className="quantity-control d-flex align-items-center">
-                    <button type="button" className="btn btn-outline-secondary">
-                      -
-                    </button>
-                    <input
-                      type="text"
-                      value="1"
-                      className="form-control text-center mx-2"
-                      style={{ width: "50px" }}
-                    />
-                    <button type="button" className="btn btn-outline-secondary">
-                      +
-                    </button>
-                  </div>
-                  <p className="text-primary mb-0 ms-3">70.000đ</p>
-                </div>
-                <div className="menu-item d-flex justify-content-between align-items-center mb-3">
-                  <div className="d-flex align-items-center">
-                    <input type="checkbox" id="main1" className="me-2" />
-                    <label htmlFor="main1" className="mb-0 flex-grow-1">
-                      Cá chiên nước mắm
-                    </label>
-                    <img
-                      src="../../Assets/Client/Images/huong-sen-logo.png"
-                      style={{ width: "50px" }}
-                      alt="Cá chiên"
-                      className="img-fluid ms-3"
-                    />
-                  </div>
-                  <div className="quantity-control d-flex align-items-center">
-                    <button type="button" className="btn btn-outline-secondary">
-                      -
-                    </button>
-                    <input
-                      type="text"
-                      value="1"
-                      className="form-control text-center mx-2"
-                      style={{ width: "50px" }}
-                    />
-                    <button type="button" className="btn btn-outline-secondary">
-                      +
-                    </button>
-                  </div>
-                  <p className="text-primary mb-0 ms-3">70.000đ</p>
-                </div>
-                <div className="menu-item d-flex justify-content-between align-items-center mb-3">
-                  <div className="d-flex align-items-center">
-                    <input
-                      type="checkbox"
-                      id="main1"
-                      checked
-                      className="me-2"
-                    />
-                    <label htmlFor="main1" className="mb-0 flex-grow-1">
-                      Cá chiên nước mắm
-                    </label>
-                    <img
-                      src="../../Assets/Client/Images/huong-sen-logo.png"
-                      style={{ width: "50px" }}
-                      alt="Cá chiên"
-                      className="img-fluid ms-3"
-                    />
-                  </div>
-                  <div className="quantity-control d-flex align-items-center">
-                    <button type="button" className="btn btn-outline-secondary">
-                      -
-                    </button>
-                    <input
-                      type="text"
-                      value="1"
-                      className="form-control text-center mx-2"
-                      style={{ width: "50px" }}
-                    />
-                    <button type="button" className="btn btn-outline-secondary">
-                      +
-                    </button>
-                  </div>
-                  <p className="text-primary mb-0 ms-3">70.000đ</p>
-                </div>
-                <div className="menu-item d-flex justify-content-between align-items-center mb-3">
-                  <div className="d-flex align-items-center">
-                    <input
-                      type="checkbox"
-                      id="main1"
-                      checked
-                      className="me-2"
-                    />
-                    <label htmlFor="main1" className="mb-0 flex-grow-1">
-                      Cá chiên nước mắm
-                    </label>
-                    <img
-                      src="../../Assets/Client/Images/huong-sen-logo.png"
-                      style={{ width: "50px" }}
-                      alt="Cá chiên"
-                      className="img-fluid ms-3"
-                    />
-                  </div>
-                  <div className="quantity-control d-flex align-items-center">
-                    <button type="button" className="btn btn-outline-secondary">
-                      -
-                    </button>
-                    <input
-                      type="text"
-                      value="1"
-                      className="form-control text-center mx-2"
-                      style={{ width: "50px" }}
-                    />
-                    <button type="button" className="btn btn-outline-secondary">
-                      +
-                    </button>
-                  </div>
-                  <p className="text-primary mb-0 ms-3">70.000đ</p>
-                </div>
+                ))}
 
-                <div className="text-end mt-4">
-                  <NavLink to="/pay" className="btn btn-primary py-2 px-5">
-                    Tiếp theo
+                <div className="d-flex justify-content-between mt-5">
+                  <NavLink className="btn btn-secondary" to="/booking">
+                    Quay lại
+                  </NavLink>
+                  <NavLink
+                    className="btn btn-primary"
+                    to="/pay"
+                    onClick={handleNext}
+                  >
+                    Tiếp tục
                   </NavLink>
                 </div>
               </form>
