@@ -42,8 +42,8 @@ export default function Service() {
             <div className="col-lg-3 col-sm-6 wow fadeInUp" data-wow-delay="0.5s">
               <div className="service-item rounded pt-3">
                 <div className="p-4">
-                  <i className="fa fa-3x fa-cart-plus text-primary mb-4"></i>
-                  <h5>Đặt hàng trực tuyến</h5>
+                  <i class="fa fa-3x fa-solid fa-chair text-primary mb-4"></i>
+                  <h5>Đặt bàn trực tuyến</h5>
                   <p>Dễ dàng đặt món ăn yêu thích của bạn thông qua hệ thống trực tuyến của chúng tôi, nhanh chóng và tiện lợi.</p>
                 </div>
               </div>
@@ -53,7 +53,7 @@ export default function Service() {
                 <div className="p-4">
                   <i className="fa fa-3x fa-headset text-primary mb-4"></i>
                   <h5>Dịch vụ 24/7</h5>
-                  <p>Chúng tôi luôn sẵn sàng phục vụ bạn mọi lúc, mọi nơi, với dịch vụ khách hàng 24/7.</p>
+                  <p>Chúng tôi luôn sẵn sàng phục vụ bạn mọi lúc, mọi nơi, với dịch vụ khách hàng 24/7. Hỗ trợ chat trực tuyến với nhà hàng.</p>
                 </div>
               </div>
             </div>

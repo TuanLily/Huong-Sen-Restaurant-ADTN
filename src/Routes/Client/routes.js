@@ -17,6 +17,8 @@ import DetailBlog from '../../Pages/Client/DetailBlog';
 import Order from '../../Pages/Client/Order';
 import Pay from '../../Pages/Client/pay';
 import Confirm from '../../Pages/Client/ConfirmPay';
+import Policy from '../../Pages/Client/Policy';
+import ReservationGuide from '../../Pages/Client/ReservationGuide';
 
 
 
@@ -40,6 +42,8 @@ const publicClientRoutes = [
     { path: ClientConfig.routes.order, component: Order },
     { path: ClientConfig.routes.pay, component: Pay },
     { path: ClientConfig.routes.confirm, component: Confirm },
+    { path: ClientConfig.routes.policy, component: Policy },
+    { path: ClientConfig.routes.reservationGuide, component: ReservationGuide },
 
 ];
 

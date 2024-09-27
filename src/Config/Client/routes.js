@@ -16,6 +16,8 @@ const ClientRoutes = {
     order: '/order',
     pay: '/pay',
     confirm: '/confirm',
+    policy: '/policy',
+    reservationGuide: '/reservation-guide'
 };
 
 export default ClientRoutes;

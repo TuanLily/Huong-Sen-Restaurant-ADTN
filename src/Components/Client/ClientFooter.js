@@ -9,11 +9,11 @@ export default function ClientFooter() {
                     <div className="row g-5">
                         <div className="col-lg-3 col-md-6">
                             <h4 className="section-title ff-secondary text-start text-primary fw-normal mb-4">Về nhà hàng</h4>
-                            <Link className="btn btn-link" to="#">Về chúng tôi</Link>
-                            <Link className="btn btn-link" to="#">Liên hệ</Link>
-                            <Link className="btn btn-link" to="#">Dịch vụ</Link>
-                            <Link className="btn btn-link" to="#">Chính sách sử dụng thông tin</Link>
-                            <Link className="btn btn-link" to="#">Chính sách về tài khoản</Link>
+                            <Link className="btn btn-link" to="/about">Về chúng tôi</Link>
+                            <Link className="btn btn-link" to="/contact">Liên hệ</Link>
+                            <Link className="btn btn-link" to="/service">Dịch vụ</Link>
+                            <Link className="btn btn-link" to="/policy">Chính sách hoạt động</Link>
+                            <Link className="btn btn-link" to="/reservation-guide">Hướng dẫn đặt bàn</Link>
                         </div>
                         <div className="col-lg-3 col-md-6">
                             <h4 className="section-title ff-secondary text-start text-primary fw-normal mb-4">Thông tin liên lạc</h4>
