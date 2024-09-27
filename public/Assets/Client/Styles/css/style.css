@@ -514,4 +514,6 @@
     font-size: 14px;
     color: #666;
   }
-  
+  .comment-card{
+    border-radius: 15px;
+  }

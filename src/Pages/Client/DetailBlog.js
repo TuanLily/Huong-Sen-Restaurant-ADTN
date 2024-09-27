@@ -5,6 +5,7 @@ import { Link, useParams } from "react-router-dom"; // To get the slug from the 
 import { fetchBlog } from "../../Actions/BlogActions";
 import unidecode from "unidecode";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../../Components/Client/Spinner";
 
 const DetailBlog = () => {
   const { slug } = useParams();
@@ -70,7 +71,7 @@ const DetailBlog = () => {
       </div>
 
       {blogDetailState.loading ? (
-        <div>Loading...</div>
+        <Spinner/>
       ) : blogDetailState.error ? (
         <div>Error: {blogDetailState.error}</div>
       ) : blogDetailState.blogDetail ? (
@@ -120,7 +121,176 @@ const DetailBlog = () => {
               />
             </div>
           </div>
+
+
+                {/* Phần bình luận của khách hàng */}
+                <div className="container mt-5">
+  <h3 className="text-center mb-4">Bình Luận</h3>
+  
+  {/* Card bao quanh phần bình luận với tên lớp mới */}
+  <div className="comment-card" style={{ backgroundColor: '#fff' }}>
+    <div className="card-body">
+      {/* Hiển thị danh sách bình luận */}
+      <div className="mb-4">
+        <div className="media mb-4 mt-3">
+          <div className="media-body">
+            <h5 className="mt-0">
+              <img
+                src="https://via.placeholder.com/40" // Giảm kích thước avatar
+                alt="User Avatar" 
+                className="mr-3 rounded-circle"
+                style={{ width: "40px", height: "40px" }} // Kích thước mới
+              /> Tên khách hàng 1
+            </h5>
+            Đây là nội dung bình luận của khách hàng.
+            <div className="text-muted">
+              Ngày đăng: 25/09/2024
+            </div>
+            {/* Form trả lời bình luận */}
+            <div className="mt-2">
+              <button 
+                className="btn btn-link p-0" 
+                onClick={() => document.getElementById('replyForm1').classList.toggle('d-none')}
+              >
+                Trả lời
+              </button>
+              <div id="replyForm1" className="d-none mt-2">
+                <form>
+                  <div className="form-group">
+                    <label htmlFor="replyContent1">Nội dung trả lời</label>
+                    <textarea
+                      className="form-control mt-1"
+                      id="replyContent1"
+                      rows="2"
+                      placeholder="Viết câu trả lời của bạn"
+                    ></textarea>
+                  </div>
+                  <button type="submit" className="btn btn-primary mt-2">
+                    Gửi trả lời
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* Bình luận trả lời */}
+            <div className="mt-3" style={{ marginLeft: "20px" }}> {/* Thêm margin-left để thụt vào */}
+              <div className="media mb-2">
+                <div className="media-body">
+                  <h6 className="mt-0">
+                    <img
+                      src="https://via.placeholder.com/30" // Avatar cho bình luận trả lời
+                      alt="User Avatar"
+                      className="mr-2 rounded-circle"
+                      style={{ width: "30px", height: "30px" }}
+                    /> Tên khách hàng 3
+                  </h6>
+                  Cảm ơn bạn đã bình luận!
+                  <div className="text-muted">Ngày đăng: 26/09/2024</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <div className="media mb-4">
+          <div className="media-body">
+            <h5 className="mt-0">
+              <img
+                src="https://via.placeholder.com/40" // Giảm kích thước avatar
+                alt="User Avatar" 
+                className="mr-3 rounded-circle"
+                style={{ width: "40px", height: "40px" }} // Kích thước mới
+              /> Tên khách hàng 2
+            </h5>
+            Một bình luận khác từ khách hàng.
+            <div className="text-muted">
+              Ngày đăng: 26/09/2024
+            </div>
+            {/* Form trả lời bình luận */}
+            <div className="mt-2">
+              <button 
+                className="btn btn-link p-0" 
+                onClick={() => document.getElementById('replyForm2').classList.toggle('d-none')}
+              >
+                Trả lời
+              </button>
+              <div id="replyForm2" className="d-none mt-2">
+                <form>
+                  <div className="form-group">
+                    <label htmlFor="replyContent2">Nội dung trả lời</label>
+                    <textarea
+                      className="form-control mt-1"
+                      id="replyContent2"
+                      rows="2"
+                      placeholder="Viết câu trả lời của bạn"
+                    ></textarea>
+                  </div>
+                  <button type="submit" className="btn btn-primary mt-2">
+                    Gửi trả lời
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            {/* Bình luận trả lời */}
+            <div className="mt-3" style={{ marginLeft: "20px" }}> {/* Thêm margin-left để thụt vào */}
+              <div className="media mb-2">
+                <div className="media-body">
+                  <h6 className="mt-0">
+                    <img
+                      src="https://via.placeholder.com/30" // Avatar cho bình luận trả lời
+                      alt="User Avatar"
+                      className="mr-2 rounded-circle"
+                      style={{ width: "30px", height: "30px" }}
+                    /> Tên khách hàng 4
+                  </h6>
+                  Cảm ơn bạn đã chia sẻ thông tin này!
+                  <div className="text-muted">Ngày đăng: 27/09/2024</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Form thêm bình luận mới */}
+      <hr></hr>
+      <div className="comment-form-card">
+        <div className="card-body">
+          <h5 className="card-title">Thêm bình luận</h5>
+          <form>
+            <div className="form-group">
+              <label htmlFor="commentName">Tên của bạn</label>
+              <input
+                type="text"
+                className="form-control mt-1 mb-3"
+                id="commentName"
+                placeholder="Nhập tên của bạn"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="commentContent">Nội dung bình luận</label>
+              <textarea
+                className="form-control mt-1 mb-3"
+                id="commentContent"
+                rows="3"
+                placeholder="Viết bình luận của bạn"
+              ></textarea>
+            </div>
+            <button type="submit" className="btn btn-primary">
+              Gửi bình luận
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+          
+        </div>
+
       ) : (
         <div className="container">
           <p className="text-center">No blog details available.</p>
@@ -183,5 +353,9 @@ const DetailBlog = () => {
     </div>
   );
 };
+
+
+
+
 
 export default DetailBlog;

@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchBlog } from "../../Actions/BlogActions";
-import unidecode from "unidecode";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchBlog } from '../../Actions/BlogActions';
+import unidecode from 'unidecode';
+import { useNavigate } from 'react-router-dom';
+import Spinner from "../../Components/Client/Spinner";
 
 export default function Blog() {
   const dispatch = useDispatch();
@@ -60,7 +61,7 @@ export default function Blog() {
           <div className="col-md-9">
             <div className="row">
               {/* Show loading or error state */}
-              {blogState.loading && <div>Loading...</div>}
+              {blogState.loading && <Spinner/>}
               {blogState.error && <div>Error: {blogState.error}</div>}
 
               {/* Map over the blog posts */}
