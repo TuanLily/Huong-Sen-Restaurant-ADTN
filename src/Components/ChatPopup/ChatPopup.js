@@ -50,6 +50,14 @@ function ChatPopup() {
   const [chatMode, setChatMode] = useState('bot'); // 'bot' hoặc 'human'
   const [humanChatStatus, setHumanChatStatus] = useState('inactive'); // 'inactive', 'active', 'ended'
 
+
+  const predefinedMessages = [
+    "Xin chào",
+    "Cho tôi biết thêm thông tin về dịch vụ.",
+    "Tôi muốn đặt lịch hẹn.",
+  ];
+
+
   // * Effect để lấy và lắng nghe tin nhắn mới
   useEffect(() => {
     let unsubscribe;
@@ -97,10 +105,16 @@ function ChatPopup() {
     const determineCurrentChatState = () => {
       if (messages.length > 0) {
         const lastMessage = messages[messages.length - 1];
-        if (lastMessage.text.includes("Cuộc trò chuyện đã được tiếp tục.") || lastMessage.text.includes("Bạn đang được chuyển sang chat với nhân viên hỗ trợ")) {
+        const humanChatKeywords = ["tiếp nối", "nhân viên tư vấn"];
+        const botChatKeywords = ["kết thúc", "cuộc trò chuyện đã kết thúc"];
+
+        const isHumanChat = humanChatKeywords.some(keyword => lastMessage.text.includes(keyword));
+        const isBotChat = botChatKeywords.some(keyword => lastMessage.text.includes(keyword));
+
+        if (isHumanChat) {
           setChatMode('human');
           setHumanChatStatus('active');
-        } else if (lastMessage.text.includes("Cuộc trò chuyện đã kết thúc.")) {
+        } else if (isBotChat) {
           setChatMode('bot');
           setHumanChatStatus('inactive');
         }
@@ -109,6 +123,7 @@ function ChatPopup() {
 
     determineCurrentChatState();
   }, [messages]);
+
 
   // * Hàm định dạng thời gian tin nhắn
   const formatMessageTimestamp = (timestamp) => {
@@ -233,28 +248,6 @@ function ChatPopup() {
         setBotTyping(false);
       }
     }
-  };
-
-  // * Hàm xử lý khi nhân viên kết thúc cuộc trò chuyện
-  const handleHumanChatEnd = async () => {
-    const endMessage = {
-      text: "Cuộc trò chuyện với nhân viên đã kết thúc. Bạn đang chat với bot.",
-      timestamp: new Date(),
-      role: "admin",
-      fullname: "Hệ thống",
-      status: "sent",
-      chatId: `${userInfo.fullname}_${userInfo.tel}`,
-    };
-
-    setMessages((prevMessages) => [...prevMessages, endMessage]);
-    await addDoc(collection(db, "messages"), {
-      ...endMessage,
-      timestamp: serverTimestamp(),
-    });
-
-    // Đảm bảo trạng thái được cập nhật ngay lập tức
-    setChatMode('bot');
-    setHumanChatStatus('inactive');
   };
 
   // * Hàm chuyển đổi URL thành link có thể nhấp được
@@ -546,54 +539,104 @@ function ChatPopup() {
                 ))}
               </Box>
               <hr />
-              <Box
-                sx={{ display: "flex", alignItems: "center", width: "100%" }}
-              >
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  placeholder={
-                    chatMode === 'bot'
-                      ? "Nhập câu hỏi cho chatbot..."
-                      : humanChatStatus === 'active'
-                        ? "Nhập tin nhắn cho nhân viên..."
-                        : "Đang chờ nhân viên..."
-                  }
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSendMessage();
-                    }
-                  }}
-                  disabled={chatMode === 'human' && humanChatStatus !== 'active'}
+              <Box sx={{ display: "flex", alignItems: "center", width: "100%", flexDirection: "column" }}>
+
+                {/* Danh sách tin nhắn có sẵn */}
+                <Box
                   sx={{
-                    mr: 1,
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      border: "none",
+                    display: "flex",
+                    overflowX: "auto", // Để có thanh cuộn ngang khi cần
+                    mb: 1,
+                    width: "100%",
+                    padding: "8px",
+                    backgroundColor: "#f9f9f9",
+                    borderRadius: 2,
+                    whiteSpace: "nowrap", // Giữ cho tin nhắn không bị ngắt dòng
+                    "&::-webkit-scrollbar": {
+                      height: "8px",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                      backgroundColor: "#c1c1c1",
+                      borderRadius: "4px",
                     },
                   }}
-                />
-                <IconButton onClick={handleEmojiButtonClick} sx={{ mr: 1 }}>
-                  <EmojiEmotionsIcon />
-                </IconButton>
-                <Popover
-                  id={id}
-                  open={open}
-                  anchorEl={anchorEl}
-                  onClose={handleCloseEmoji}
-                  anchorOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  transformOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                  }}
                 >
-                  <EmojiPicker onEmojiClick={handleEmojiClick} />
-                </Popover>
+                  {predefinedMessages.map((message, index) => (
+                    <Button
+                      key={index}
+                      variant="contained"
+                      size="small"
+                      onClick={async () => {
+                        await setNewMessage(message);
+                        handleSendMessage(message);
+                      }}
+                      sx={{
+                        mr: 1,
+                        whiteSpace: "nowrap",
+                        minWidth: "90%",
+                        padding: "4px 8px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        color: "black",
+                        backgroundColor: "#ffb300",
+                        "&:hover": {
+                          backgroundColor: "#ef6c00",
+                        },
+                      }}
+                    >
+                      {message}
+                    </Button>
+                  ))}
+                </Box>
+
+                <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    placeholder={
+                      chatMode === 'bot'
+                        ? "Nhập câu hỏi cho chatbot..."
+                        : humanChatStatus === 'active'
+                          ? "Nhập tin nhắn cho nhân viên..."
+                          : "Đang chờ nhân viên..."
+                    }
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSendMessage();
+                      }
+                    }}
+                    disabled={chatMode === 'human' && humanChatStatus !== 'active'}
+                    sx={{
+                      mr: 1,
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        border: "none",
+                      },
+                    }}
+                  />
+                  <IconButton onClick={handleEmojiButtonClick} sx={{ mr: 1 }}>
+                    <EmojiEmotionsIcon />
+                  </IconButton>
+                  <Popover
+                    id={id}
+                    open={open}
+                    anchorEl={anchorEl}
+                    onClose={handleCloseEmoji}
+                    anchorOrigin={{
+                      vertical: "top",
+                      horizontal: "right",
+                    }}
+                    transformOrigin={{
+                      vertical: "bottom",
+                      horizontal: "right",
+                    }}
+                  >
+                    <EmojiPicker onEmojiClick={handleEmojiClick} />
+                  </Popover>
+                </Box>
+
               </Box>
             </Paper>
           )}
