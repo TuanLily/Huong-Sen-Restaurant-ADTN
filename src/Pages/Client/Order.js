@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react"; 
-import { NavLink } from "react-router-dom"; 
-import { useDispatch, useSelector } from "react-redux"; 
+import React, { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchProductHoatDong } from "../../Actions/ProductActions";
 
 export default function Order() {
@@ -10,11 +10,12 @@ export default function Order() {
   const error = useSelector((state) => state.product.error);
 
   const [customerInfo, setCustomerInfo] = useState({
-    name: "",
+    fullname: "",
     email: "",
-    phone: "",
-    datetime: "",
-    quantity: "",
+    tel: "",
+    reservation_date: "",
+    party_size: "",
+    note: "",
   });
 
   const [selectedProducts, setSelectedProducts] = useState({});
@@ -43,7 +44,7 @@ export default function Order() {
         // Nếu sản phẩm chưa được chọn, thêm nó vào
         newSelection[productId] = {
           id: productId,
-          price: price,
+          price: parseFloat(price),
           quantity: 1,
           image: image, // Lưu ảnh vào selection
           name: name, // Lưu tên sản phẩm vào selection
@@ -58,14 +59,14 @@ export default function Order() {
     setSelectedProducts((prev) => {
       const currentProduct = prev[productId] || { quantity: 0 };
       const newQuantity = Math.max(currentProduct.quantity + change, 0); // Ngăn không cho số lượng âm
-      
+
       // Nếu số lượng lớn hơn 0, tick sản phẩm; nếu về 0, bỏ tick
       if (newQuantity > 0) {
         return {
           ...prev,
           [productId]: {
             id: productId,
-            price: price,
+            price: parseFloat(price),
             quantity: newQuantity,
             image: image, // Lưu ảnh sản phẩm
             name: name, // Lưu tên sản phẩm
@@ -80,15 +81,34 @@ export default function Order() {
   };
 
   const handleNext = () => {
-    const filteredProducts = Object.entries(selectedProducts).reduce((acc, [id, product]) => {
-      if (product.quantity > 0) {
-        acc[id] = product; // Chỉ bao gồm sản phẩm có số lượng lớn hơn 0
-      }
-      return acc;
-    }, {});
-  
+    const filteredProducts = Object.entries(selectedProducts).reduce(
+      (acc, [id, product]) => {
+        if (product.quantity > 0) {
+          // Tính giá sau khi giảm giá
+          const finalPrice =
+            product.sale_price > 0
+              ? product.price - product.sale_price
+              : product.price;
+
+          acc[id] = {
+            ...product,
+            price: finalPrice, // Lưu giá đã tính toán vào selection
+          }; // Chỉ bao gồm sản phẩm có số lượng lớn hơn 0
+        }
+        return acc;
+      },
+      {}
+    );
+
     localStorage.setItem("selectedProducts", JSON.stringify(filteredProducts));
-    console.log(filteredProducts); // Log sản phẩm đã lọc để kiểm tra    
+    console.log(filteredProducts); // Log sản phẩm đã lọc để kiểm tra
+  };
+
+  const formatPrice = (price) => {
+    return price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
   };
 
   return (
@@ -148,19 +168,23 @@ export default function Order() {
               </h1>
             </div>
             <p className="mb-4 mt-4 text-dark text-start">
-              <strong>Họ tên:</strong> {customerInfo.name}
+              <strong>Họ tên:</strong> {customerInfo.fullname}
             </p>
             <p className="mb-4 text-dark text-start">
               <strong>Email:</strong> {customerInfo.email}
             </p>
             <p className="mb-4 text-dark text-start">
-              <strong>Số điện thoại:</strong> {customerInfo.phone}
+              <strong>Số điện thoại:</strong> {customerInfo.tel}
             </p>
             <p className="mb-4 text-dark text-start">
-              <strong>Thời gian đặt bàn:</strong> {customerInfo.datetime}
+              <strong>Thời gian đặt bàn:</strong>{" "}
+              {customerInfo.reservation_date}
             </p>
             <p className="mb-4 text-dark text-start">
-              <strong>Số người:</strong> {customerInfo.quantity} người
+              <strong>Số người:</strong> {customerInfo.party_size} người
+            </p>
+            <p className="mb-4 text-dark text-start">
+              <strong>Ghi chú:</strong> {customerInfo.note}
             </p>
           </div>
 
@@ -197,32 +221,38 @@ export default function Order() {
                     className="menu-item d-flex justify-content-between align-items-center mb-3"
                     key={product.id}
                   >
-                    <div className="d-flex align-items-center">
-                      <input
-                        type="checkbox"
-                        id={`product-${product.id}`}
-                        className="me-2"
-                        checked={!!selectedProducts[product.id]} // Chuyển về boolean
-                        onChange={() => handleProductChange(product.id, product.price, product.image, product.name)}
-                      />
-                      <label
-                        htmlFor={`product-${product.id}`}
-                        className="mb-0 flex-grow-1"
-                      >
-                        {product.name}
-                      </label>
+                    <div className="d-flex align-items-center flex-grow-1">
                       <img
                         src={product.image}
                         style={{ width: "50px" }}
                         alt={product.name}
-                        className="img-fluid ms-3"
+                        className="img-fluid me-3" // Image on the left
                       />
+                      <div className="flex-grow-1">
+                        <label
+                          htmlFor={`product-${product.id}`}
+                          className="mb-0"
+                        >
+                          {product.name}
+                        </label>
+                        <p className="text-primary mb-0">
+                          {formatPrice(product.price - product.sale_price)}
+                        </p>
+                      </div>
                     </div>
                     <div className="quantity-control d-flex align-items-center">
                       <button
                         type="button"
                         className="btn btn-outline-secondary"
-                        onClick={() => handleQuantityChange(product.id, -1, product.price, product.image, product.name)}
+                        onClick={() =>
+                          handleQuantityChange(
+                            product.id,
+                            -1,
+                            product.price,
+                            product.image,
+                            product.name
+                          )
+                        }
                       >
                         -
                       </button>
@@ -236,12 +266,19 @@ export default function Order() {
                       <button
                         type="button"
                         className="btn btn-outline-secondary"
-                        onClick={() => handleQuantityChange(product.id, 1, product.price, product.image, product.name)}
+                        onClick={() =>
+                          handleQuantityChange(
+                            product.id,
+                            1,
+                            product.price - product.sale_price,
+                            product.image,
+                            product.name
+                          )
+                        }
                       >
                         +
                       </button>
                     </div>
-                    <p className="text-primary mb-0 ms-3">{product.price}đ</p>
                   </div>
                 ))}
 

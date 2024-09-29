@@ -4,11 +4,12 @@ import { NavLink } from "react-router-dom";
 export default function Pay() {
   // State for customer info and selected products
   const [customerInfo, setCustomerInfo] = useState({
-    name: "",
+    fullname: "",
     email: "",
-    phone: "",
-    datetime: "",
-    quantity: "",
+    tel: "",
+    reservation_date: "",
+    party_size: "",
+    note: "",
   });
 
   const [selectedProducts, setSelectedProducts] = useState({});
@@ -28,7 +29,10 @@ export default function Pay() {
 
   // Format price function
   const formatPrice = (price) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
+    return price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
   };
 
   // Calculate total price of selected products
@@ -38,6 +42,22 @@ export default function Pay() {
       0
     );
   };
+
+  // Calculate discount (5%)
+  const calculateDiscount = (total) => {
+    return (total / 100) * 6;
+  };
+
+  // Calculate total after discount and tax
+  const calculateFinalTotal = (total) => {
+    const discount = calculateDiscount(total);
+    const tax = total * 0.1; // Assuming 10% tax
+    return total - discount + tax;
+  };
+
+  const totalPrice = calculateTotalPrice();
+  const discountAmount = calculateDiscount(totalPrice);
+  const finalTotal = calculateFinalTotal(totalPrice);
 
   return (
     <div>
@@ -52,7 +72,10 @@ export default function Pay() {
               <li className="breadcrumb-item">
                 <a href="/">Trang chủ</a>
               </li>
-              <li className="breadcrumb-item text-white active" aria-current="page">
+              <li
+                className="breadcrumb-item text-white active"
+                aria-current="page"
+              >
                 Đặt bàn
               </li>
             </ol>
@@ -87,26 +110,38 @@ export default function Pay() {
       </div>
 
       {/* Customer and Order Details */}
-      <div className="container-xxl py-5 px-0 wow fadeInUp mx-auto" data-wow-delay="0.1s" style={{ maxWidth: "1200px" }}>
+      <div
+        className="container-xxl py-5 px-0 wow fadeInUp mx-auto"
+        data-wow-delay="0.1s"
+        style={{ maxWidth: "1200px" }}
+      >
         <div className="row justify-content-center">
           <div className="col-md-6">
             <div className="p-4 bg-white shadow-sm mb-3">
-              <h2 className="text-warning fw-bold ff-secondary">Thông tin khách hàng</h2>
-              <p className="mb-0 fw-bold">Họ tên: {customerInfo.name}</p>
+              <h2 className="text-warning fw-bold ff-secondary">
+                Thông tin khách hàng
+              </h2>
+              <p className="mb-0 fw-bold">Họ tên: {customerInfo.fullname}</p>
               <p className="mb-0 fw-bold">Email: {customerInfo.email}</p>
-              <p className="mb-0 fw-bold">Số điện thoại: {customerInfo.phone}</p>
-              <p className="mb-0 fw-bold">Thời gian dùng bữa: {customerInfo.datetime}</p>
+              <p className="mb-0 fw-bold">Số điện thoại: {customerInfo.tel}</p>
+              <p className="mb-0 fw-bold">
+                Thời gian dùng bữa: {customerInfo.reservation_date}
+              </p>
             </div>
           </div>
 
           <div className="col-md-6">
             <div className="p-4 bg-white shadow-sm mb-3">
-              <h2 className="text-warning fw-bold ff-secondary">Thông tin đơn đặt bàn</h2>
+              <h2 className="text-warning fw-bold ff-secondary">
+                Thông tin đơn đặt bàn
+              </h2>
               <div className="d-flex justify-content-between align-items-center mt-3">
                 <p className="mb-0 fw-bold">Mã đơn: HS-001</p>
               </div>
               <p className="mb-0 fw-bold">Bàn số: 02</p>
-              <p className="fw-bold">Số người: {customerInfo.quantity} người</p>
+              <p className="fw-bold">
+                Số người: {customerInfo.party_size} người
+              </p>
             </div>
           </div>
         </div>
@@ -114,14 +149,19 @@ export default function Pay() {
         {/* Selected Products */}
         <div className="row justify-content-center">
           <div className="col-md-8">
-            <h5 className="text-warning fw-bold mb-3">Đơn hàng ({Object.keys(selectedProducts).length} sản phẩm)</h5>
+            <h5 className="text-warning fw-bold mb-3">
+              Đơn hàng ({Object.keys(selectedProducts).length} sản phẩm)
+            </h5>
             <hr />
             {Object.values(selectedProducts).map((product) => (
               <div key={product.id} className="bg-white shadow-sm mb-2 p-3">
                 <div className="d-flex justify-content-between align-items-center">
                   <div className="d-flex align-items-center">
                     <img
-                      src={product.image || "../../Assets/Client/Images/placeholder.png"}
+                      src={
+                        product.image ||
+                        "../../Assets/Client/Images/placeholder.png"
+                      }
                       alt={product.name}
                       className="me-3"
                       style={{
@@ -140,7 +180,9 @@ export default function Pay() {
                         >
                           {product.quantity}
                         </span>
-                        <span style={{ color: "#ff9f1a" }}>{formatPrice(product.price)}</span>
+                        <span style={{ color: "#ff9f1a" }}>
+                          {formatPrice(product.price)}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -171,20 +213,22 @@ export default function Pay() {
               </div>
               <div className="d-flex justify-content-between">
                 <span>Tạm tính:</span>
-                <span>{formatPrice(calculateTotalPrice())}</span>
+                <span>{formatPrice(totalPrice)}</span>
+              </div>
+              <div className="d-flex justify-content-between">
+                <span>Giảm giá (5%):</span>
+                <span>{formatPrice(discountAmount)}</span>
               </div>
               <div className="d-flex justify-content-between">
                 <span>Thuế (10%):</span>
-                <span>{formatPrice((calculateTotalPrice() * 0.1).toFixed(0))}</span>
-              </div>
-              <div className="d-flex justify-content-between">
-                <span>Giảm giá:</span>
-                <span>0đ</span>
+                <span>
+                  {formatPrice(Number((totalPrice * 0.1).toFixed(0)))}
+                </span>
               </div>
               <hr />
               <div className="d-flex justify-content-between fw-bold">
                 <span>Tổng cộng:</span>
-                <span>{formatPrice((calculateTotalPrice() - calculateTotalPrice() * 0.1).toFixed(0))}</span>
+                <span>{formatPrice(Number(finalTotal.toFixed(0)))}</span>
               </div>
               <div className="d-flex justify-content-between align-items-center mt-3">
                 <NavLink to="/order" className="btn btn-dark">

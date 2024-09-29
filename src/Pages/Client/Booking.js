@@ -4,12 +4,12 @@ import { NavLink } from "react-router-dom";
 export default function Booking() {
   // State để lưu thông tin khách hàng
   const [customerInfo, setCustomerInfo] = useState({
-    name: "",
+    fullname: "",
     email: "",
-    datetime: "",
-    quantity: "",
-    phone: "",
-    message: ""
+    reservation_date: "",
+    party_size: "",
+    tel: "",
+    note: ""
   });
 
   // Tải dữ liệu đã lưu từ local storage khi component được tải
@@ -101,12 +101,12 @@ export default function Booking() {
                       <input
                         type="text"
                         className="form-control"
-                        id="name"
+                        id="fullname"
                         placeholder="Your Name"
-                        value={customerInfo.name}
+                        value={customerInfo.fullname}
                         onChange={handleChange}
                       />
-                      <label htmlFor="name">Họ và tên bạn</label>
+                      <label htmlFor="fullname">Họ và tên bạn</label>
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -127,12 +127,12 @@ export default function Booking() {
                       <input
                         type="datetime-local"
                         className="form-control datetimepicker-input"
-                        id="datetime"
+                        id="reservation_date"
                         placeholder="Date & Time"
-                        value={customerInfo.datetime}
+                        value={customerInfo.reservation_date}
                         onChange={handleChange}
                       />
-                      <label htmlFor="datetime">Thời gian dùng bữa</label>
+                      <label htmlFor="reservation_date">Thời gian dùng bữa</label>
                     </div>
                   </div>
                   <div className="col-md-6">
@@ -140,25 +140,25 @@ export default function Booking() {
                       <input
                         type="number"
                         className="form-control"
-                        id="quantity"
-                        placeholder="Quantity"
-                        value={customerInfo.quantity}
+                        id="party_size"
+                        placeholder="Party Size"
+                        value={customerInfo.party_size}
                         onChange={handleChange}
                       />
-                      <label htmlFor="quantity">Số người ăn</label>
+                      <label htmlFor="party_size">Số người ăn</label>
                     </div>
                   </div>
                   <div className="col-12">
                     <div className="form-floating">
                       <input
-                        type="text"
+                        type="tel"
                         className="form-control"
-                        placeholder="Special Request"
-                        id="phone"
-                        value={customerInfo.phone}
+                        placeholder="Your Phone"
+                        id="tel"
+                        value={customerInfo.tel}
                         onChange={handleChange}
                       />
-                      <label htmlFor="phone">Số điện thoại</label>
+                      <label htmlFor="tel">Số điện thoại</label>
                     </div>
                   </div>
                   <div className="col-12">
@@ -166,12 +166,12 @@ export default function Booking() {
                       <textarea
                         className="form-control"
                         placeholder="Special Request"
-                        id="message"
+                        id="note"
                         style={{ height: "100px" }}
-                        value={customerInfo.message}
+                        value={customerInfo.note}
                         onChange={handleChange}
                       ></textarea>
-                      <label htmlFor="message">Ghi chú thêm</label>
+                      <label htmlFor="note">Ghi chú thêm</label>
                     </div>
                   </div>
                   <div className="d-flex justify-content-between align-items-center mt-3">
