@@ -53,8 +53,11 @@ function ChatPopup() {
 
   const predefinedMessages = [
     "Xin chào",
-    "Cho tôi biết thêm thông tin về dịch vụ.",
-    "Tôi muốn đặt lịch hẹn.",
+    "Địa chỉ của nhà hàng?",
+    "Phương thức liên hệ với nhà hàng?",
+    "Giờ hoạt động của nhà hàng?",
+    "Làm nào để đặt bàn?",
+    "Gặp nhân viên tư vấn!",
   ];
 
 
@@ -544,14 +547,14 @@ function ChatPopup() {
                 {/* Danh sách tin nhắn có sẵn */}
                 <Box
                   sx={{
-                    display: "flex",
-                    overflowX: "auto", // Để có thanh cuộn ngang khi cần
-                    mb: 1,
+                    display: "block",
+                    overflowX: "auto",
+                    mb: 2,
                     width: "100%",
                     padding: "8px",
                     backgroundColor: "#f9f9f9",
                     borderRadius: 2,
-                    whiteSpace: "nowrap", // Giữ cho tin nhắn không bị ngắt dòng
+                    whiteSpace: "nowrap", 
                     "&::-webkit-scrollbar": {
                       height: "8px",
                     },
@@ -563,29 +566,24 @@ function ChatPopup() {
                 >
                   {predefinedMessages.map((message, index) => (
                     <Button
-                      key={index}
-                      variant="contained"
-                      size="small"
-                      onClick={async () => {
-                        await setNewMessage(message);
-                        handleSendMessage(message);
-                      }}
-                      sx={{
-                        mr: 1,
-                        whiteSpace: "nowrap",
-                        minWidth: "90%",
-                        padding: "4px 8px",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        color: "black",
-                        backgroundColor: "#ffb300",
-                        "&:hover": {
-                          backgroundColor: "#ef6c00",
-                        },
-                      }}
-                    >
-                      {message}
-                    </Button>
+                    key={index}
+                    color="warning"
+                    variant="outlined"
+                    size="small"
+                    onClick={async () => {
+                      await setNewMessage(message);
+                      handleSendMessage(message);
+                    }}
+                    sx={{
+                      mr: 1,
+                      whiteSpace: "nowrap",
+                      padding: "2px 6px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    {message}
+                  </Button>                
                   ))}
                 </Box>
 
@@ -594,6 +592,7 @@ function ChatPopup() {
                     fullWidth
                     variant="outlined"
                     size="small"
+                    type="search"
                     placeholder={
                       chatMode === 'bot'
                         ? "Nhập câu hỏi cho chatbot..."
