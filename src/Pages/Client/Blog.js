@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBlog } from '../../Actions/BlogActions';
 import unidecode from 'unidecode';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Spinner from "../../Components/Client/Spinner";
 
 export default function Blog() {
