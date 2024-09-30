@@ -12,5 +12,6 @@ export const API_DATA = {
   changePassword: "/auth/change-password",
 
   blog: "/public/blogs",
-  contact: "/contact"
+  contact: "/contact",
+  promotion: "/public/promotion",
 };

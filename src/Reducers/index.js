@@ -7,6 +7,7 @@ import blogReducer from "./BlogReducers";
 import productDetailReducer from "./ProductDetailReducers";
 import contactReducer from "./ContactReducers";
 import blogDetailReducer from "./BlogDetailReducers";
+import promotionReducer from "./PromotionReducers";
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -16,7 +17,8 @@ const rootReducer = combineReducers({
     blog: blogReducer,
     product_detail: productDetailReducer,
     contact: contactReducer,
-    blog_detail: blogDetailReducer
+    blog_detail: blogDetailReducer,
+    promotion: promotionReducer,
 });
 
 export default rootReducer;
