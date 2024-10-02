@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductHoatDong } from "../../Actions/ProductActions";
+import { fetchProductCategoryHoatDong } from "../../Actions/ProductCategoryActions";
 
 export default function Order() {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.product.product);
+  const productCategoryState = useSelector((state) => state.product_category);
   const loading = useSelector((state) => state.product.loading);
   const error = useSelector((state) => state.product.error);
 
@@ -19,9 +21,11 @@ export default function Order() {
   });
 
   const [selectedProducts, setSelectedProducts] = useState({});
+  const [selectedCategory, setSelectedCategory] = useState(null); // State cho danh mục sản phẩm
 
   useEffect(() => {
     dispatch(fetchProductHoatDong());
+    dispatch(fetchProductCategoryHoatDong());
 
     const savedData = localStorage.getItem("customerInfo");
     if (savedData) {
@@ -38,16 +42,14 @@ export default function Order() {
     setSelectedProducts((prev) => {
       const newSelection = { ...prev };
       if (newSelection[productId]) {
-        // Nếu sản phẩm đã được chọn, bỏ chọn nó
         delete newSelection[productId];
       } else {
-        // Nếu sản phẩm chưa được chọn, thêm nó vào
         newSelection[productId] = {
           id: productId,
           price: parseFloat(price),
           quantity: 1,
-          image: image, // Lưu ảnh vào selection
-          name: name, // Lưu tên sản phẩm vào selection
+          image: image,
+          name: name,
         };
       }
       localStorage.setItem("selectedProducts", JSON.stringify(newSelection));
@@ -58,9 +60,8 @@ export default function Order() {
   const handleQuantityChange = (productId, change, price, image, name) => {
     setSelectedProducts((prev) => {
       const currentProduct = prev[productId] || { quantity: 0 };
-      const newQuantity = Math.max(currentProduct.quantity + change, 0); // Ngăn không cho số lượng âm
+      const newQuantity = Math.max(currentProduct.quantity + change, 0);
 
-      // Nếu số lượng lớn hơn 0, tick sản phẩm; nếu về 0, bỏ tick
       if (newQuantity > 0) {
         return {
           ...prev,
@@ -68,13 +69,13 @@ export default function Order() {
             id: productId,
             price: parseFloat(price),
             quantity: newQuantity,
-            image: image, // Lưu ảnh sản phẩm
-            name: name, // Lưu tên sản phẩm
+            image: image,
+            name: name,
           },
         };
       } else {
         const newSelection = { ...prev };
-        delete newSelection[productId]; // Bỏ tick khi số lượng là 0
+        delete newSelection[productId];
         return newSelection;
       }
     });
@@ -84,16 +85,7 @@ export default function Order() {
     const filteredProducts = Object.entries(selectedProducts).reduce(
       (acc, [id, product]) => {
         if (product.quantity > 0) {
-          // Tính giá sau khi giảm giá
-          const finalPrice =
-            product.sale_price > 0
-              ? product.price - product.sale_price
-: product.price;
-
-          acc[id] = {
-            ...product,
-            price: finalPrice, // Lưu giá đã tính toán vào selection
-          }; // Chỉ bao gồm sản phẩm có số lượng lớn hơn 0
+          acc[id] = { ...product };
         }
         return acc;
       },
@@ -101,7 +93,7 @@ export default function Order() {
     );
 
     localStorage.setItem("selectedProducts", JSON.stringify(filteredProducts));
-    console.log(filteredProducts); // Log sản phẩm đã lọc để kiểm tra
+    console.log(filteredProducts);
   };
 
   const formatPrice = (price) => {
@@ -110,6 +102,11 @@ export default function Order() {
       currency: "VND",
     });
   };
+
+  // Lọc sản phẩm theo danh mục đã chọn
+  const productsInCategorySelected = selectedCategory
+    ? products.filter((product) => product.categories_id === selectedCategory)
+    : products;
 
   return (
     <div>
@@ -177,7 +174,7 @@ export default function Order() {
               <strong>Số điện thoại:</strong> {customerInfo.tel}
             </p>
             <p className="mb-4 text-dark text-start">
-<strong>Thời gian đặt bàn:</strong>{" "}
+              <strong>Thời gian đặt bàn:</strong>{" "}
               {customerInfo.reservation_date}
             </p>
             <p className="mb-4 text-dark text-start">
@@ -190,33 +187,42 @@ export default function Order() {
 
           <div className="col-8 bg-light p-5">
             <ul className="nav nav-tabs">
-              <li className="nav-item">
-                <a className="nav-link active" href="#">
-                  Món khai vị
+              <li
+                className="nav-item"
+                onClick={() => setSelectedCategory(null)}
+              >
+                <a
+                  className={`nav-link ${
+                    selectedCategory === null ? "active" : ""
+                  }`}
+                  href="#"
+                >
+                  Tất cả
                 </a>
               </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Món chính
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Tráng miệng
-                </a>
-              </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#">
-                  Nước uống
-                </a>
-              </li>
+              {productCategoryState.product_category.map((category) => (
+                <li
+                  className="nav-item"
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                >
+                  <a
+                    className={`nav-link ${
+                      selectedCategory === category.id ? "active" : ""
+                    }`}
+                    href="#"
+                  >
+                    {category.name}
+                  </a>
+                </li>
+              ))}
             </ul>
 
             <div className="col-md-12 bg-light p-4">
               <form>
                 {loading && <p>Loading...</p>}
                 {error && <p>Error: {error}</p>}
-                {products.map((product) => (
+                {productsInCategorySelected.map((product) => (
                   <div
                     className="menu-item d-flex justify-content-between align-items-center mb-3"
                     key={product.id}
@@ -226,7 +232,7 @@ export default function Order() {
                         src={product.image}
                         style={{ width: "50px" }}
                         alt={product.name}
-                        className="img-fluid me-3" // Image on the left
+                        className="img-fluid me-3"
                       />
                       <div className="flex-grow-1">
                         <label
@@ -254,7 +260,7 @@ export default function Order() {
                           )
                         }
                       >
--
+                        -
                       </button>
                       <input
                         type="text"
@@ -270,7 +276,7 @@ export default function Order() {
                           handleQuantityChange(
                             product.id,
                             1,
-                            product.price - product.sale_price,
+                            product.price,
                             product.image,
                             product.name
                           )
@@ -281,20 +287,20 @@ export default function Order() {
                     </div>
                   </div>
                 ))}
-
-                <div className="d-flex justify-content-between mt-5">
-                  <NavLink className="btn btn-secondary" to="/booking">
-                    Quay lại
-                  </NavLink>
-                  <NavLink
-                    className="btn btn-primary"
-                    to="/pay"
-                    onClick={handleNext}
-                  >
-                    Tiếp tục
-                  </NavLink>
-                </div>
               </form>
+
+              <div className="text-end">
+                <NavLink to="/booking" className="btn btn-secondary me-2">
+                  Trở lại
+                </NavLink>
+                <NavLink
+                  to="/pay"
+                  className="btn btn-primary"
+                  onClick={handleNext}
+                >
+                  Tiếp theo
+                </NavLink>
+              </div>
             </div>
           </div>
         </div>

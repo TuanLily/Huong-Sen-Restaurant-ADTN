@@ -14,4 +14,5 @@ export const API_DATA = {
   blog: "/public/blogs",
   contact: "/contact",
   promotion: "/public/promotion",
+  reservations: "/public/reservations",
 };

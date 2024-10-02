@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addNewReservation } from "../../Actions/ReservationActions";
 
 export default function Booking() {
+  const dispatch = useDispatch();
+
   // State để lưu thông tin khách hàng
   const [customerInfo, setCustomerInfo] = useState({
     fullname: "",
@@ -9,7 +13,8 @@ export default function Booking() {
     reservation_date: "",
     party_size: "",
     tel: "",
-    note: ""
+    note: "",
+    status: 1, // Trạng thái mặc định là 1
   });
 
   // Tải dữ liệu đã lưu từ local storage khi component được tải
@@ -32,7 +37,22 @@ export default function Booking() {
   // Lưu dữ liệu hiện tại của form vào local storage khi nhấn "Tiếp theo"
   const handleNext = () => {
     localStorage.setItem("customerInfo", JSON.stringify(customerInfo));
-    console.log(JSON.parse(localStorage.getItem("customerInfo")));    
+    console.log("Saved customer info:", JSON.parse(localStorage.getItem("customerInfo")));
+  };
+
+  // Xử lý hoàn tất đặt bàn
+  const handleCompleteBooking = async () => {
+    localStorage.setItem("customerInfo", JSON.stringify(customerInfo));
+
+    // Gửi dữ liệu lên server
+    try {
+      await dispatch(addNewReservation(customerInfo));
+      alert("Đặt bàn thành công!");
+      localStorage.removeItem("customerInfo"); // Xóa dữ liệu trong local storage
+    } catch (error) {
+      console.error("Error completing booking:", error);
+      alert("Có lỗi xảy ra, vui lòng thử lại!");
+    }
   };
 
   return (
@@ -47,10 +67,7 @@ export default function Booking() {
               <li className="breadcrumb-item">
                 <Link to="/">Trang chủ</Link>
               </li>
-              <li
-                className="breadcrumb-item text-white active"
-                aria-current="page"
-              >
+              <li className="breadcrumb-item text-white active" aria-current="page">
                 Đặt bàn
               </li>
             </ol>
@@ -178,6 +195,7 @@ export default function Booking() {
                     <NavLink
                       to="/confirm"
                       className="btn btn-primary py-2 px-4"
+                      onClick={handleCompleteBooking} // Gọi hàm hoàn tất đặt bàn
                     >
                       Hoàn tất đặt bàn
                     </NavLink>

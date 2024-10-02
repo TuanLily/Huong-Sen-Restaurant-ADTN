@@ -42,7 +42,6 @@ export default function Pay() {
     dispatch(fetchPromotion());
   }, [dispatch]);
 
-  // Format price function
   const formatPrice = (price) => {
     return price.toLocaleString("vi-VN", {
       style: "currency",
@@ -54,7 +53,6 @@ export default function Pay() {
     return new Date(datetime).toLocaleString("vi-VN");
   };
 
-  // Calculate total price of selected products
   const calculateTotalPrice = () => {
     return Object.values(selectedProducts).reduce(
       (total, product) => total + product.price * product.quantity,
@@ -67,16 +65,14 @@ export default function Pay() {
     return `HS-${randomNumber}`;
   };
 
-  // Calculate total after discount and tax
   const calculateFinalTotal = (total) => {
-    const discount = calculateDiscount(total);
-    const tax = total * 0.1; // Assuming 10% tax
-    return total - discount + tax;
+    const discountAmount = (total * discount) / 100;
+    const tax = total * 0.1;
+    return {
+      discountedTotal: total - discountAmount,
+      finalTotal: total - discountAmount + tax,
+    };
   };
-
-  const calculateDiscount = (total) => {
-    return (total / 100) * 6;
-  }
 
   const assignTable = (quantity) => {
     if (quantity <= 2) {
@@ -89,8 +85,7 @@ export default function Pay() {
   };
 
   const totalPrice = calculateTotalPrice();
-  const discountAmount = calculateDiscount(totalPrice);
-  const finalTotal = calculateFinalTotal(totalPrice);
+  const { discountedTotal, finalTotal } = calculateFinalTotal(totalPrice);
 
   const applyVoucher = (codeToApply) => {
     const promotion = promotions.find(
@@ -119,11 +114,8 @@ export default function Pay() {
     }
   };
 
-
   const validPromotions = promotions.filter(
-    (promo) =>
-      new Date(promo.valid_to) >= new Date() &&
-      promo.quantity > 0
+    (promo) => new Date(promo.valid_to) >= new Date() && promo.quantity > 0
   );
 
   return (
@@ -157,6 +149,7 @@ export default function Pay() {
         style={{ maxWidth: "1200px" }}
       >
         <div className="row justify-content-center">
+          {/* Customer Information */}
           <div className="col-md-6">
             <div className="p-4 bg-white shadow-sm mb-3">
               <h2 className="text-warning fw-bold ff-secondary">
@@ -164,12 +157,11 @@ export default function Pay() {
               </h2>
               <p className="mb-0 fw-bold">Họ tên: {customerInfo.fullname}</p>
               <p className="mb-0 fw-bold">Email: {customerInfo.email}</p>
-              <p className="mb-0 fw-bold">
-                Số điện thoại: {customerInfo.tel}
-              </p>
+              <p className="mb-0 fw-bold">Số điện thoại: {customerInfo.tel}</p>
             </div>
           </div>
 
+          {/* Order Information */}
           <div className="col-md-6">
             <div className="p-4 bg-white shadow-sm mb-3">
               <h2 className="text-warning fw-bold ff-secondary">
@@ -178,7 +170,8 @@ export default function Pay() {
               <div className="d-flex justify-content-between align-items-center mt-2">
                 <p className="mb-0 fw-bold">Mã đơn: {orderId}</p>
                 <p className="mb-0 fw-bold text-end">
-                  Thời gian dùng bữa: {formatTime(customerInfo.reservation_date)}
+                  Thời gian dùng bữa:{" "}
+                  {formatTime(customerInfo.reservation_date)}
                 </p>
               </div>
               <p className="mb-0 fw-bold">Bàn số: {tableNumber}</p>
@@ -196,42 +189,44 @@ export default function Pay() {
               Đơn hàng ({Object.keys(selectedProducts).length} sản phẩm)
             </h5>
             <hr />
-            {Object.values(selectedProducts).map((product) => (
-              <div key={product.id} className="bg-white shadow-sm mb-2 p-3">
-                <div className="d-flex justify-content-between align-items-center">
-                  <div className="d-flex align-items-center">
-                    <img
-                      src={
-                        product.image ||
-                        "../../Assets/Client/Images/placeholder.png"
-                      }
-                      alt={product.name}
-                      className="me-3"
-                      style={{
-                        width: "60px",
-                        height: "60px",
-                        objectFit: "cover",
-                        borderRadius: "5px",
-                      }}
-                    />
-                    <div className="d-flex flex-column">
-                      <span className="fw-bold">{product.name}</span>
-                      <div className="d-flex align-items-center mt-1">
-                        <span
-                          className="badge bg-warning rounded-circle"
-                          style={{ marginRight: "8px" }}
-                        >
-                          {product.quantity}
-                        </span>
-                        <span style={{ color: "#ff9f1a" }}>
-                          {formatPrice(product.price)}
-                        </span>
+            <div style={{ maxHeight: "600px", overflowY: "auto" }}>
+              {Object.values(selectedProducts).map((product) => (
+                <div key={product.id} className="bg-white shadow-sm mb-2 p-3">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-center">
+                      <img
+                        src={
+                          product.image ||
+                          "../../Assets/Client/Images/placeholder.png"
+                        }
+                        alt={product.name}
+                        className="me-3"
+                        style={{
+                          width: "60px",
+                          height: "60px",
+                          objectFit: "cover",
+                          borderRadius: "5px",
+                        }}
+                      />
+                      <div className="d-flex flex-column">
+                        <span className="fw-bold">{product.name}</span>
+                        <div className="d-flex align-items-center mt-1">
+                          <span
+                            className="badge bg-warning rounded-circle"
+                            style={{ marginRight: "8px" }}
+                          >
+                            {product.quantity}
+                          </span>
+                          <span style={{ color: "#ff9f1a" }}>
+                            {formatPrice(product.price)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Order Summary */}
@@ -266,66 +261,61 @@ export default function Pay() {
                     value={selectedPromotion}
                     onChange={(e) => handlePromotionSelect(e.target.value)}
                   >
-                    <option value="" disabled>Chọn mã khuyến mãi</option>
-                    {validPromotions.map((promo) => (
-                      <option key={promo.id} value={promo.code_name}>
-                        {promo.code_name} - Giảm {promo.discount}%
+                    <option value="">Chọn mã khuyến mãi</option>
+                    {validPromotions.map((promotion) => (
+                      <option key={promotion.id} value={promotion.code_name}>
+                        {promotion.code_name} ({promotion.discount}%)
                       </option>
                     ))}
                   </select>
                 ) : (
-                  <p className="text-muted">
-                    Không có mã khuyến mãi nào còn hiệu lực.
-                  </p>
+                  <p>Không có khuyến mãi hiện tại.</p>
                 )}
               </div>
 
-              <div className="d-flex justify-content-between">
-                <span>Tạm tính:</span>
+              {/* Order total */}
+              <div className="d-flex justify-content-between align-items-center">
+                <span>Tổng tiền:</span>
                 <span>{formatPrice(totalPrice)}</span>
               </div>
-              <div className="d-flex justify-content-between">
-                <span>Giảm giá (5%):</span>
-                <span>{formatPrice(discountAmount)}</span>
-              </div>
-              <div className="d-flex justify-content-between">
+
+              {/* Discount */}
+              <div className="d-flex justify-content-between align-items-center">
                 <span>Giảm giá:</span>
-                <span>
-                  {formatPrice(
-                    (calculateTotalPrice() * (discount / 100)).toFixed(0)
-                  )}
-                </span>
-              </div>
-              <div className="d-flex justify-content-between">
-                <span>Thuế (10%):</span>
-                <span>
-                  {formatPrice(
-                    Number((calculateTotalPrice() * 0.1).toFixed(0))
-                  )}
-                </span>
-              </div>
-              <hr />
-              <div>
-                <label className="d-flex justify-content-between fw-bold">Phương thức thanh toán</label>
-                <input type="radio" /> Thanh toán 30% hóa đơn <br />
-                <input type="radio" /> Thanh toán tổng hóa đơn
-                <hr />
-                <input type="radio" /> Thanh toán chuyển khoản <br />
-                <input type="radio" /> Thanh toán tiền mặt
-              </div>
-              <div className="d-flex justify-content-between fw-bold">
-                <span>Tổng cộng:</span>
-                <span>
-                  {formatPrice(Number(finalTotal.toFixed(0)))}
-                </span>
+                <span>{formatPrice(totalPrice * (discount / 100))}</span>
               </div>
 
-              <div className="d-flex justify-content-between align-items-center mt-3">
-                <NavLink to="/order" className="btn btn-outline-primary">
-                  Quay lại
+              {/* Tax */}
+              <div className="d-flex justify-content-between align-items-center">
+                <span>Thuế:</span>
+                <span>{formatPrice(totalPrice * 0.1)}</span>
+              </div>
+
+              <hr />
+
+              {/* Payment Method */}
+              <label className="d-flex justify-content-between fw-bold">Phương thức thanh toán</label>
+              <input type="radio" name="payment-method" /> Thanh toán 30% hóa đơn <br />
+              <hr />
+              <input type="radio" name="payment-method" /> Thanh toán chuyển khoản <br />
+
+              <hr />
+
+              {/* Final total */}
+              <div className="d-flex justify-content-between align-items-center">
+                <span>Tổng thanh toán:</span>
+                <span className="fw-bold">{formatPrice(finalTotal)}</span>
+              </div>
+
+              {/* Buttons for confirmation and going back */}
+              <div className="d-flex justify-content-between mt-3">
+                <NavLink to="/order" className="w-30">
+                  <button className="btn btn-secondary w-100">Trở lại</button>
                 </NavLink>
-                <NavLink to="/confirm" className="btn btn-primary">
-                  Xác nhận thanh toán
+                <NavLink to="/confirm" className="w-70">
+                  <button className="btn btn-primary w-100">
+                    Xác nhận đơn hàng
+                  </button>
                 </NavLink>
               </div>
             </div>
