@@ -67,6 +67,17 @@ export default function Pay() {
     return `HS-${randomNumber}`;
   };
 
+  // Calculate total after discount and tax
+  const calculateFinalTotal = (total) => {
+    const discount = calculateDiscount(total);
+    const tax = total * 0.1; // Assuming 10% tax
+    return total - discount + tax;
+  };
+
+  const calculateDiscount = (total) => {
+    return (total / 100) * 6;
+  }
+
   const assignTable = (quantity) => {
     if (quantity <= 2) {
       return "02";
@@ -76,6 +87,10 @@ export default function Pay() {
       return "Bàn tiệc";
     }
   };
+
+  const totalPrice = calculateTotalPrice();
+  const discountAmount = calculateDiscount(totalPrice);
+  const finalTotal = calculateFinalTotal(totalPrice);
 
   const applyVoucher = (codeToApply) => {
     const promotion = promotions.find(
@@ -104,18 +119,10 @@ export default function Pay() {
     }
   };
 
-  const calculateFinalTotal = () => {
-    const productTotal = calculateTotalPrice();
-    const discountAmount = productTotal * (discount / 100);
-    const discountedTotal = productTotal - discountAmount;
-    const tax = discountedTotal * 0.1;
-    const finalTotal = discountedTotal + tax;
-    return finalTotal;
-  };
 
   const validPromotions = promotions.filter(
-    (promo) => 
-      new Date(promo.valid_to) >= new Date() && 
+    (promo) =>
+      new Date(promo.valid_to) >= new Date() &&
       promo.quantity > 0
   );
 
@@ -155,10 +162,10 @@ export default function Pay() {
               <h2 className="text-warning fw-bold ff-secondary">
                 Thông tin khách hàng
               </h2>
-              <p className="mb-0 fw-bold">Họ tên: {customerInfo.name}</p>
+              <p className="mb-0 fw-bold">Họ tên: {customerInfo.fullname}</p>
               <p className="mb-0 fw-bold">Email: {customerInfo.email}</p>
               <p className="mb-0 fw-bold">
-                Số điện thoại: {customerInfo.phone}
+                Số điện thoại: {customerInfo.tel}
               </p>
             </div>
           </div>
@@ -171,12 +178,12 @@ export default function Pay() {
               <div className="d-flex justify-content-between align-items-center mt-2">
                 <p className="mb-0 fw-bold">Mã đơn: {orderId}</p>
                 <p className="mb-0 fw-bold text-end">
-                  Thời gian dùng bữa: {formatTime(customerInfo.datetime)}
+                  Thời gian dùng bữa: {formatTime(customerInfo.reservation_date)}
                 </p>
               </div>
               <p className="mb-0 fw-bold">Bàn số: {tableNumber}</p>
               <p className="mb-0 fw-bold">
-                Số người: {customerInfo.quantity} người
+                Số người: {customerInfo.party_size} người
               </p>
             </div>
           </div>
@@ -299,17 +306,17 @@ export default function Pay() {
               </div>
               <hr />
               <div>
-              <label className="d-flex justify-content-between fw-bold">Phương thức thanh toán</label>
-              <input type="radio"/> Thanh toán 30% hóa đơn <br/>
-              <input type="radio"/> Thanh toán tổng hóa đơn
-              <hr/>
-              <input type="radio"/> Thanh toán chuyển khoản <br/>
-              <input type="radio"/> Thanh toán tiền mặt
+                <label className="d-flex justify-content-between fw-bold">Phương thức thanh toán</label>
+                <input type="radio" /> Thanh toán 30% hóa đơn <br />
+                <input type="radio" /> Thanh toán tổng hóa đơn
+                <hr />
+                <input type="radio" /> Thanh toán chuyển khoản <br />
+                <input type="radio" /> Thanh toán tiền mặt
               </div>
               <div className="d-flex justify-content-between fw-bold">
                 <span>Tổng cộng:</span>
                 <span>
-                  {formatPrice(Number(calculateFinalTotal().toFixed(0)))}
+                  {formatPrice(Number(finalTotal.toFixed(0)))}
                 </span>
               </div>
 

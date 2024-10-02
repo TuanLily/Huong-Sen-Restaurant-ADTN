@@ -80,20 +80,20 @@ export default function Order() {
     });
   };
 
-  const formatTime = (datetime) => {
-    return new Date(datetime).toLocaleString("vi-VN");
-  };
-
-  const formatPrice = (price) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
-  };
-  
-
   const handleNext = () => {
     const filteredProducts = Object.entries(selectedProducts).reduce(
       (acc, [id, product]) => {
         if (product.quantity > 0) {
-          acc[id] = product; // Chỉ bao gồm sản phẩm có số lượng lớn hơn 0
+          // Tính giá sau khi giảm giá
+          const finalPrice =
+            product.sale_price > 0
+              ? product.price - product.sale_price
+: product.price;
+
+          acc[id] = {
+            ...product,
+            price: finalPrice, // Lưu giá đã tính toán vào selection
+          }; // Chỉ bao gồm sản phẩm có số lượng lớn hơn 0
         }
         return acc;
       },
@@ -102,6 +102,13 @@ export default function Order() {
 
     localStorage.setItem("selectedProducts", JSON.stringify(filteredProducts));
     console.log(filteredProducts); // Log sản phẩm đã lọc để kiểm tra
+  };
+
+  const formatPrice = (price) => {
+    return price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
   };
 
   return (
@@ -170,17 +177,14 @@ export default function Order() {
               <strong>Số điện thoại:</strong> {customerInfo.tel}
             </p>
             <p className="mb-4 text-dark text-start">
-              <strong>Thời gian đặt bàn:</strong>{" "}
-              {formatTime(customerInfo.datetime)}
+<strong>Thời gian đặt bàn:</strong>{" "}
+              {customerInfo.reservation_date}
             </p>
             <p className="mb-4 text-dark text-start">
               <strong>Số người:</strong> {customerInfo.party_size} người
             </p>
             <p className="mb-4 text-dark text-start">
               <strong>Ghi chú:</strong> {customerInfo.note}
-            </p>
-            <p className="mb-4 text-dark text-start">
-              <strong>Ghi chú:</strong> {customerInfo.message}
             </p>
           </div>
 
@@ -217,38 +221,10 @@ export default function Order() {
                     className="menu-item d-flex justify-content-between align-items-center mb-3"
                     key={product.id}
                   >
-                    <div
-                      className="d-flex align-items-center"
-                      style={{ minWidth: "250px" }}
-                    >
-                      <input
-                        type="checkbox"
-                        id={`product-${product.id}`}
-                        className="me-2"
-                        checked={!!selectedProducts[product.id]}
-                        onChange={() =>
-                          handleProductChange(
-                            product.id,
-                            product.price,
-                            product.image,
-                            product.name
-                          )
-                        }
-                      />
-                      <label
-                        htmlFor={`product-${product.id}`}
-                        className="mb-0"
-                        style={{ flexGrow: 1, minWidth: "100px" }} // Giới hạn chiều rộng của label
-                      >
-                        {product.name}
-                      </label>
+                    <div className="d-flex align-items-center flex-grow-1">
                       <img
                         src={product.image}
-                        style={{
-                          width: "50px",
-                          minWidth: "50px",
-                          maxWidth: "50px",
-                        }} // Đảm bảo chiều rộng cố định của ảnh
+                        style={{ width: "50px" }}
                         alt={product.name}
                         className="img-fluid me-3" // Image on the left
                       />
@@ -264,10 +240,7 @@ export default function Order() {
                         </p>
                       </div>
                     </div>
-                    <div
-                      className="quantity-control d-flex align-items-center"
-                      style={{ minWidth: "150px" }}
-                    >
+                    <div className="quantity-control d-flex align-items-center">
                       <button
                         type="button"
                         className="btn btn-outline-secondary"
@@ -280,19 +253,14 @@ export default function Order() {
                             product.name
                           )
                         }
-                        style={{ width: "40px" }} // Giới hạn chiều rộng của nút
                       >
-                        -
+-
                       </button>
                       <input
                         type="text"
                         value={selectedProducts[product.id]?.quantity || 0}
                         className="form-control text-center mx-2"
-                        style={{
-                          width: "50px",
-                          minWidth: "50px",
-                          maxWidth: "50px",
-                        }} // Cố định độ rộng của input số lượng
+                        style={{ width: "50px" }}
                         readOnly
                       />
                       <button
@@ -302,22 +270,15 @@ export default function Order() {
                           handleQuantityChange(
                             product.id,
                             1,
-                            product.price,
+                            product.price - product.sale_price,
                             product.image,
                             product.name
                           )
                         }
-                        style={{ width: "40px" }} // Giới hạn chiều rộng của nút
                       >
                         +
                       </button>
                     </div>
-                    <p
-                      className="text-primary mb-0 ms-3"
-                      style={{ minWidth: "100px", textAlign: "right" }}
-                    >
-                      {formatPrice(product.price)}
-                    </p>
                   </div>
                 ))}
 
