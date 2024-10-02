@@ -17,7 +17,9 @@ const ClientRoutes = {
     pay: '/pay',
     confirm: '/confirm',
     policy: '/policy',
-    reservationGuide: '/reservation-guide'
+    reservationGuide: '/reservation-guide',
+    commentBlog: 'comment-blog',
+    commentBlogAdd: 'comment-blog/add',
 };
 
 export default ClientRoutes;

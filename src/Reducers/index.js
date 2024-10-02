@@ -8,6 +8,8 @@ import productDetailReducer from "./ProductDetailReducers";
 import contactReducer from "./ContactReducers";
 import blogDetailReducer from "./BlogDetailReducers";
 import promotionReducer from "./PromotionReducers";
+import CommentBlogReducer from './CommentBlogReducers';
+
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -19,6 +21,8 @@ const rootReducer = combineReducers({
     contact: contactReducer,
     blog_detail: blogDetailReducer,
     promotion: promotionReducer,
+    comment_blog: CommentBlogReducer,
+    blog_detail: blogDetailReducer
 });
 
 export default rootReducer;
