@@ -2,8 +2,13 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPromotion } from "../../Actions/PromotionActions";
+import { addNewReservation } from "../../Actions/ReservationActions";
+import { addNewReservationDetail } from "../../Actions/Reservation_detailActions";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Pay() {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const promotions = useSelector((state) => state.promotion.promotion);
 
@@ -14,6 +19,7 @@ export default function Pay() {
     reservation_date: "",
     party_size: "",
     note: "",
+    status: 1,
   });
 
   const [selectedProducts, setSelectedProducts] = useState({});
@@ -22,6 +28,7 @@ export default function Pay() {
   const [discount, setDiscount] = useState(0);
   const [orderId, setOrderId] = useState("");
   const [tableNumber, setTableNumber] = useState("");
+  
 
   useEffect(() => {
     const savedCustomerInfo = localStorage.getItem("customerInfo");
@@ -35,8 +42,8 @@ export default function Pay() {
     }
 
     setOrderId(generateOrderId());
-    setTableNumber(assignTable(customerInfo.quantity));
-  }, [customerInfo.quantity]);
+    setTableNumber(assignTable(customerInfo.party_size));
+  }, [customerInfo.party_size]);
 
   useEffect(() => {
     dispatch(fetchPromotion());
@@ -74,18 +81,18 @@ export default function Pay() {
     };
   };
 
-  const assignTable = (quantity) => {
-    if (quantity <= 2) {
+  const assignTable = (party_size) => {
+    if (party_size <= 2) {
       return "02";
-    } else if (quantity <= 4) {
+    } else if (party_size <= 4) {
       return "04";
     } else {
       return "Bàn tiệc";
     }
   };
 
-  const totalPrice = calculateTotalPrice();
-  const { discountedTotal, finalTotal } = calculateFinalTotal(totalPrice);
+  const total_amount = calculateTotalPrice();
+  const { discountedTotal, finalTotal } = calculateFinalTotal(total_amount);
 
   const applyVoucher = (codeToApply) => {
     const promotion = promotions.find(
@@ -97,6 +104,8 @@ export default function Pay() {
 
     if (promotion) {
       setDiscount(promotion.discount);
+      setSelectedPromotion(promotion.id);
+      // Lưu id của khuyến mãi
       if (voucherCode) {
         setSelectedPromotion("");
       }
@@ -111,12 +120,62 @@ export default function Pay() {
     if (selectedCode) {
       applyVoucher(selectedCode);
       setVoucherCode("");
+    } else {
+      setSelectedPromotion(""); // Đặt lại id nếu không có khuyến mãi được chọn
     }
   };
 
   const validPromotions = promotions.filter(
     (promo) => new Date(promo.valid_to) >= new Date() && promo.quantity > 0
   );
+
+  const handleCompleteBooking = async () => {
+    try {
+      // Tạo dữ liệu đơn hàng để gửi lên server
+      const orderData = {
+        ...customerInfo,
+        orderId,
+        tableNumber,
+        total_amount: finalTotal, // Lưu tổng thanh toán
+        discount,
+        promotion_id: selectedPromotion || null, // Thiết lập promotion_id là null nếu không có khuyến mãi nào được chọn
+      };
+
+      // Log tổng thanh toán và ID khuyến mãi ra console
+      console.log("Final Total Payment:", finalTotal);
+      console.log("Selected Promotion ID:", selectedPromotion);
+
+      // Gửi dữ liệu đặt bàn lên server
+      const reservation = await dispatch(addNewReservation(orderData));
+
+      // Xóa dữ liệu trong local storage sau khi đặt hàng thành công
+      localStorage.removeItem("customerInfo");
+      localStorage.removeItem("selectedProducts");
+
+      // Gửi chi tiết đơn đặt hàng cho từng sản phẩm đã chọn
+      await Promise.all(
+        Object.values(selectedProducts).map((product) => {
+          const reservationDetail = {
+            reservation_id: reservation.id, // Sử dụng ID đơn đặt hàng vừa tạo
+            product_id: product.id,
+            quantity: product.quantity,
+            price: product.price,
+          };
+          return dispatch(addNewReservationDetail(reservationDetail));
+        })
+      );
+
+      alert("Đơn hàng của bạn đã được xác nhận!");
+
+      // Chuyển trang sang trang xác nhận
+      navigate("/confirm");
+    } catch (error) {
+      console.error("Lỗi khi xác nhận đơn hàng:", error);
+      alert("Có lỗi xảy ra khi đặt hàng, vui lòng thử lại.");
+    }
+  };
+
+
 
   return (
     <div>
@@ -233,7 +292,6 @@ export default function Pay() {
           <div className="col-md-4">
             <div className="bg-white shadow-sm p-4">
               <h5 className="text-warning fw-bold">Tóm tắt đơn hàng</h5>
-
               {/* Input for manual voucher code */}
               <div className="input-group mb-3">
                 <input
@@ -252,7 +310,6 @@ export default function Pay() {
                   Áp dụng
                 </button>
               </div>
-
               {/* Dropdown select for available promotions */}
               <div className="mb-3">
                 {validPromotions.length > 0 ? (
@@ -272,51 +329,48 @@ export default function Pay() {
                   <p>Không có khuyến mãi hiện tại.</p>
                 )}
               </div>
-
               {/* Order total */}
               <div className="d-flex justify-content-between align-items-center">
                 <span>Tổng tiền:</span>
-                <span>{formatPrice(totalPrice)}</span>
+                <span>{formatPrice(total_amount)}</span>
               </div>
-
               {/* Discount */}
               <div className="d-flex justify-content-between align-items-center">
                 <span>Giảm giá:</span>
-                <span>{formatPrice(totalPrice * (discount / 100))}</span>
+                <span>{formatPrice(total_amount * (discount / 100))}</span>
               </div>
-
               {/* Tax */}
               <div className="d-flex justify-content-between align-items-center">
                 <span>Thuế:</span>
-                <span>{formatPrice(totalPrice * 0.1)}</span>
+                <span>{formatPrice(total_amount * 0.1)}</span>
               </div>
-
               <hr />
-
               {/* Payment Method */}
-              <label className="d-flex justify-content-between fw-bold">Phương thức thanh toán</label>
-              <input type="radio" name="payment-method" /> Thanh toán 30% hóa đơn <br />
+              <label className="d-flex justify-content-between fw-bold">
+                Phương thức thanh toán
+              </label>
+              <input type="radio" name="payment-method" /> Thanh toán 30% hóa
+              đơn <br />
               <hr />
-              <input type="radio" name="payment-method" /> Thanh toán chuyển khoản <br />
-
+              <input type="radio" name="payment-method" /> Thanh toán chuyển
+              khoản <br />
               <hr />
-
               {/* Final total */}
               <div className="d-flex justify-content-between align-items-center">
                 <span>Tổng thanh toán:</span>
                 <span className="fw-bold">{formatPrice(finalTotal)}</span>
               </div>
-
               {/* Buttons for confirmation and going back */}
               <div className="d-flex justify-content-between mt-3">
                 <NavLink to="/order" className="w-30">
                   <button className="btn btn-secondary w-100">Trở lại</button>
                 </NavLink>
-                <NavLink to="/confirm" className="w-70">
-                  <button className="btn btn-primary w-100">
-                    Xác nhận đơn hàng
-                  </button>
-                </NavLink>
+                <button
+                  className="btn btn-primary w-70"
+                  onClick={handleCompleteBooking}
+                >
+                  Xác nhận đơn hàng
+                </button>
               </div>
             </div>
           </div>
