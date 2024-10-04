@@ -19,8 +19,7 @@ import Pay from '../../Pages/Client/pay';
 import Confirm from '../../Pages/Client/ConfirmPay';
 import Policy from '../../Pages/Client/Policy';
 import ReservationGuide from '../../Pages/Client/ReservationGuide';
-
-
+import MyBooking from '../../Pages/Client/My-bookings';
 
 // Public routes
 const publicClientRoutes = [
@@ -44,7 +43,7 @@ const publicClientRoutes = [
     { path: ClientConfig.routes.confirm, component: Confirm },
     { path: ClientConfig.routes.policy, component: Policy },
     { path: ClientConfig.routes.reservationGuide, component: ReservationGuide },
-
+    { path: ClientConfig.routes.myBookings, component: MyBooking }
 ];
 
 

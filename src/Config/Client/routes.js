@@ -20,6 +20,7 @@ const ClientRoutes = {
     reservationGuide: '/reservation-guide',
     commentBlog: 'comment-blog',
     commentBlogAdd: 'comment-blog/add',
+    myBookings: '/my-bookings'
 };
 
 export default ClientRoutes;

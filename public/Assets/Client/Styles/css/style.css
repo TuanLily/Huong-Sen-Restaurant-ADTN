@@ -499,21 +499,21 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   }
 
-  .card:hover, .list-group:hover {
+  /* .card:hover, .list-group:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  }
+  } */
   
-  .card-title {
+  /* .card-title {
     font-size: 18px;
     font-weight: bold;
     color: #333;
-  }
+  } */
   
-  .card-text {
+  /* .card-text {
     font-size: 14px;
     color: #666;
   }
   .comment-card{
     border-radius: 15px;
-  }
+  } */
