@@ -6,8 +6,11 @@ import { fetchBlog } from "../../Actions/BlogActions";
 import unidecode from "unidecode";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../Components/Client/Spinner";
-import { addCommentBlog, fetchCommentBlog } from "../../Actions/CommentBlogActions";
-import { jwtDecode as jwt_decode } from 'jwt-decode';
+import {
+  addCommentBlog,
+  fetchCommentBlog,
+} from "../../Actions/CommentBlogActions";
+import { jwtDecode as jwt_decode } from "jwt-decode";
 
 const DetailBlog = () => {
   const { slug } = useParams();
@@ -18,17 +21,26 @@ const DetailBlog = () => {
   const blogState = useSelector((state) => state.blog);
   const commentState = useSelector((state) => state.comment_blog);
 
-  // Lấy id đăng nhập
-  const [userId, setUserId] = useState();
+  const [userId, setUserId] = useState(null); // userId null khi chưa đăng nhập
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Trạng thái đăng nhập
+  const [newComment, setNewComment] = useState({
+    content: "",
+    blog_id: "",
+    user_id: "",
+  });
 
+  // Kiểm tra xem người dùng có đăng nhập không
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
       const decodedToken = jwt_decode(accessToken);
       const userIdFromToken = decodedToken.id;
       setUserId(userIdFromToken); // Cập nhật userId trong state
+      setIsLoggedIn(true); // Đánh dấu là đã đăng nhập
+    } else {
+      setIsLoggedIn(false); // Người dùng chưa đăng nhập
     }
-  }, []); // Chỉ chạy khi component được mount lần đầu
+  }, []);
 
   useEffect(() => {
     dispatch(fetchBlogDetailBySlug(slug));
@@ -36,14 +48,6 @@ const DetailBlog = () => {
     dispatch(fetchCommentBlog());
   }, [dispatch, slug]);
 
-  // State cho bình luận mới
-  const [newComment, setNewComment] = useState({
-    content: "",
-    blog_id: "", 
-    user_id: "", 
-  });
-
-  // Theo dõi khi userId thay đổi và cập nhật newComment
   useEffect(() => {
     if (userId) {
       setNewComment((prevComment) => ({
@@ -53,7 +57,6 @@ const DetailBlog = () => {
     }
   }, [userId]);
 
-  // Theo dõi khi blogDetailState.blogDetail có giá trị và cập nhật newComment
   useEffect(() => {
     if (blogDetailState.blogDetail) {
       setNewComment((prevComment) => ({
@@ -63,7 +66,15 @@ const DetailBlog = () => {
     }
   }, [blogDetailState.blogDetail]);
 
-  const relatedPosts = Array.isArray(blogState.blog) ? blogState.blog.filter((blog) => blog.id !== blogDetailState.blogDetail?.id) : [];
+  const filteredComments = commentState.commentBlog.filter(
+    (comment) => comment.blog_id === blogDetailState.blogDetail?.id
+  );
+
+  const relatedPosts = Array.isArray(blogState.blog)
+    ? blogState.blog.filter(
+        (blog) => blog.id !== blogDetailState.blogDetail?.id
+      )
+    : [];
 
   const createSlug = (title) => {
     return unidecode(title)
@@ -80,18 +91,13 @@ const DetailBlog = () => {
     navigate(`/blog-detail/${slug}.html`);
   };
 
-  // Hàm gửi bình luận mới
   const handleCommentSubmit = (e) => {
     e.preventDefault();
-    // Gửi bình luận với đầy đủ blog_id, user_id, name và content
-
     const commentData = {
       blog_id: newComment.blog_id,
       user_id: newComment.user_id,
       content: newComment.content,
     };
-
-    // console.log(commentData);
     dispatch(addCommentBlog(commentData));
   };
 
@@ -181,7 +187,7 @@ const DetailBlog = () => {
               <div className="card-body">
                 {/* Hiển thị danh sách bình luận */}
                 <div className="mb-4">
-                  {commentState.commentBlog.map((comment, index) => (
+                  {filteredComments.map((comment, index) => (
                     <div className="media mb-4" key={index}>
                       <div className="media-body">
                         <h5 className="mt-0">
@@ -191,11 +197,21 @@ const DetailBlog = () => {
                             className="mr-3 rounded-circle"
                             style={{ width: "40px", height: "40px" }}
                           />{" "}
-                          {comment.author}
+                          {comment.fullname}
                         </h5>
                         {comment.content}
                         <div className="text-muted">
-                          Ngày đăng: {comment.date}
+                          Ngày đăng:{" "}
+                          {new Date(comment.created_at).toLocaleString(
+                            "vi-VN",
+                            {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
                         </div>
                       </div>
                     </div>
@@ -204,37 +220,43 @@ const DetailBlog = () => {
 
                 {/* Form thêm bình luận mới */}
                 <hr />
-                <div className="comment-form-card">
-                  <div className="card-body">
-                    <h5 className="card-title">Thêm bình luận</h5>
-                    <form onSubmit={handleCommentSubmit}>
-                      <div className="form-group">
-                        
-                        <textarea
-                          className="form-control mt-1 mb-3"
-                          id="commentContent"
-                          rows="3"
-                          placeholder="Viết bình luận của bạn"
-                          value={newComment.content || ""} // Nếu giá trị là null, gán chuỗi rỗng
-                          onChange={(e) =>
-                            setNewComment({
-                              ...newComment,
-                              content: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
+                {isLoggedIn ? (
+                  <div className="comment-form-card">
+                    <div className="card-body">
+                      <h5 className="card-title">Thêm bình luận</h5>
+                      <form onSubmit={handleCommentSubmit}>
+                        <div className="form-group">
+                          <textarea
+                            className="form-control mt-1 mb-3"
+                            id="commentContent"
+                            rows="3"
+                            placeholder="Viết bình luận của bạn"
+                            value={newComment.content || ""}
+                            onChange={(e) =>
+                              setNewComment({
+                                ...newComment,
+                                content: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
 
-                      {/* Hidden inputs to store blog_id and user_id */}
-                      <input type="hidden" value={newComment.blog_id} />
-                      <input type="hidden" value={newComment.user_id} />
+                        {/* Hidden inputs to store blog_id and user_id */}
+                        <input type="hidden" value={newComment.blog_id} />
+                        <input type="hidden" value={newComment.user_id} />
 
-                      <button type="submit" className="btn btn-primary">
-                        Gửi bình luận
-                      </button>
-                    </form>
+                        <button type="submit" className="btn btn-primary">
+                          Gửi bình luận
+                        </button>
+                      </form>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="alert alert-warning" role="alert">
+                    Bạn phải <Link to="/login">đăng nhập</Link> để có thể bình
+                    luận.
+                  </div>
+                )}
               </div>
             </div>
           </div>
