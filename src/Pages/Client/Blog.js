@@ -69,39 +69,38 @@ export default function Blog() {
                 blogState.blog?.length > 0 &&
                 blogState.blog.map((blog) => (
                   <div className="col-md-4 mb-4" key={blog.id}>
-                    <div
-                      className="card"
-                      onClick={() => handleBlogClick(blog.title)}
-                      style={{
-                        cursor: "pointer",
-                        borderRadius: "8px",
-                        overflow: "hidden",
-                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                        transition: "transform 0.3s ease",
-                        background: "white",
-                      }}
-                    >
-                      <img
-                        src={
-                          blog.poster ||
-                          "https://cdn.tgdd.vn/Files/2022/01/25/1412805/cach-nau-pho-bo-nam-dinh-chuan-vi-thom-ngon-nhu-hang-quan-202201250313281452.jpg"
-                        }
-                        className="card-img-top"
-                        alt={blog.title}
-                        style={{
-                          height: "200px",
-                          objectFit: "cover",
-                          width: "100%",
-                        }}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title">
-                          {blog.title.slice(0, 50)}
-                        </h5>
-                        <p className="card-text">{blog.author}</p>
-                      </div>
-                    </div>
-                  </div>
+  <div
+    className="blog-card"
+    onClick={() => handleBlogClick(blog.title)}
+    style={{
+      cursor: "pointer",
+      borderRadius: "8px",
+      overflow: "hidden",
+      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+      transition: "transform 0.3s ease",
+      background: "white",
+    }}
+  >
+    <img
+      src={
+        blog.poster ||
+        "https://images.rawpixel.com/image_social_square/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA0L2pvYjcwOS0yMy12LmpwZw.jpg"
+      }
+      className="card-img-top"
+      alt={blog.title}
+      style={{
+        height: "200px",
+        objectFit: "cover",
+        width: "100%",
+      }}
+    />
+    <div className="card-body">
+      <h5 className="card-title">{blog.title.slice(0, 50)}</h5>
+      <p className="card-text">{blog.author}</p>
+    </div>
+  </div>
+</div>
+
                 ))}
 
               {/* If no blogs are found */}
@@ -151,7 +150,7 @@ export default function Blog() {
                       <img
                         src={
                           blog.poster ||
-                          "https://cdn.tgdd.vn/Files/2022/01/25/1412805/cach-nau-pho-bo-nam-dinh-chuan-vi-thom-ngon-nhu-hang-quan-202201250313281452.jpg"
+                          "https://images.rawpixel.com/image_social_square/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA0L2pvYjcwOS0yMy12LmpwZw.jpg"
                         }
                         className="img-fluid"
                         alt={blog.title}

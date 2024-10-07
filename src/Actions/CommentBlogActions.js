@@ -45,9 +45,13 @@ export const fetchCommentBlog = (content = '', page = 1, pageSize = 10) => {
         url.searchParams.append('page', page);
         url.searchParams.append('pageSize', pageSize);
 
+        // Thực hiện gọi API để lấy danh sách bình luận
         http.get(url.toString())
             .then(response => {
+                // Nhận thêm dữ liệu từ API: fullname, avatar
                 const { results, totalCount, totalPages, currentPage } = response.data;
+
+                // Dispatch dữ liệu sau khi thành công
                 dispatch(fetchCommentBlogSuccess(results, totalCount, totalPages, currentPage));
             })
             .catch(error => {
@@ -56,6 +60,7 @@ export const fetchCommentBlog = (content = '', page = 1, pageSize = 10) => {
             });
     };
 };
+
 
 // Add Permissions Action
 export const addCommentBlog = (commentblog) => {

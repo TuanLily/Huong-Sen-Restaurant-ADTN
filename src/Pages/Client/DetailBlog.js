@@ -187,36 +187,49 @@ const DetailBlog = () => {
               <div className="card-body">
                 {/* Hiển thị danh sách bình luận */}
                 <div className="mb-4">
-                  {filteredComments.map((comment, index) => (
-                    <div className="media mb-4" key={index}>
-                      <div className="media-body">
-                        <h5 className="mt-0">
-                          <img
-                            src="https://via.placeholder.com/40"
-                            alt="User Avatar"
-                            className="mr-3 rounded-circle"
-                            style={{ width: "40px", height: "40px" }}
-                          />{" "}
-                          {comment.fullname}
-                        </h5>
-                        {comment.content}
-                        <div className="text-muted">
-                          Ngày đăng:{" "}
-                          {new Date(comment.created_at).toLocaleString(
-                            "vi-VN",
-                            {
-                              day: "2-digit",
-                              month: "2-digit",
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+  {filteredComments.length > 0 ? (
+    filteredComments.map((comment, index) => (
+      <div className="media mb-4" key={index}>
+        <div className="media-body">
+          <h6 className="mt-0 d-flex align-items-center">
+            <img
+              src={
+                comment.avatar
+                  ? comment.avatar.startsWith("http")
+                    ? comment.avatar
+                    : `${API_BASE_URL}/${comment.avatar}`
+                  : "https://via.placeholder.com/40"
+              }
+              alt={comment.fullname}
+              className="comment-avatar"
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                marginRight: "15px", // Thêm khoảng cách giữa avatar và tên
+              }}
+            />
+            {comment.fullname}
+          </h6>
+          <p>{comment.content}</p>
+          <div className="text-muted">
+            Ngày đăng:{" "}
+            {new Date(comment.created_at).toLocaleString("vi-VN", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </div>
+        </div>
+      </div>
+    ))
+  ) : (
+    <div className="alert alert-info">Không có bình luận nào</div>
+  )}
+</div>
+
 
                 {/* Form thêm bình luận mới */}
                 <hr />
