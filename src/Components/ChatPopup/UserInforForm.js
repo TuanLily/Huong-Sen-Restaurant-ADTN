@@ -33,7 +33,7 @@ const UserInfoForm = ({ onFormSubmit, onCancel }) => {
       if (!querySnapshot.empty) {
         // Nếu thông tin tồn tại, lấy thông tin người dùng
         const existingUser = querySnapshot.docs[0].data();
-        
+
         // Cập nhật localStorage và thông báo cho parent component
         localStorage.setItem("userInfo", JSON.stringify(existingUser));
         onFormSubmit(existingUser);
@@ -72,23 +72,37 @@ const UserInfoForm = ({ onFormSubmit, onCancel }) => {
             <input
               type="text"
               className={`form-control ${errors.fullname ? "is-invalid" : ""}`}
-              {...register("fullname", { required: "Vui lòng nhập họ tên" })}
+              {...register("fullname", {
+                required: "Vui lòng nhập họ tên",
+                pattern: {
+                  value: /^[a-zA-ZÀ-ỹ0-9\s]+$/,
+                  message: "Họ tên không được chứa kí tự đặc biệt",
+                },
+              })}
             />
             {errors.fullname && (
               <div className="invalid-feedback">{errors.fullname.message}</div>
             )}
           </div>
+
           <div className="mb-3">
             <label className="form-label">Số điện thoại:</label>
             <input
               type="text"
               className={`form-control ${errors.tel ? "is-invalid" : ""}`}
-              {...register("tel", { required: "Vui lòng nhập số điện thoại" })}
+              {...register("tel", {
+                required: "Vui lòng nhập số điện thoại",
+                pattern: {
+                  value: /^(0|\+84)(\d{9})$/,
+                  message: "Số điện thoại không hợp lệ",
+                },
+              })}
             />
             {errors.tel && (
               <div className="invalid-feedback">{errors.tel.message}</div>
             )}
           </div>
+
           <div className="mb-3">
             <label className="form-label">Xưng hô:</label>
             <select

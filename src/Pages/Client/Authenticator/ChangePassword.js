@@ -74,7 +74,7 @@ export default function ChangePassword() {
                                             </span>
                                             <input
                                                 type={passwordVisible ? 'text' : 'password'}
-                                                className="form-control"
+                                                className={`form-control ${errors.newPassword ? 'is-invalid' : ''}`}
                                                 id="newPassword"
                                                 placeholder="Nhập mật khẩu mới"
                                                 {...register('newPassword', {
@@ -104,7 +104,7 @@ export default function ChangePassword() {
                                             </span>
                                             <input
                                                 type={confirmPasswordVisible ? 'text' : 'password'}
-                                                className="form-control"
+                                                className={`form-control ${errors.confirmNewPassword ? 'is-invalid' : ''}`}
                                                 id="confirmNewPassword"
                                                 placeholder="Nhập lại mật khẩu mới"
                                                 {...register('confirmNewPassword', {

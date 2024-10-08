@@ -35,7 +35,7 @@ export default function Login() {
 
             if (user && accessToken) {
                 window.location.href = '/';
-            } 
+            }
         } catch (err) {
             setLoading(false);
             setServerError(err.message || 'Đăng nhập thất bại');
@@ -70,7 +70,7 @@ export default function Login() {
                                                 </span>
                                                 <input
                                                     type="email"
-                                                    className="form-control"
+                                                    className={`form-control ${errors.email ? "is-invalid" : ""}`}
                                                     id="email"
                                                     placeholder="Nhập Email"
                                                     {...register('email', {
@@ -93,7 +93,7 @@ export default function Login() {
                                                 </span>
                                                 <input
                                                     type={passwordVisible ? 'text' : 'password'}
-                                                    className="form-control"
+                                                    className={`form-control ${errors.password ? "is-invalid" : ""}`}
                                                     id="password"
                                                     placeholder="Nhập mật khẩu"
                                                     {...register('password', {

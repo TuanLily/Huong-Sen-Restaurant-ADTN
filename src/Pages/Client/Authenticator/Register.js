@@ -117,7 +117,7 @@ export default function Register() {
                                                         </span>
                                                         <input
                                                             type="text"
-                                                            className="form-control"
+                                                            className={`form-control ${errors.fullname ? 'is-invalid' : ''}`}
                                                             id="fullname"
                                                             placeholder="Nhập họ và tên"
                                                             {...register("fullname", {
@@ -139,14 +139,11 @@ export default function Register() {
                                                     </label>
                                                     <div className="input-group">
                                                         <span className="input-group-text">
-                                                            <i
-                                                                className="fa fa-envelope"
-                                                                aria-hidden="true"
-                                                            ></i>
+                                                            <i className="fa fa-envelope" aria-hidden="true"></i>
                                                         </span>
                                                         <input
                                                             type="email"
-                                                            className="form-control"
+                                                            className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                                                             id="email"
                                                             placeholder="Nhập Email"
                                                             {...register("email", {
@@ -191,16 +188,14 @@ export default function Register() {
                                                         </span>
                                                         <input
                                                             type="tel"
-                                                            className="form-control"
+                                                            className={`form-control ${errors.tel ? 'is-invalid' : ''}`}
                                                             id="tel"
                                                             placeholder="Nhập số điện thoại"
                                                             {...register("tel", {
                                                                 required: "Số điện thoại là bắt buộc",
                                                                 pattern: {
-                                                                    value:
-                                                                        /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
-                                                                    message:
-                                                                        "Số điện thoại không không đúng định dạng",
+                                                                    value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+                                                                    message: "Số điện thoại không không đúng định dạng",
                                                                 },
                                                             })}
                                                         />
@@ -220,7 +215,7 @@ export default function Register() {
                                                         </span>
                                                         <input
                                                             type={passwordVisible ? "text" : "password"}
-                                                            className="form-control"
+                                                            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
                                                             id="password"
                                                             placeholder="Nhập mật khẩu mới"
                                                             {...register("password", {
@@ -230,10 +225,8 @@ export default function Register() {
                                                                     message: "Mật khẩu phải có ít nhất 8 ký tự",
                                                                 },
                                                                 pattern: {
-                                                                    value:
-                                                                        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-                                                                    message:
-                                                                        "Mật khẩu phải bao gồm ít nhất chữ in hoa, số và ký tự đặc biệt",
+                                                                    value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+                                                                    message: "Mật khẩu phải bao gồm ít nhất chữ in hoa, số và ký tự đặc biệt",
                                                                 },
                                                             })}
                                                         />
@@ -243,11 +236,7 @@ export default function Register() {
                                                             style={{ cursor: "pointer" }}
                                                         >
                                                             <i
-                                                                className={
-                                                                    passwordVisible
-                                                                        ? "fa fa-eye-slash"
-                                                                        : "fa fa-eye"
-                                                                }
+                                                                className={passwordVisible ? "fa fa-eye-slash" : "fa fa-eye"}
                                                                 aria-hidden="true"
                                                             ></i>
                                                         </span>
@@ -260,10 +249,7 @@ export default function Register() {
                                                 </div>
 
                                                 <div className="form-group mb-3">
-                                                    <label
-                                                        htmlFor="confirm-password"
-                                                        className="form-label"
-                                                    >
+                                                    <label htmlFor="confirm-password" className="form-label">
                                                         Xác nhận mật khẩu
                                                     </label>
                                                     <div className="input-group">
@@ -271,17 +257,14 @@ export default function Register() {
                                                             <i className="fa fa-lock" aria-hidden="true"></i>
                                                         </span>
                                                         <input
-                                                            type={
-                                                                confirmPasswordVisible ? "text" : "password"
-                                                            }
-                                                            className="form-control"
+                                                            type={confirmPasswordVisible ? "text" : "password"}
+                                                            className={`form-control ${errors.confirmPassword ? 'is-invalid' : ''}`}
                                                             id="confirm-password"
                                                             placeholder="Nhập mật khẩu xác nhận"
                                                             {...register("confirmPassword", {
                                                                 required: "Mật khẩu xác nhận là bắt buộc",
                                                                 validate: (value) =>
-                                                                    value === password ||
-                                                                    "Mật khẩu xác nhận không khớp",
+                                                                    value === password || "Mật khẩu xác nhận không khớp",
                                                             })}
                                                         />
                                                         <span
@@ -290,11 +273,7 @@ export default function Register() {
                                                             style={{ cursor: "pointer" }}
                                                         >
                                                             <i
-                                                                className={
-                                                                    confirmPasswordVisible
-                                                                        ? "fa fa-eye-slash"
-                                                                        : "fa fa-eye"
-                                                                }
+                                                                className={confirmPasswordVisible ? "fa fa-eye-slash" : "fa fa-eye"}
                                                                 aria-hidden="true"
                                                             ></i>
                                                         </span>
@@ -317,13 +296,12 @@ export default function Register() {
                                                 <div className="form-group mb-3">
                                                     <input
                                                         type="text"
-                                                        className="form-control"
+                                                        className={`form-control ${errors.address ? 'is-invalid' : ''}`}
                                                         readOnly
                                                         {...register("address", {
                                                             required: "Địa chỉ là bắt buộc",
                                                             validate: (value) =>
-                                                                value.split(",").filter((part) => part.trim())
-                                                                    .length >= 4 ||
+                                                                value.split(",").filter((part) => part.trim()).length >= 4 ||
                                                                 "Vui lòng điền đầy đủ thông tin địa chỉ",
                                                         })}
                                                     />
@@ -358,6 +336,7 @@ export default function Register() {
                                             </Link>
                                         </div>
                                     </form>
+
                                 </div>
                             </div>
                         </div>

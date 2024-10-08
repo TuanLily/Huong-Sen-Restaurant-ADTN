@@ -50,7 +50,7 @@ export default function ForgotPassword() {
                                             </span>
                                             <input
                                                 type="email"
-                                                className="form-control"
+                                                className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                                                 id="email"
                                                 placeholder="Nhập Email"
                                                 {...register('email', {
