@@ -21,9 +21,8 @@ export default function Register() {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
     const [avatar, setAvatar] = useState("");
-    const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
-    const [openDangerAlert, setOpenDangerAlert] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [loading, setLoading] = useState(false);
+
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -67,28 +66,27 @@ export default function Register() {
     };
 
     const onSubmit = async (data) => {
+        setLoading(true);
+
         const emailIsValid = await validateEmailExists(data.email);
-        if (!emailIsValid) return;
+        if (!emailIsValid) {
+            setLoading(false);
+            return; // Nếu email không hợp lệ, dừng lại ở đây
+        }
 
         const customerData = {
             ...data,
-            avatar,
+            // avatar, // Đảm bảo biến avatar đã được định nghĩa trước đó
             address: data.address,
         };
 
-        setIsSubmitting(true);
-
         try {
             await dispatch(addNewCustomer(customerData));
-            setOpenSuccessAlert(true);
-            setTimeout(() => {
-                navigate("/login");
-            }, 3000);
+            navigate("/login"); // Điều hướng đến trang đăng nhập ngay sau khi đăng ký thành công
         } catch (error) {
-            setOpenDangerAlert(true);
             console.error("Đăng ký thất bại:", error.message);
         } finally {
-            setIsSubmitting(false);
+            setLoading(false); // Đặt loading về false sau khi hoàn tất
         }
     };
 
@@ -344,17 +342,7 @@ export default function Register() {
                 </div>
             </div>
             <div>
-                {isSubmitting && <Spinner />}
-                <SuccessAlert
-                    open={openSuccessAlert}
-                    onClose={() => setOpenSuccessAlert(false)}
-                    message="Đăng ký thành công!"
-                />
-                <DangerAlert
-                    open={openDangerAlert}
-                    onClose={() => setOpenDangerAlert(false)}
-                    message="Đăng ký thất bại, vui lòng thử lại!"
-                />
+                {loading && <Spinner />}
             </div>
         </div>
     );

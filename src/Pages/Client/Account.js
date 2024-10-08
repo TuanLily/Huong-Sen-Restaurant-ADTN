@@ -10,6 +10,7 @@ import { jwtDecode as jwt_decode } from 'jwt-decode';
 import { DangerAlert, SuccessAlert } from '../../Components/Alert/Alert';
 import AddressSelector from '../../Components/Location/AddressSelector';
 import normalAvatar from '../../Assets/Client/Images/default-avatar.png';
+import { useUser } from '../../Context/UserContext';
 
 
 function Account() {
@@ -17,6 +18,8 @@ function Account() {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const { passwordCheckMessage, error } = useSelector(state => state.user);
+    const { setUser } = useUser(); 
+
 
     const [profile, setProfile] = useState({
         fullname: '',
@@ -41,10 +44,8 @@ function Account() {
     const [activeTab, setActiveTab] = useState('updateInfo');
     const [isLoading, setIsLoading] = useState(false);
     const [userId, setUserId] = useState(null);
-
     const [initialAvatar, setInitialAvatar] = useState(null);
     const [initialPassword, setInitialPassword] = useState('');
-
     const [fullAddress, setFullAddress] = useState('');
 
 
@@ -99,12 +100,10 @@ function Account() {
     };
 
     const handleLogout = () => {
-        setIsLoading(true);
-        setTimeout(() => {
-            localStorage.removeItem('user');
-            localStorage.removeItem('accessToken');
-            navigate('/login');
-        }, 2000);
+        localStorage.removeItem('user');
+        localStorage.removeItem('accessToken');
+        setUser(null);
+        navigate('/login');
     };
 
     const handleUpdateProfile = async (data) => {
@@ -244,7 +243,7 @@ function Account() {
                                         <p>{profile.tel}</p>
                                         <h5 className="section-title ff-secondary fw-normal text-primary">Địa chỉ</h5>
                                         <p>{profile.address}</p>
-                                        <button className="btn btn-danger w-100 mt-3" onClick={() => handleLogout()}>Đăng Xuất</button>
+                                        <button className="btn btn-danger w-100 mt-3" onClick={handleLogout}>Đăng Xuất</button>
                                     </div>
                                 </div>
                                 <div className="col-md-8">

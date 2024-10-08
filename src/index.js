@@ -12,6 +12,7 @@ import { Provider } from 'react-redux';
 import store from './Store/Store';
 import { UserProvider } from './Context/UserContext';
 import { AuthProvider } from './Context/AuthContext';
+import ScrollToTop from './Components/Client/ScrollToTop';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -20,6 +21,7 @@ root.render(
     <AuthProvider>
       <UserProvider>
         <Router>
+          <ScrollToTop />
           <React.StrictMode>
             <App />
           </React.StrictMode>

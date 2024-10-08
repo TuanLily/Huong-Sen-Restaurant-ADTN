@@ -11,8 +11,8 @@ import { fetchLogin } from '../../../Actions/AuthActions';
 export default function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [serverError, setServerError] = useState(''); // Sử dụng state để lưu trữ lỗi từ máy chủ
-    const [loading, setLoading] = useState(false); // Local loading state
+    const [serverError, setServerError] = useState(''); 
+    const [loading, setLoading] = useState(false);
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -26,15 +26,16 @@ export default function Login() {
 
     const onSubmit = async (data) => {
         setLoading(true);
+        setServerError('');
+
         try {
             await dispatch(fetchLogin(data.email, data.password));
             setLoading(false);
 
             const user = localStorage.getItem('user');
             const accessToken = localStorage.getItem('accessToken');
-
             if (user && accessToken) {
-                window.location.href = '/';
+                navigate('/');
             }
         } catch (err) {
             setLoading(false);
