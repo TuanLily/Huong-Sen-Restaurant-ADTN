@@ -68,7 +68,7 @@ const GoogleAuth = () => {
                 const accessToken = localStorage.getItem('accessToken');
 
                 if (storedUser && accessToken) {
-                    window.location.href = '/';
+                    navigate('/');
                 } else {
                     console.error('Thiếu thông tin người dùng hoặc access token. Vui lòng thử lại.');
                 }
@@ -92,9 +92,9 @@ const GoogleAuth = () => {
             {loading ? (
                 <Spinner />
             ) : (
-                <button className="google-btn d-flex justify-content-center align-items-center" onClick={handleLogin}>
-                    <img src={logoGoogle} alt="Google Logo" className="google-icon" />
-                    Đăng nhập với Google
+                <button className="btn btn-light btn-sm mx-2 d-flex justify-content-center align-items-center" onClick={handleLogin}>
+                    <img src={logoGoogle} alt="Google Logo" className="google-icon" width={20} height={20} />
+                    <span className='mx-2'>Google</span>
                 </button>
             )}
 

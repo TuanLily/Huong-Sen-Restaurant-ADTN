@@ -66,6 +66,26 @@ export const fetchGoogleAuth = (userData) => {
     };
 };
 
+export const fetchFacebookeAuth = (userData) => {
+    return async dispatch => {
+        dispatch(fetchAuthRequest());
+        try {
+            const response = await http.post(`${API_ENDPOINT}${API_DATA.authOFacebook}`, userData);
+            if (response.status === 200) {
+                const data = response.data;
+                dispatch(fetchAuthSuccess(data));
+                // Lưu thông tin người dùng vào localStorage
+                localStorage.setItem('user', JSON.stringify(data.user));
+                localStorage.setItem('accessToken', data.accessToken);
+            } else {
+                dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
+            }
+        } catch (error) {
+            dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
+        }
+    };
+};
+
 
 
 export const fetchLogin = (email, password) => {

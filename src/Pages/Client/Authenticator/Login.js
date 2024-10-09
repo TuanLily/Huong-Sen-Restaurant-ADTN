@@ -7,11 +7,12 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Spinner from '../../../Components/Client/Spinner';
 import { fetchLogin } from '../../../Actions/AuthActions';
+import FacebookAuth from '../../../Services/FaceboolAuth/FacebookAuth';
 
 export default function Login() {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const [serverError, setServerError] = useState(''); 
+    const [serverError, setServerError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const dispatch = useDispatch();
@@ -133,8 +134,9 @@ export default function Login() {
 
                                         <div className="text-center mt-3">
                                             <span>Hoặc đăng nhập bằng</span>
-                                            <div className="mt-2">
+                                            <div className="mt-2 d-flex align-items-center justify-content-center">
                                                 <GoogleAuth />
+                                                <FacebookAuth />
                                             </div>
                                         </div>
 

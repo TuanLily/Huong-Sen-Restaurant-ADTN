@@ -6,6 +6,7 @@ export const API_DATA = {
   users: "/users",
   checkPassword: "/users/check-password",
   authOGoogle: "/auth/google",
+  authOFacebook: "/auth/facebook",
   login: "/auth/login",
   register: "/auth/register",
   forgotPassword: "/auth/forgot-password",
