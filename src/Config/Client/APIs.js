@@ -19,4 +19,5 @@ export const API_DATA = {
   promotion: "/public/promotion",
   reservations: "/public/reservations",
   reservation_detail: "/public/reservation_detail",
+  table: "/public/table",
 };

@@ -18,6 +18,7 @@ export default function Order() {
     reservation_date: "",
     party_size: "",
     note: "",
+    status: 1,
   });
 
   const [selectedProducts, setSelectedProducts] = useState({});
@@ -103,6 +104,10 @@ export default function Order() {
     });
   };
 
+  const formatTime = (datetime) => {
+    return new Date(datetime).toLocaleString("VN-vi");
+  };
+
   // Lọc sản phẩm theo danh mục đã chọn
   const productsInCategorySelected = selectedCategory
     ? products.filter((product) => product.categories_id === selectedCategory)
@@ -175,7 +180,7 @@ export default function Order() {
             </p>
             <p className="mb-4 text-dark text-start">
               <strong>Thời gian đặt bàn:</strong>{" "}
-              {customerInfo.reservation_date}
+              {formatTime(customerInfo.reservation_date)}
             </p>
             <p className="mb-4 text-dark text-start">
               <strong>Số người:</strong> {customerInfo.party_size} người
@@ -195,7 +200,6 @@ export default function Order() {
                   className={`nav-link ${
                     selectedCategory === null ? "active" : ""
                   }`}
-                  href="#"
                 >
                   Tất cả
                 </a>
@@ -210,7 +214,6 @@ export default function Order() {
                     className={`nav-link ${
                       selectedCategory === category.id ? "active" : ""
                     }`}
-                    href="#"
                   >
                     {category.name}
                   </a>

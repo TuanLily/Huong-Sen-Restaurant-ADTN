@@ -2,15 +2,16 @@ import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPromotion } from "../../Actions/PromotionActions";
+import { fetchTable } from "../../Actions/TableActions";
 import { addNewReservation } from "../../Actions/ReservationActions";
 import { addNewReservationDetail } from "../../Actions/Reservation_detailActions";
 import { useNavigate } from "react-router-dom";
-
 
 export default function Pay() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const promotions = useSelector((state) => state.promotion.promotion);
+  const tables = useSelector((state) => state.table.table);
 
   const [customerInfo, setCustomerInfo] = useState({
     fullname: "",
@@ -27,10 +28,12 @@ export default function Pay() {
   const [selectedPromotion, setSelectedPromotion] = useState("");
   const [discount, setDiscount] = useState(0);
   const [orderId, setOrderId] = useState("");
+  const [tableId, setTableId] = useState(null); // Store table_id
   const [tableNumber, setTableNumber] = useState("");
-  
 
   useEffect(() => {
+    dispatch(fetchTable());
+
     const savedCustomerInfo = localStorage.getItem("customerInfo");
     if (savedCustomerInfo) {
       setCustomerInfo(JSON.parse(savedCustomerInfo));
@@ -42,8 +45,19 @@ export default function Pay() {
     }
 
     setOrderId(generateOrderId());
-    setTableNumber(assignTable(customerInfo.party_size));
-  }, [customerInfo.party_size]);
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (customerInfo.party_size && tables.length > 0) {
+      const assignedTable = assignTable(customerInfo.party_size);
+      if (assignedTable) {
+        setTableId(assignedTable.id);  // Lưu ID của bàn
+        setTableNumber(assignedTable.number); // Sử dụng đúng trường 'number' từ cơ sở dữ liệu
+      } else {
+        setTableNumber("Không có bàn trống");
+      }
+    }
+  }, [customerInfo.party_size, tables]);
 
   useEffect(() => {
     dispatch(fetchPromotion());
@@ -81,15 +95,30 @@ export default function Pay() {
     };
   };
 
-  const assignTable = (party_size) => {
-    if (party_size <= 2) {
-      return "02";
-    } else if (party_size <= 4) {
-      return "04";
-    } else {
-      return "Bàn tiệc";
-    }
-  };
+  // Hàm để gán bàn đúng dựa trên kích thước bữa tiệc và tính khả dụng
+const assignTable = (party_size) => {
+  // Lọc các bàn phù hợp với sức chứa và còn trống
+  const availableTables = tables
+    .filter((table) => {
+      // Điều chỉnh logic này nếu trạng thái của bạn trong cơ sở dữ liệu là số (tinyint 1 cho bàn trống)
+      if (party_size <= 2) {
+        return table.capacity === 2 && table.status === 1;  // Giả định rằng status = 1 nghĩa là bàn trống
+      } else if (party_size <= 4) {
+        return table.capacity === 4 && table.status === 1;
+      } else if (party_size <= 6) {
+        return table.capacity === 6 && table.status === 1;
+      } else if (party_size <= 8) {
+        return table.capacity === 8 && table.status === 1;
+      } else {
+        return table.capacity > 8 && table.status === 1;
+      }
+    })
+    .sort((a, b) => a.number - b.number);  // Sắp xếp theo 'number'
+
+  // Trả về bàn đầu tiên còn trống hoặc null nếu không có bàn nào trống
+  return availableTables.length > 0 ? availableTables[0] : null;
+};
+  
 
   const total_amount = calculateTotalPrice();
   const { discountedTotal, finalTotal } = calculateFinalTotal(total_amount);
@@ -105,7 +134,7 @@ export default function Pay() {
     if (promotion) {
       setDiscount(promotion.discount);
       setSelectedPromotion(promotion.id);
-      // Lưu id của khuyến mãi
+      // Reset selected promotion if voucherCode is applied
       if (voucherCode) {
         setSelectedPromotion("");
       }
@@ -121,7 +150,7 @@ export default function Pay() {
       applyVoucher(selectedCode);
       setVoucherCode("");
     } else {
-      setSelectedPromotion(""); // Đặt lại id nếu không có khuyến mãi được chọn
+      setSelectedPromotion(""); // Reset if no promotion selected
     }
   };
 
@@ -131,32 +160,32 @@ export default function Pay() {
 
   const handleCompleteBooking = async () => {
     try {
-      // Tạo dữ liệu đơn hàng để gửi lên server
+      // Create order data to send to the server
       const orderData = {
         ...customerInfo,
         orderId,
         tableNumber,
-        total_amount: finalTotal, // Lưu tổng thanh toán
+        table_id: tableId, // Store table_id
+        total_amount: finalTotal, // Store final total amount
         discount,
-        promotion_id: selectedPromotion || null, // Thiết lập promotion_id là null nếu không có khuyến mãi nào được chọn
+        promotion_id: selectedPromotion || null, // Set promotion_id as null if no promotion is selected
       };
 
-      // Log tổng thanh toán và ID khuyến mãi ra console
       console.log("Final Total Payment:", finalTotal);
       console.log("Selected Promotion ID:", selectedPromotion);
+      console.log("Selected Table ID:", tableId); // Log selected table ID
 
-      // Gửi dữ liệu đặt bàn lên server
+      // Dispatch reservation action
       const reservation = await dispatch(addNewReservation(orderData));
 
-      // Xóa dữ liệu trong local storage sau khi đặt hàng thành công
       localStorage.removeItem("customerInfo");
       localStorage.removeItem("selectedProducts");
 
-      // Gửi chi tiết đơn đặt hàng cho từng sản phẩm đã chọn
+      // Dispatch reservation detail action for each selected product
       await Promise.all(
         Object.values(selectedProducts).map((product) => {
           const reservationDetail = {
-            reservation_id: reservation.id, // Sử dụng ID đơn đặt hàng vừa tạo
+            reservation_id: reservation.id,
             product_id: product.id,
             quantity: product.quantity,
             price: product.price,
@@ -167,11 +196,11 @@ export default function Pay() {
 
       alert("Đơn hàng của bạn đã được xác nhận!");
 
-      // Chuyển trang sang trang xác nhận
+      // Redirect to confirmation page
       navigate("/confirm");
     } catch (error) {
-      console.error("Lỗi khi xác nhận đơn hàng:", error);
-      alert("Có lỗi xảy ra khi đặt hàng, vui lòng thử lại.");
+      console.error("Error confirming the reservation:", error);
+      alert("An error occurred while booking. Please try again.");
     }
   };
 
