@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINT } from '../Config/Client/APIs';
 
 const createHttpInstance = () => {
     const instance = axios.create({
-        baseURL: 'http://localhost:4000/',
+        baseURL: API_ENDPOINT,
         timeout: 10000,
         headers: {
             'Content-Type': 'application/json'
