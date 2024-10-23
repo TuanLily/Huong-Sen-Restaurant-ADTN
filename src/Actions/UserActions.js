@@ -89,3 +89,5 @@ export const updateProfile = (id, data) => {
             });
     };
 };
+
+

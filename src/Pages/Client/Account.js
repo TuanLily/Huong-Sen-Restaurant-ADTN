@@ -13,6 +13,10 @@ import normalAvatar from '../../Assets/Client/Images/default-avatar.png';
 import { useUser } from '../../Context/UserContext';
 
 import defaultLogo from '../../Assets/Client/Images/huong-sen-logo.png'
+import { FetchInfoMembershipCard } from '../../Actions/MembershipActions';
+import { formatDateTime } from '../../Utils/FormatDateTime';
+import { FetchAllListMemberShipTiers, FetchMembershipTier } from '../../Actions/MembershipTiersActions';
+import { formatNumber } from '../../Utils/FormatNumber';
 
 
 function Account() {
@@ -20,6 +24,8 @@ function Account() {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const { passwordCheckMessage, error } = useSelector(state => state.user);
+    const membershipData = useSelector(state => state.membership);
+    const membershipTiersData = useSelector(state => state.membership_tiers);
     const { setUser } = useUser();
 
 
@@ -49,39 +55,57 @@ function Account() {
     const [initialAvatar, setInitialAvatar] = useState(null);
     const [initialPassword, setInitialPassword] = useState('');
     const [fullAddress, setFullAddress] = useState('');
-
+    const [membershipLevel, setMembershipLevel] = useState('');
+    const [activeInfoCardTab, setActiveInfoCardTab] = useState(membershipLevel);
 
     const memberInfo = {
-        fullname: 'Nguyễn Văn A',
-        membershipLevel: 'MỚI',
-        totalPoints: 300,
-        totalSpent: 6000000,
+        fullname: membershipData.membership.fullname || 'Nguyễn Văn A',
+        membershipLevel: membershipLevel,
+        totalPoints: membershipData.membership.point || 0,
+        created_at: formatDateTime(membershipData.membership.created_at) || '23/10/2024',
     };
 
-    const [activeInfoCardTab, setactiveInfoCardTab] = useState(memberInfo.membershipLevel);
+    const membershipLevels = {};
+    membershipTiersData.membership_tiers.forEach(tier => {
+        const [condition, benefits] = tier.description.split("\r\n\r\n");
+        membershipLevels[tier.name] = {
+            condition: condition.replace("Điều kiện: ", ""),
+            benefits: benefits.replace("Ưu đãi: ", "")
+        };
+    });
+
+
+    useEffect(() => {
+        if (userId) {
+            dispatch(FetchInfoMembershipCard(userId));
+        }
+    }, [dispatch, userId]);
+
+    useEffect(() => {
+        dispatch(FetchAllListMemberShipTiers());
+    }, [dispatch]);
+
+    useEffect(() => {
+        const fetchMembershipData = async () => {
+            if (userId) {
+                const result = await FetchMembershipTier(userId);
+                if (result) {
+                    setMembershipLevel(result.tierName); // Lưu tierName vào state
+                }
+            }
+        };
+
+        fetchMembershipData();
+    }, [dispatch, userId]);
 
     const handleTabChange = (level) => {
-        setactiveInfoCardTab(level);
+        setActiveInfoCardTab(level);
     };
 
-    const membershipLevels = {
-        'MỚI': {
-            condition: 'Khách mới tạo tài khoản hoặc chi tiêu dưới 5 triệu đồng.',
-            benefits: 'Không có ưu đãi.'
-        },
-        'THÂN THIẾT': {
-            condition: 'Chi tiêu từ 5 triệu đồng trở lên.',
-            benefits: 'Giảm giá 5% thông qua voucher cho các đơn hàng.'
-        },
-        'HẠNG BẠC': {
-            condition: 'Chi tiêu từ 20 triệu đồng trở lên.',
-            benefits: 'Giảm giá 10% thông qua voucher cho các đơn hàng, quà tặng vào dịp sinh nhật.'
-        },
-        'HẠNG VÀNG': {
-            condition: 'Chi tiêu từ 50 triệu đồng trở lên.',
-            benefits: 'Giảm giá 15% thông qua voucher cho các đơn hàng, quà tặng vào dịp sinh nhật và ưu đãi đặc biệt cho sự kiện.'
-        }
-    };
+
+    useEffect(() => {
+        setActiveInfoCardTab(membershipLevel);
+    }, [membershipLevel]);
 
 
     useEffect(() => {
@@ -313,10 +337,10 @@ function Account() {
                                             <div className="row justify-content-center">
                                                 <div className="col-md-6">
                                                     <div style={{
-                                                        backgroundColor: memberInfo.membershipLevel === 'MỚI' ? '#ffffff' :
-                                                            memberInfo.membershipLevel === 'THÂN THIẾT' ? '#d4edda' :
-                                                                memberInfo.membershipLevel === 'HẠNG BẠC' ? '#e2e3e5' :
-                                                                    memberInfo.membershipLevel === 'HẠNG VÀNG' ? '#ffedb4' :
+                                                        backgroundColor: memberInfo.membershipLevel === 'Mới' ? '#ffffff' :
+                                                            memberInfo.membershipLevel === 'Thân Thiết' ? '#d4edda' :
+                                                                memberInfo.membershipLevel === 'Hạng Bạc' ? '#e2e3e5' :
+                                                                    memberInfo.membershipLevel === 'Hạng Vàng' ? '#ffedb4' :
                                                                         '#f8f9fa',
                                                         borderRadius: '20px',
                                                         padding: '10px',
@@ -326,17 +350,19 @@ function Account() {
                                                         <div className="card mb-3" style={{ width: '100%', borderRadius: '15px', border: 'none', overflow: 'hidden' }}>
                                                             <div className="card-body d-flex justify-content-between align-items-center" style={{ backgroundColor: '#f8f9fa' }}>
                                                                 <div>
-                                                                    <h5 className="card-title" style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{profile.fullname}</h5>
+                                                                    <h5 className="card-title" style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{memberInfo.fullname}</h5>
                                                                     <h6 className="card-subtitle mb-2" style={{
                                                                         fontSize: '1.4rem',
-                                                                        color: memberInfo.membershipLevel === 'MỚI' ? '#000' :
-                                                                            memberInfo.membershipLevel === 'THÂN THIẾT' ? '#28a745' :
-                                                                                memberInfo.membershipLevel === 'HẠNG BẠC' ? '#6c757d' :
-                                                                                    memberInfo.membershipLevel === 'HẠNG VÀNG' ? '#ffc107' : '#000'
-                                                                    }}>Cấp độ: Thành viên {memberInfo.membershipLevel}</h6>
+                                                                        color: memberInfo.membershipLevel === 'Mới' ? '#000' :
+                                                                            memberInfo.membershipLevel === 'Thân Thiết' ? '#28a745' :
+                                                                                memberInfo.membershipLevel === 'Hạng Bạc' ? '#6c757d' :
+                                                                                    memberInfo.membershipLevel === 'Hạng Vàng' ? '#ffc107' : '#000'
+                                                                    }}>
+                                                                        Cấp độ: Thành viên {memberInfo.membershipLevel}
+                                                                    </h6>
                                                                     <p className="card-text" style={{ fontSize: '1.2rem' }}>
-                                                                        Điểm tích lũy: <span style={{ fontWeight: 'bold' }}>{memberInfo.totalPoints}</span> <br />
-                                                                        Tổng chi tiêu: <span style={{ fontWeight: 'bold' }}>{memberInfo.totalSpent.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                                                        Điểm tích lũy: <span style={{ fontWeight: 'bold' }}>{formatNumber(memberInfo.totalPoints)}</span> <br />
+                                                                        Thời gian tạo thẻ: <span style={{ fontWeight: 'bold', fontSize: "1rem" }}>{memberInfo.created_at}</span> <br />
                                                                     </p>
                                                                 </div>
                                                                 <img
@@ -345,10 +371,10 @@ function Account() {
                                                                     style={{
                                                                         width: '5rem',
                                                                         height: '5rem',
-                                                                        filter: memberInfo.membershipLevel === 'MỚI' ? 'none' :
-                                                                            memberInfo.membershipLevel === 'THÂN THIẾT' ? 'sepia(100%) hue-rotate(100deg)' :
-                                                                                memberInfo.membershipLevel === 'HẠNG BẠC' ? 'grayscale(100%)' :
-                                                                                    memberInfo.membershipLevel === 'HẠNG VÀNG' ? 'sepia(100%) saturate(400%)' : 'brightness(0)'
+                                                                        filter: memberInfo.membershipLevel === 'Mới' ? 'none' :
+                                                                            memberInfo.membershipLevel === 'Thân Thiết' ? 'sepia(100%) hue-rotate(100deg)' :
+                                                                                memberInfo.membershipLevel === 'Hạng Bạc' ? 'grayscale(100%)' :
+                                                                                    memberInfo.membershipLevel === 'Hạng Vàng' ? 'sepia(100%) saturate(400%)' : 'brightness(0)'
                                                                     }}
                                                                 />
                                                             </div>
@@ -358,9 +384,9 @@ function Account() {
                                                 <div className="col-md-6">
                                                     <div className="card rounded-3 shadow">
                                                         <div className="card-body">
-                                                            <h className="card-title fw-bold fs-4 text-dark">
-                                                                <i className="fa-solid fa-circle-info fs-5"></i>  Thông tin về Thẻ Thành Viên
-                                                            </h>
+                                                            <h6 className="card-title fw-bold fs-4 text-dark">
+                                                                <i className="fa-solid fa-circle-info fs-5"></i> Thông tin về Thẻ Thành Viên
+                                                            </h6>
                                                             <div className="overflow-auto">
                                                                 <ul className="nav nav-tabs flex-nowrap">
                                                                     {Object.keys(membershipLevels).map(level => (
@@ -373,7 +399,6 @@ function Account() {
                                                                                 {level}
                                                                             </a>
                                                                         </li>
-
                                                                     ))}
                                                                 </ul>
                                                             </div>
@@ -381,192 +406,193 @@ function Account() {
                                                                 {Object.keys(membershipLevels).map(level => (
                                                                     <div className={`tab-pane fade ${activeInfoCardTab === level ? 'show active' : ''}`} key={level}>
                                                                         <h6 className="fw-bold">Thành Viên {level}</h6>
-                                                                        <p>Điều kiện: {membershipLevels[level].condition}</p>
-                                                                        <p>Ưu đãi: {membershipLevels[level].benefits}</p>
+                                                                        <p><strong>Quy chuẩn tích điểm</strong>: 1 điểm tương ứng với 1.000vnd</p>
+                                                                        <p><strong>Điều kiện</strong>: {membershipLevels[level].condition}</p>
+                                                                        <p><strong>Ưu đãi</strong>: {membershipLevels[level].benefits}</p>
                                                                     </div>
                                                                 ))}
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-
+                                            </div>
                                             </div>
                                         )}
 
-                                        {activeTab === 'updateInfo' && (
-                                            <form onSubmit={handleSubmit(handleUpdateProfile)}>
-                                                <div className="row">
-                                                    <div className="col-md-6">
-                                                        <div className="form-floating mb-3">
-                                                            <input
-                                                                type="text"
-                                                                className="form-control"
-                                                                id="fullname"
-                                                                placeholder="Họ và Tên"
-                                                                {...register('fullname', { required: "Họ và tên là bắt buộc" })}
-                                                            />
-                                                            <label htmlFor="fullname">Họ và Tên</label>
-                                                            {errors.fullname && <span className="text-danger">{errors.fullname.message}</span>}
-                                                        </div>
-                                                        <div className="form-floating mb-3">
-                                                            <input
-                                                                type="email"
-                                                                className="form-control"
-                                                                id="email"
-                                                                placeholder="Email"
-                                                                {...register('email', { required: "Email là bắt buộc" })}
-                                                            />
-                                                            <label htmlFor="email">Email</label>
-                                                            {errors.email && <span className="text-danger">{errors.email.message}</span>}
-                                                        </div>
-                                                        <div className="form-floating mb-3">
-                                                            <input
-                                                                type="tel"
-                                                                className="form-control"
-                                                                id="tel"
-                                                                placeholder="Số Điện Thoại"
-                                                                {...register('tel', {
-                                                                    required: 'Số điện thoại là bắt buộc',
-                                                                    pattern: {
-                                                                        value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
-                                                                        message: 'Số điện thoại không đúng định dạng',
-                                                                    },
-                                                                })}
-                                                            />
-                                                            <label htmlFor="tel">Số Điện Thoại</label>
-                                                            {errors.tel && <p className="text-danger">{errors.tel.message}</p>}
-                                                        </div>
-                                                        <div className="mb-3">
-                                                            <label htmlFor="avatar">Ảnh đại diện</label>
-                                                            <ImageUploadComponent
-                                                                id="avatar"
-                                                                onImageUpload={handleImageUpload}
-                                                            />
-                                                        </div>
+                                    {activeTab === 'updateInfo' && (
+                                        <form onSubmit={handleSubmit(handleUpdateProfile)}>
+                                            <div className="row">
+                                                <div className="col-md-6">
+                                                    <div className="form-floating mb-3">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control"
+                                                            id="fullname"
+                                                            placeholder="Họ và Tên"
+                                                            {...register('fullname', { required: "Họ và tên là bắt buộc" })}
+                                                        />
+                                                        <label htmlFor="fullname">Họ và Tên</label>
+                                                        {errors.fullname && <span className="text-danger">{errors.fullname.message}</span>}
                                                     </div>
-                                                    <div className="col-md-6">
-                                                        <div className='form-floating'>
-                                                            <label htmlFor="address" style={{ marginTop: -10, opacity: '50%' }}>Địa chỉ</label>
-                                                            <AddressSelector
-                                                                onChange={handleAddressChange}
-                                                                initialAddress={profile.address}
-                                                            />
-                                                            {errors.address && <p className="text-danger">{errors.address.message}</p>}
-                                                        </div>
+                                                    <div className="form-floating mb-3">
+                                                        <input
+                                                            type="email"
+                                                            className="form-control"
+                                                            id="email"
+                                                            placeholder="Email"
+                                                            {...register('email', { required: "Email là bắt buộc" })}
+                                                        />
+                                                        <label htmlFor="email">Email</label>
+                                                        {errors.email && <span className="text-danger">{errors.email.message}</span>}
+                                                    </div>
+                                                    <div className="form-floating mb-3">
+                                                        <input
+                                                            type="tel"
+                                                            className="form-control"
+                                                            id="tel"
+                                                            placeholder="Số Điện Thoại"
+                                                            {...register('tel', {
+                                                                required: 'Số điện thoại là bắt buộc',
+                                                                pattern: {
+                                                                    value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+                                                                    message: 'Số điện thoại không đúng định dạng',
+                                                                },
+                                                            })}
+                                                        />
+                                                        <label htmlFor="tel">Số Điện Thoại</label>
+                                                        {errors.tel && <p className="text-danger">{errors.tel.message}</p>}
+                                                    </div>
+                                                    <div className="mb-3">
+                                                        <label htmlFor="avatar">Ảnh đại diện</label>
+                                                        <ImageUploadComponent
+                                                            id="avatar"
+                                                            onImageUpload={handleImageUpload}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className='form-floating'>
+                                                        <label htmlFor="address" style={{ marginTop: -10, opacity: '50%' }}>Địa chỉ</label>
+                                                        <AddressSelector
+                                                            onChange={handleAddressChange}
+                                                            initialAddress={profile.address}
+                                                        />
+                                                        {errors.address && <p className="text-danger">{errors.address.message}</p>}
+                                                    </div>
 
-                                                    </div>
-                                                    <div className="col-12 mt-3">
-                                                        <button className="btn btn-primary w-100 py-3 rounded-pill" type="submit">Cập Nhật</button>
-                                                    </div>
-                                                    <div className="col-12 mt-2">
-                                                        <button className="btn btn-secondary w-100 py-3 rounded-pill" type="reset">Đặt Lại</button>
+                                                </div>
+                                                <div className="col-12 mt-3">
+                                                    <button className="btn btn-primary w-100 py-3 rounded-pill" type="submit">Cập Nhật</button>
+                                                </div>
+                                                <div className="col-12 mt-2">
+                                                    <button className="btn btn-secondary w-100 py-3 rounded-pill" type="reset">Đặt Lại</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    )}
+                                    {activeTab === 'changePassword' && (
+                                        <form onSubmit={handleSubmit(handleChangePassword)}>
+                                            <div className="row g-3">
+                                                <div className="col-12 position-relative">
+                                                    <div className="form-floating">
+                                                        <input
+                                                            type={showPassword.currentPassword ? "text" : "password"}
+                                                            className="form-control"
+                                                            id="currentPassword"
+                                                            placeholder="Mật Khẩu Cũ"
+                                                            {...register('currentPassword', {
+                                                                required: "Mật khẩu cũ là bắt buộc",
+                                                                minLength: {
+                                                                    value: 8,
+                                                                    message: 'Mật khẩu phải có ít nhất 8 ký tự',
+                                                                },
+                                                                pattern: {
+                                                                    value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+                                                                    message: 'Mật khẩu phải bao gồm số và ký tự đặc biệt',
+                                                                },
+                                                            })}
+                                                        />
+                                                        <label htmlFor="currentPassword">Mật Khẩu Cũ</label>
+                                                        <i
+                                                            className={`fa ${showPassword.currentPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
+                                                            onClick={() => togglePasswordVisibility('currentPassword')}
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
+                                                        {errors.currentPassword && <span className="text-danger">{errors.currentPassword.message}</span>}
+                                                        {error && <span className="text-danger">{error}</span>}
                                                     </div>
                                                 </div>
-                                            </form>
-                                        )}
-                                        {activeTab === 'changePassword' && (
-                                            <form onSubmit={handleSubmit(handleChangePassword)}>
-                                                <div className="row g-3">
-                                                    <div className="col-12 position-relative">
-                                                        <div className="form-floating">
-                                                            <input
-                                                                type={showPassword.currentPassword ? "text" : "password"}
-                                                                className="form-control"
-                                                                id="currentPassword"
-                                                                placeholder="Mật Khẩu Cũ"
-                                                                {...register('currentPassword', {
-                                                                    required: "Mật khẩu cũ là bắt buộc",
-                                                                    minLength: {
-                                                                        value: 8,
-                                                                        message: 'Mật khẩu phải có ít nhất 8 ký tự',
-                                                                    },
-                                                                    pattern: {
-                                                                        value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-                                                                        message: 'Mật khẩu phải bao gồm số và ký tự đặc biệt',
-                                                                    },
-                                                                })}
-                                                            />
-                                                            <label htmlFor="currentPassword">Mật Khẩu Cũ</label>
-                                                            <i
-                                                                className={`fa ${showPassword.currentPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
-                                                                onClick={() => togglePasswordVisibility('currentPassword')}
-                                                                style={{ cursor: 'pointer' }}
-                                                            />
-                                                            {errors.currentPassword && <span className="text-danger">{errors.currentPassword.message}</span>}
-                                                            {error && <span className="text-danger">{error}</span>}
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-12 position-relative">
-                                                        <div className="form-floating">
-                                                            <input
-                                                                type={showPassword.newPassword ? "text" : "password"}
-                                                                className="form-control"
-                                                                id="newPassword"
-                                                                placeholder="Mật Khẩu Mới"
-                                                                {...register('newPassword', {
-                                                                    required: 'Mật khẩu là bắt buộc',
-                                                                    minLength: {
-                                                                        value: 8,
-                                                                        message: 'Mật khẩu phải có ít nhất 8 ký tự',
-                                                                    },
-                                                                    pattern: {
-                                                                        value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-                                                                        message: 'Mật khẩu phải bao gồm số và ký tự đặc biệt',
-                                                                    },
-                                                                })}
-                                                            />
-                                                            <label htmlFor="newPassword">Mật Khẩu Mới</label>
-                                                            <i
-                                                                className={`fa ${showPassword.newPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
-                                                                onClick={() => togglePasswordVisibility('newPassword')}
-                                                                style={{ cursor: 'pointer' }}
-                                                            />
-                                                            {errors.newPassword && <span className="text-danger">{errors.newPassword.message}</span>}
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-12 position-relative">
-                                                        <div className="form-floating">
-                                                            <input
-                                                                type={showPassword.confirmNewPassword ? "text" : "password"}
-                                                                className="form-control"
-                                                                id="confirmNewPassword"
-                                                                placeholder="Nhập Lại Mật Khẩu Mới"
-                                                                {...register('confirmNewPassword', {
-                                                                    required: 'Xác nhận mật khẩu là bắt buộc',
-                                                                    validate: (value) =>
-                                                                        value === getValues('newPassword') || 'Mật khẩu không khớp',
-                                                                })}
-                                                            />
-                                                            <label htmlFor="confirmNewPassword">Nhập Lại Mật Khẩu Mới</label>
-                                                            <i
-                                                                className={`fa ${showPassword.confirmNewPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
-                                                                onClick={() => togglePasswordVisibility('confirmNewPassword')}
-                                                                style={{ cursor: 'pointer' }}
-                                                            />
-                                                            {errors.confirmNewPassword && <span className="text-danger">{errors.confirmNewPassword.message}</span>}
-                                                        </div>
-                                                    </div>
-                                                    <div className="col-12">
-                                                        <button className="btn btn-primary w-100 py-3 rounded-pill" type="submit">Đổi Mật Khẩu</button>
-                                                    </div>
-                                                    <div className="col-12">
-                                                        <button className="btn btn-secondary w-100 py-3 rounded-pill" type="reset">Đặt Lại</button>
+                                                <div className="col-12 position-relative">
+                                                    <div className="form-floating">
+                                                        <input
+                                                            type={showPassword.newPassword ? "text" : "password"}
+                                                            className="form-control"
+                                                            id="newPassword"
+                                                            placeholder="Mật Khẩu Mới"
+                                                            {...register('newPassword', {
+                                                                required: 'Mật khẩu là bắt buộc',
+                                                                minLength: {
+                                                                    value: 8,
+                                                                    message: 'Mật khẩu phải có ít nhất 8 ký tự',
+                                                                },
+                                                                pattern: {
+                                                                    value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+                                                                    message: 'Mật khẩu phải bao gồm số và ký tự đặc biệt',
+                                                                },
+                                                            })}
+                                                        />
+                                                        <label htmlFor="newPassword">Mật Khẩu Mới</label>
+                                                        <i
+                                                            className={`fa ${showPassword.newPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
+                                                            onClick={() => togglePasswordVisibility('newPassword')}
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
+                                                        {errors.newPassword && <span className="text-danger">{errors.newPassword.message}</span>}
                                                     </div>
                                                 </div>
-                                            </form>
-                                        )}
-                                    </div>
+                                                <div className="col-12 position-relative">
+                                                    <div className="form-floating">
+                                                        <input
+                                                            type={showPassword.confirmNewPassword ? "text" : "password"}
+                                                            className="form-control"
+                                                            id="confirmNewPassword"
+                                                            placeholder="Nhập Lại Mật Khẩu Mới"
+                                                            {...register('confirmNewPassword', {
+                                                                required: 'Xác nhận mật khẩu là bắt buộc',
+                                                                validate: (value) =>
+                                                                    value === getValues('newPassword') || 'Mật khẩu không khớp',
+                                                            })}
+                                                        />
+                                                        <label htmlFor="confirmNewPassword">Nhập Lại Mật Khẩu Mới</label>
+                                                        <i
+                                                            className={`fa ${showPassword.confirmNewPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
+                                                            onClick={() => togglePasswordVisibility('confirmNewPassword')}
+                                                            style={{ cursor: 'pointer' }}
+                                                        />
+                                                        {errors.confirmNewPassword && <span className="text-danger">{errors.confirmNewPassword.message}</span>}
+                                                    </div>
+                                                </div>
+                                                <div className="col-12">
+                                                    <button className="btn btn-primary w-100 py-3 rounded-pill" type="submit">Đổi Mật Khẩu</button>
+                                                </div>
+                                                <div className="col-12">
+                                                    <button className="btn btn-secondary w-100 py-3 rounded-pill" type="reset">Đặt Lại</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    )}
                                 </div>
                             </div>
                         </div>
-                        {/* Hiển thị thông báo ở đây*/}
-                        <SuccessAlert open={alert.open && alert.severity === 'success'} onClose={() => setAlert({ ...alert, open: false })} message={alert.message} />
-                        <DangerAlert open={alert.open && alert.severity === 'error'} onClose={() => setAlert({ ...alert, open: false })} message={alert.message} />
                     </div>
-                </>
-            )}
+                    {/* Hiển thị thông báo ở đây*/}
+                    <SuccessAlert open={alert.open && alert.severity === 'success'} onClose={() => setAlert({ ...alert, open: false })} message={alert.message} />
+                    <DangerAlert open={alert.open && alert.severity === 'error'} onClose={() => setAlert({ ...alert, open: false })} message={alert.message} />
+                </div>
+        </>
+    )
+}
 
-        </div>
+        </div >
     );
 }
 

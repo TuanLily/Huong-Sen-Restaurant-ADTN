@@ -12,6 +12,8 @@ import CommentBlogReducer from './CommentBlogReducers';
 import MyBookingReducer from './MyBookingReducers';
 import ReservationDetailReducer from './ReservationDetailOfTrangReducers';
 import TableReducer from './TableReducers';
+import MembershipReducer from "./MembershipReducers";
+import MembershipTiersReducer from "./MembershipTiersReducers";
 
 
 const rootReducer = combineReducers({
@@ -28,7 +30,9 @@ const rootReducer = combineReducers({
     blog_detail: blogDetailReducer,
     my_booking: MyBookingReducer,
     my_booking_detail: ReservationDetailReducer,
-    table: TableReducer
+    table: TableReducer,
+    membership: MembershipReducer,
+    membership_tiers: MembershipTiersReducer
 });
 
 export default rootReducer;

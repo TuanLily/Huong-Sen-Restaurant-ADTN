@@ -76,7 +76,7 @@ export default function Register() {
 
         const customerData = {
             ...data,
-            // avatar, // Đảm bảo biến avatar đã được định nghĩa trước đó
+            avatar, // Đảm bảo biến avatar đã được định nghĩa trước đó
             address: data.address,
         };
 

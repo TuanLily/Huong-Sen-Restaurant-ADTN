@@ -20,4 +20,6 @@ export const API_DATA = {
   reservations: "/public/reservations",
   reservation_detail: "/public/reservation_detail",
   table: "/public/table",
+  membership: "public/membership",
+  membership_tiers: "public/membership_tiers"
 };
