@@ -12,13 +12,15 @@ import AddressSelector from '../../Components/Location/AddressSelector';
 import normalAvatar from '../../Assets/Client/Images/default-avatar.png';
 import { useUser } from '../../Context/UserContext';
 
+import defaultLogo from '../../Assets/Client/Images/huong-sen-logo.png'
+
 
 function Account() {
     const { register, handleSubmit, formState: { errors }, getValues, setValue, watch } = useForm();
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const { passwordCheckMessage, error } = useSelector(state => state.user);
-    const { setUser } = useUser(); 
+    const { setUser } = useUser();
 
 
     const [profile, setProfile] = useState({
@@ -47,6 +49,39 @@ function Account() {
     const [initialAvatar, setInitialAvatar] = useState(null);
     const [initialPassword, setInitialPassword] = useState('');
     const [fullAddress, setFullAddress] = useState('');
+
+
+    const memberInfo = {
+        fullname: 'Nguyễn Văn A',
+        membershipLevel: 'MỚI',
+        totalPoints: 300,
+        totalSpent: 6000000,
+    };
+
+    const [activeInfoCardTab, setactiveInfoCardTab] = useState(memberInfo.membershipLevel);
+
+    const handleTabChange = (level) => {
+        setactiveInfoCardTab(level);
+    };
+
+    const membershipLevels = {
+        'MỚI': {
+            condition: 'Khách mới tạo tài khoản hoặc chi tiêu dưới 5 triệu đồng.',
+            benefits: 'Không có ưu đãi.'
+        },
+        'THÂN THIẾT': {
+            condition: 'Chi tiêu từ 5 triệu đồng trở lên.',
+            benefits: 'Giảm giá 5% thông qua voucher cho các đơn hàng.'
+        },
+        'HẠNG BẠC': {
+            condition: 'Chi tiêu từ 20 triệu đồng trở lên.',
+            benefits: 'Giảm giá 10% thông qua voucher cho các đơn hàng, quà tặng vào dịp sinh nhật.'
+        },
+        'HẠNG VÀNG': {
+            condition: 'Chi tiêu từ 50 triệu đồng trở lên.',
+            benefits: 'Giảm giá 15% thông qua voucher cho các đơn hàng, quà tặng vào dịp sinh nhật và ưu đãi đặc biệt cho sự kiện.'
+        }
+    };
 
 
     useEffect(() => {
@@ -250,6 +285,14 @@ function Account() {
                                     <ul className="nav nav-tabs">
                                         <li className="nav-item">
                                             <button
+                                                className={`nav-link ${activeTab === 'memberCard' ? 'active' : ''}`}
+                                                onClick={() => setActiveTab('memberCard')}
+                                            >
+                                                Thành viên
+                                            </button>
+                                        </li>
+                                        <li className="nav-item">
+                                            <button
                                                 className={`nav-link ${activeTab === 'updateInfo' ? 'active' : ''}`}
                                                 onClick={() => setActiveTab('updateInfo')}
                                             >
@@ -266,6 +309,90 @@ function Account() {
                                         </li>
                                     </ul>
                                     <div className="tab-content p-4 bg-white rounded-bottom">
+                                        {activeTab === 'memberCard' && (
+                                            <div className="row justify-content-center">
+                                                <div className="col-md-6">
+                                                    <div style={{
+                                                        backgroundColor: memberInfo.membershipLevel === 'MỚI' ? '#ffffff' :
+                                                            memberInfo.membershipLevel === 'THÂN THIẾT' ? '#d4edda' :
+                                                                memberInfo.membershipLevel === 'HẠNG BẠC' ? '#e2e3e5' :
+                                                                    memberInfo.membershipLevel === 'HẠNG VÀNG' ? '#ffedb4' :
+                                                                        '#f8f9fa',
+                                                        borderRadius: '20px',
+                                                        padding: '10px',
+                                                        boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)',
+                                                        marginBottom: '10px'
+                                                    }}>
+                                                        <div className="card mb-3" style={{ width: '100%', borderRadius: '15px', border: 'none', overflow: 'hidden' }}>
+                                                            <div className="card-body d-flex justify-content-between align-items-center" style={{ backgroundColor: '#f8f9fa' }}>
+                                                                <div>
+                                                                    <h5 className="card-title" style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>{profile.fullname}</h5>
+                                                                    <h6 className="card-subtitle mb-2" style={{
+                                                                        fontSize: '1.4rem',
+                                                                        color: memberInfo.membershipLevel === 'MỚI' ? '#000' :
+                                                                            memberInfo.membershipLevel === 'THÂN THIẾT' ? '#28a745' :
+                                                                                memberInfo.membershipLevel === 'HẠNG BẠC' ? '#6c757d' :
+                                                                                    memberInfo.membershipLevel === 'HẠNG VÀNG' ? '#ffc107' : '#000'
+                                                                    }}>Cấp độ: Thành viên {memberInfo.membershipLevel}</h6>
+                                                                    <p className="card-text" style={{ fontSize: '1.2rem' }}>
+                                                                        Điểm tích lũy: <span style={{ fontWeight: 'bold' }}>{memberInfo.totalPoints}</span> <br />
+                                                                        Tổng chi tiêu: <span style={{ fontWeight: 'bold' }}>{memberInfo.totalSpent.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                                                                    </p>
+                                                                </div>
+                                                                <img
+                                                                    src={defaultLogo}
+                                                                    alt="Membership Icon"
+                                                                    style={{
+                                                                        width: '5rem',
+                                                                        height: '5rem',
+                                                                        filter: memberInfo.membershipLevel === 'MỚI' ? 'none' :
+                                                                            memberInfo.membershipLevel === 'THÂN THIẾT' ? 'sepia(100%) hue-rotate(100deg)' :
+                                                                                memberInfo.membershipLevel === 'HẠNG BẠC' ? 'grayscale(100%)' :
+                                                                                    memberInfo.membershipLevel === 'HẠNG VÀNG' ? 'sepia(100%) saturate(400%)' : 'brightness(0)'
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-md-6">
+                                                    <div className="card rounded-3 shadow">
+                                                        <div className="card-body">
+                                                            <h className="card-title fw-bold fs-4 text-dark">
+                                                                <i className="fa-solid fa-circle-info fs-5"></i>  Thông tin về Thẻ Thành Viên
+                                                            </h>
+                                                            <div className="overflow-auto">
+                                                                <ul className="nav nav-tabs flex-nowrap">
+                                                                    {Object.keys(membershipLevels).map(level => (
+                                                                        <li className="nav-item" key={level}>
+                                                                            <a
+                                                                                className={`nav-link ${activeInfoCardTab === level ? 'active' : ''} d-flex text-center justify-content-center align-items-center`}
+                                                                                onClick={() => handleTabChange(level)}
+                                                                                style={{ cursor: 'pointer', height: '100%' }}
+                                                                            >
+                                                                                {level}
+                                                                            </a>
+                                                                        </li>
+
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                            <div className="tab-content mt-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                                                                {Object.keys(membershipLevels).map(level => (
+                                                                    <div className={`tab-pane fade ${activeInfoCardTab === level ? 'show active' : ''}`} key={level}>
+                                                                        <h6 className="fw-bold">Thành Viên {level}</h6>
+                                                                        <p>Điều kiện: {membershipLevels[level].condition}</p>
+                                                                        <p>Ưu đãi: {membershipLevels[level].benefits}</p>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        )}
+
                                         {activeTab === 'updateInfo' && (
                                             <form onSubmit={handleSubmit(handleUpdateProfile)}>
                                                 <div className="row">
