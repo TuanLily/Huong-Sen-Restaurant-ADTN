@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { fetchReservations, updateReservations, setCurrentPage } from '../../Actions/MyBookingActions';
+import { requestMomoPayUrl } from "../../Actions/ReservationActions";
 import DialogConfirm from '../../Components/Dialog/Dialog';
 import CustomPagination from '../../Components/Pagination/CustomPagination';
 import SpinnerSink from '../../Components/Client/SniperSink';
@@ -106,6 +107,14 @@ export default function MyBooking() {
   const handleDetail = (id) => {
     navigate(`detail/${id}`);
   };
+
+  const pay = async (reservationID , depositAmount) => {
+    const momoResponse = await dispatch(requestMomoPayUrl(reservationID, depositAmount));
+
+    if (momoResponse && momoResponse.payUrl) {
+      window.location.href = momoResponse.payUrl;
+    }
+  }
 
   const formatCurrency = (value) => {
     return `${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VND`;
@@ -248,7 +257,7 @@ export default function MyBooking() {
                             Xem chi tiết
                           </button>
                           {(statusInfo.text === 'Chờ thanh toán cọc') && (
-                            <button className="btn btn-primary btn-sm mt-2 ms-2" style={{ padding: '0.25rem 0.75rem' }}>
+                            <button className="btn btn-primary btn-sm mt-2 ms-2" onClick={() => pay(booking.id , booking.deposit)} style={{ padding: '0.25rem 0.75rem' }}>
                               Thanh toán
                             </button>
                           )}
