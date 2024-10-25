@@ -3,10 +3,9 @@ import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPromotion } from "../../Actions/PromotionActions";
 import { fetchTable } from "../../Actions/TableActions";
-import { addNewReservation } from "../../Actions/ReservationActions";
+import { addNewReservation, requestMomoPayment } from "../../Actions/ReservationActions";
 import { addNewReservationDetail } from "../../Actions/Reservation_detailActions";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
 
 export default function Pay() {
   const navigate = useNavigate();
@@ -83,8 +82,8 @@ export default function Pay() {
   };
 
   const generateOrderId = () => {
-    const randomNumber = Math.floor(1000 + Math.random() * 9000);
-    return `HS-${randomNumber}`;
+    const randomNumber = Math.floor(10000000 + Math.random() * 90000000);
+    return `HS${randomNumber}`;
   };
 
   const calculateFinalTotal = (total) => {
@@ -163,9 +162,12 @@ export default function Pay() {
     try {
       const depositAmount = finalTotal * 0.3;
 
+      const reservation_code = generateOrderId();
+
       // Create order data to send to the server
       const orderData = {
         ...customerInfo,
+        reservation_code,
         orderId,
         tableNumber,
         table_id: tableId, // Store table_id
@@ -203,14 +205,11 @@ export default function Pay() {
       localStorage.clear(); // Hoặc xóa các key cụ thể như localStorage.removeItem('selectedProducts');
 
       // Tạo yêu cầu thanh toán MOMO
-      const momoResponse = await axios.post('http://localhost:6969/api/public/payment', {
-        reservationId: reservation.id,
-        amount: depositAmount, // Gửi tiền cọc để thanh toán
-      });
+      const momoResponse = await dispatch(requestMomoPayment(reservation.id, depositAmount));
 
-      if (momoResponse.data && momoResponse.data.payUrl) {
+      if (momoResponse && momoResponse.payUrl) {
         // Điều hướng người dùng đến URL thanh toán MOMO
-        window.location.href = momoResponse.data.payUrl;
+        window.location.href = momoResponse.payUrl;
       }
 
     } catch (error) {

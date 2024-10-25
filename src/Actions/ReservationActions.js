@@ -1,38 +1,52 @@
 // Action Types
-export const ADD_NEW_RESERVATION_REQUEST = "ADD_NEW_RESERVATION_REQUEST";
-export const ADD_NEW_RESERVATION_SUCCESS = "ADD_NEW_RESERVATION_SUCCESS";
-export const ADD_NEW_RESERVATION_FAILURE = "ADD_NEW_RESERVATION_FAILURE";
+export const FETCH_RESERVATION_REQUEST = "FETCH_RESERVATION_REQUEST";
+export const FETCH_RESERVATION_SUCCESS = "FETCH_RESERVATION_SUCCESS";
+export const FETCH_RESERVATION_FAILURE = "FETCH_RESERVATION_FAILURE";
 
 // Import API config
 import { API_ENDPOINT, API_DATA } from "../Config/Client/APIs";
 import http from "../Utils/Http";
 
 // Action Creators
-export const addNewReservationRequest = () => ({
-    type: ADD_NEW_RESERVATION_REQUEST,
+export const fetchReservationRequest = () => ({
+    type: FETCH_RESERVATION_REQUEST,
 });
 
-export const addNewReservationSuccess = reservation => ({
-    type: ADD_NEW_RESERVATION_SUCCESS,
+export const fetchReservationSuccess = reservation => ({
+    type: FETCH_RESERVATION_SUCCESS,
     payload: reservation,
 });
 
-export const addNewReservationFailure = error => ({
-    type: ADD_NEW_RESERVATION_FAILURE,
+export const fetchReservationFailure = error => ({
+    type: FETCH_RESERVATION_FAILURE,
     payload: error,
 });
 
 // Thunk to Add a New Reservation
 export const addNewReservation = (reservationData) => {
     return async (dispatch) => {
-        dispatch(addNewReservationRequest());
+        dispatch(fetchReservationRequest());
         try {
             const response = await http.post(`${API_ENDPOINT}${API_DATA.reservations}`, reservationData);
-            dispatch(addNewReservationSuccess(response.data));
+            dispatch(fetchReservationSuccess(response.data));
             return response.data; // Trả về dữ liệu đơn đặt chỗ
         } catch (error) {
-            dispatch(addNewReservationFailure(error.message));
+            dispatch(fetchReservationFailure(error.message));
             throw new Error(error.message); // Ném lỗi để bắt trong component
         }
     };
 };
+
+
+export const requestMomoPayment = (reservationId, amount) => async dispatch => {
+    try {
+      const response = await http.post('http://localhost:6969/api/public/payment', {
+        reservationId,
+        amount,
+      });
+      return response.data; // Trả về dữ liệu để xử lý tiếp
+    } catch (error) {
+      console.error("Error in MoMo payment request:", error);
+      throw error;
+    }
+  };

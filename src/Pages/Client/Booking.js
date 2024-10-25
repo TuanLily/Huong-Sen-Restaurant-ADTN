@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import { addNewReservation } from "../../Actions/ReservationActions";
 import { fetchTable } from "../../Actions/TableActions";
 
 export default function Booking() {
@@ -16,20 +15,19 @@ export default function Booking() {
     setValue,
     formState: { errors },
   } = useForm({
-      reservation_code:"",
-      fullname: "",
-      email: "",
-      reservation_date: "",
-      party_size: "",
-      tel: "",
-      note: "",
-      status: 1,
+    reservation_code: "",
+    fullname: "",
+    email: "",
+    reservation_date: "",
+    party_size: "",
+    tel: "",
+    note: "",
+    status: 1,
   });
 
   const [tableId, setTableId] = useState(null); // Store table_id
   const [tableNumber, setTableNumber] = useState("");
   const [orderId, setOrderId] = useState("");
-  
 
   useEffect(() => {
     dispatch(fetchTable());
@@ -42,10 +40,10 @@ export default function Booking() {
     }
     setOrderId(generateOrderId());
   }, [dispatch, setValue]);
-  
+
   const generateOrderId = () => {
-    const randomNumber = Math.floor(1000 + Math.random() * 9000);
-    const orderId = `HS-${randomNumber}`;
+    const randomNumber = Math.floor(10000000 + Math.random() * 90000000);
+    const orderId = `HS${randomNumber}`;
     localStorage.setItem("orderId", orderId); // Lưu mã orderId vào localStorage
     return orderId;
   };
@@ -63,8 +61,8 @@ export default function Booking() {
     }
   }, [tables]);
 
-   // Hàm để gán bàn đúng dựa trên kích thước bữa tiệc và tính khả dụng
-   const assignTable = (party_size) => {
+  // Hàm để gán bàn đúng dựa trên kích thước bữa tiệc và tính khả dụng
+  const assignTable = (party_size) => {
     const availableTables = tables
       .filter((table) => {
         if (party_size <= 2) {
@@ -92,31 +90,6 @@ export default function Booking() {
       "Saved customer info:",
       JSON.parse(localStorage.getItem("customerInfo"))
     );
-  };
-
-  // Xử lý hoàn tất đặt bàn
-  const onSubmit = async (data) => {
-    localStorage.setItem("customerInfo", JSON.stringify(data));
-
-    if (!tableId) {
-      alert("Không có bàn trống phù hợp với số lượng người!");
-      return;
-    }
-
-    try {
-      const reservationData = {
-        ...data,
-        table_id: tableId,
-      };
-
-      await dispatch(addNewReservation(reservationData));
-      alert("Đặt bàn thành công!");
-      localStorage.removeItem("customerInfo"); // Clear localStorage after successful reservation
-      navigate("/confirm");
-    } catch (error) {
-      console.error("Có vấn đề khi đặt bàn:", error);
-      alert("Có lỗi xảy ra, vui lòng thử lại!");
-    }
   };
 
   return (
@@ -181,7 +154,7 @@ export default function Booking() {
                 Đặt chỗ
               </h5>
               <h1 className="text-white mb-4">Điền thông tin khách hàng</h1>
-              <form onSubmit={handleSubmit(onSubmit)}>
+              <form onSubmit={handleSubmit(handleNext)}>
                 <div className="row g-3">
                   <div className="col-md-6">
                     <div className="form-floating">
@@ -297,10 +270,7 @@ export default function Booking() {
                     </div>
                   </div>
 
-                  <div className="d-flex justify-content-between align-items-center mt-3">
-                    <button type="submit" className="btn btn-primary py-2 px-4">
-                      Hoàn tất đặt bàn
-                    </button>
+                  <div className="d-flex justify-content-end align-items-center mt-3">
                     <button
                       type="button"
                       className="btn btn-primary py-2 px-5"
