@@ -205,7 +205,7 @@ export default function Pay() {
       localStorage.clear(); // Hoặc xóa các key cụ thể như localStorage.removeItem('selectedProducts');
 
       // Tạo yêu cầu thanh toán MOMO
-      const momoResponse = await dispatch(requestMomoPayment(reservation.id, depositAmount));
+      const momoResponse = await dispatch(requestMomoPayment(reservation.id, depositAmount, reservation_code));
 
       if (momoResponse && momoResponse.payUrl) {
         // Điều hướng người dùng đến URL thanh toán MOMO

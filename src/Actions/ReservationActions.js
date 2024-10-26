@@ -38,11 +38,12 @@ export const addNewReservation = (reservationData) => {
 };
 
 
-export const requestMomoPayment = (reservationId, amount) => async dispatch => {
+export const requestMomoPayment = (reservationId, amount, reservation_code ) => async dispatch => {
     try {
       const response = await http.post('http://localhost:6969/api/public/payment', {
         reservationId,
         amount,
+        reservation_code 
       });
       return response.data; // Trả về dữ liệu để xử lý tiếp
     } catch (error) {
