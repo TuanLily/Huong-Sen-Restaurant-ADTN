@@ -130,16 +130,14 @@ export default function Pay() {
         promo.quantity > 0 &&
         new Date(promo.valid_to) >= new Date()
     );
-
+  
     if (promotion) {
       setDiscount(promotion.discount);
       setSelectedPromotion(promotion.id);
-      // Reset selected promotion if voucherCode is applied
-      if (voucherCode) {
-        setSelectedPromotion("");
-      }
+      setVoucherCode("");
     } else {
       setDiscount(0);
+      setSelectedPromotion("");
       alert("Mã giảm giá không hợp lệ hoặc đã hết hạn.");
     }
   };
@@ -358,7 +356,7 @@ export default function Pay() {
                 {validPromotions.length > 0 ? (
                   <select
                     className="form-select"
-                    value={selectedPromotion}
+                    value={promotions.find(promo => promo.id === selectedPromotion)?.code_name || ""}
                     onChange={(e) => handlePromotionSelect(e.target.value)}
                   >
                     <option value="">Chọn mã khuyến mãi</option>
