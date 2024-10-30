@@ -3,7 +3,10 @@ import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPromotion } from "../../Actions/PromotionActions";
 import { fetchTable } from "../../Actions/TableActions";
-import { addNewReservation, requestMomoPayment } from "../../Actions/ReservationActions";
+import {
+  addNewReservation,
+  requestMomoPayment,
+} from "../../Actions/ReservationActions";
 import { addNewReservationDetail } from "../../Actions/Reservation_detailActions";
 import { useNavigate } from "react-router-dom";
 
@@ -27,7 +30,7 @@ export default function Pay() {
   const [voucherCode, setVoucherCode] = useState("");
   const [selectedPromotion, setSelectedPromotion] = useState("");
   const [discount, setDiscount] = useState(0);
-  const [orderId, setOrderId] = useState("");
+  const [reservation_code, setReservationCode] = useState(""); // Lưu reservation_code
   const [tableId, setTableId] = useState(null); // Store table_id
   const [tableNumber, setTableNumber] = useState("");
 
@@ -44,14 +47,14 @@ export default function Pay() {
       setSelectedProducts(JSON.parse(savedProducts));
     }
 
-    setOrderId(generateOrderId());
+    setReservationCode(generateReservationCode());
   }, [dispatch]);
 
   useEffect(() => {
     if (customerInfo.party_size && tables.length > 0) {
       const assignedTable = assignTable(customerInfo.party_size);
       if (assignedTable) {
-        setTableId(assignedTable.id);  // Lưu ID của bàn
+        setTableId(assignedTable.id); // Lưu ID của bàn
         setTableNumber(assignedTable.number); // Sử dụng đúng trường 'number' từ cơ sở dữ liệu
       } else {
         setTableNumber("Không có bàn trống");
@@ -81,7 +84,7 @@ export default function Pay() {
     );
   };
 
-  const generateOrderId = () => {
+  const generateReservationCode = () => {
     const randomNumber = Math.floor(10000000 + Math.random() * 90000000);
     return `HS${randomNumber}`;
   };
@@ -95,14 +98,11 @@ export default function Pay() {
     };
   };
 
-  // Hàm để gán bàn đúng dựa trên kích thước bữa tiệc và tính khả dụng
   const assignTable = (party_size) => {
-    // Lọc các bàn phù hợp với sức chứa và còn trống
     const availableTables = tables
       .filter((table) => {
-        // Điều chỉnh logic này nếu trạng thái của bạn trong cơ sở dữ liệu là số (tinyint 1 cho bàn trống)
         if (party_size <= 2) {
-          return table.capacity === 2 && table.status === 1;  // Giả định rằng status = 1 nghĩa là bàn trống
+          return table.capacity === 2 && table.status === 1;
         } else if (party_size <= 4) {
           return table.capacity === 4 && table.status === 1;
         } else if (party_size <= 6) {
@@ -113,12 +113,10 @@ export default function Pay() {
           return table.capacity > 8 && table.status === 1;
         }
       })
-      .sort((a, b) => a.number - b.number);  // Sắp xếp theo 'number'
+      .sort((a, b) => a.number - b.number);
 
-    // Trả về bàn đầu tiên còn trống hoặc null nếu không có bàn nào trống
     return availableTables.length > 0 ? availableTables[0] : null;
   };
-
 
   const total_amount = calculateTotalPrice();
   const { discountedTotal, finalTotal } = calculateFinalTotal(total_amount);
@@ -130,7 +128,7 @@ export default function Pay() {
         promo.quantity > 0 &&
         new Date(promo.valid_to) >= new Date()
     );
-  
+
     if (promotion) {
       setDiscount(promotion.discount);
       setSelectedPromotion(promotion.id);
@@ -148,7 +146,7 @@ export default function Pay() {
       applyVoucher(selectedCode);
       setVoucherCode("");
     } else {
-      setSelectedPromotion(""); // Reset if no promotion selected
+      setSelectedPromotion("");
     }
   };
 
@@ -160,33 +158,22 @@ export default function Pay() {
     try {
       const depositAmount = finalTotal * 0.3;
 
-      const reservation_code = generateOrderId();
-
-      // Create order data to send to the server
       const orderData = {
         ...customerInfo,
         reservation_code,
-        orderId,
         tableNumber,
-        table_id: tableId, // Store table_id
-        total_amount: finalTotal, // Store final total amount
+        table_id: tableId,
+        total_amount: finalTotal,
         discount,
         deposit: depositAmount,
-        promotion_id: selectedPromotion || null, // Set promotion_id as null if no promotion is selected
+        promotion_id: selectedPromotion || null,
       };
 
-
-      console.log("Final Total Payment:", finalTotal);
-      console.log("Selected Promotion ID:", selectedPromotion);
-      console.log("Selected Table ID:", tableId); // Log selected table ID
-
-      // Dispatch reservation action
       const reservation = await dispatch(addNewReservation(orderData));
 
       localStorage.removeItem("customerInfo");
       localStorage.removeItem("selectedProducts");
 
-      // Dispatch reservation detail action for each selected product
       await Promise.all(
         Object.values(selectedProducts).map((product) => {
           const reservationDetail = {
@@ -199,24 +186,20 @@ export default function Pay() {
         })
       );
 
-      // Sau khi gửi dữ liệu thành công, xóa dữ liệu trong localStorage
-      localStorage.clear(); // Hoặc xóa các key cụ thể như localStorage.removeItem('selectedProducts');
+      localStorage.clear();
 
-      // Tạo yêu cầu thanh toán MOMO
-      const momoResponse = await dispatch(requestMomoPayment(reservation.id, depositAmount, reservation_code));
+      const momoResponse = await dispatch(
+        requestMomoPayment(reservation.id, depositAmount, reservation_code)
+      );
 
       if (momoResponse && momoResponse.payUrl) {
-        // Điều hướng người dùng đến URL thanh toán MOMO
         window.location.href = momoResponse.payUrl;
       }
-
     } catch (error) {
       console.error("Lỗi khi xác nhận đơn hàng:", error);
       alert("Có lỗi xảy ra khi đặt hàng, vui lòng thử lại.");
     }
   };
-
-
 
   return (
     <div>
@@ -268,7 +251,7 @@ export default function Pay() {
                 Thông tin đơn đặt bàn
               </h2>
               <div className="d-flex justify-content-between align-items-center mt-2">
-                <p className="mb-0 fw-bold">Mã đơn: {orderId}</p>
+                <p className="mb-0 fw-bold">Mã đơn: {reservation_code}</p>
                 <p className="mb-0 fw-bold text-end">
                   Thời gian dùng bữa:{" "}
                   {formatTime(customerInfo.reservation_date)}
@@ -356,7 +339,10 @@ export default function Pay() {
                 {validPromotions.length > 0 ? (
                   <select
                     className="form-select"
-                    value={promotions.find(promo => promo.id === selectedPromotion)?.code_name || ""}
+                    value={
+                      promotions.find((promo) => promo.id === selectedPromotion)
+                        ?.code_name || ""
+                    }
                     onChange={(e) => handlePromotionSelect(e.target.value)}
                   >
                     <option value="">Chọn mã khuyến mãi</option>
