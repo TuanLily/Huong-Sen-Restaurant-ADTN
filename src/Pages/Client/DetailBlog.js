@@ -89,11 +89,17 @@ const DetailBlog = () => {
     navigate(`/blog-detail/${slug}.html`);
   };
 
+  const relatedPosts = Array.isArray(blogState.blog)
+    ? blogState.blog
+        .filter((blog) => blog.id !== blogDetailState.blogDetail?.id)
+        .sort(() => Math.random() - 0.5) // Trộn ngẫu nhiên
+        .slice(0, 3) // Chỉ lấy 3 bài viết ngẫu nhiên
+    : [];
+
   const handleCommentSubmit = (e) => {
     e.preventDefault();
     setErrors({}); // Reset errors
 
-    // Kiểm tra nội dung bình luận
     if (!newComment.content.trim()) {
       setErrors({ content: "Nội dung bình luận không được để trống!" });
       return;
@@ -105,24 +111,23 @@ const DetailBlog = () => {
       content: newComment.content,
     };
 
-    // Gửi bình luận mới
     dispatch(addCommentBlog(commentData))
       .then(() => {
-        // Thêm bình luận vào state để hiển thị ngay
         const newCommentEntry = {
           ...commentData,
           created_at: new Date().toISOString(),
-          fullname: "Tên Người Dùng", // Thay thế bằng tên người dùng đã đăng nhập nếu có
-          avatar: "URL Avatar", // Thay thế bằng URL của avatar người dùng nếu có
+          fullname: "Tên Người Dùng",
+          avatar: "URL Avatar",
         };
 
-        // Cập nhật danh sách bình luận
-        setFilteredComments((prevComments) => [...prevComments, newCommentEntry]);
-        setNewComment((prevComment) => ({ ...prevComment, content: "" })); // Reset nội dung bình luận
+        setFilteredComments((prevComments) => [
+          ...prevComments,
+          newCommentEntry,
+        ]);
+        setNewComment((prevComment) => ({ ...prevComment, content: "" }));
       })
       .catch((error) => {
         console.error("Lỗi khi thêm bình luận:", error);
-        // Có thể thêm thông báo lỗi nếu cần
       });
   };
 
@@ -205,23 +210,27 @@ const DetailBlog = () => {
             </div>
           </div>
 
-          {/* Phần bình luận của khách hàng */}
+          {/* Phần bình luận */}
+          {/* Phần bình luận */}
           <div className="container mt-5">
             <h3 className="text-center mb-4">Bình Luận</h3>
-            <div className="comment-card" style={{ backgroundColor: "#fff" }}>
+            <div className="comment-card card bg-light border-0 shadow-sm p-3 mb-5 rounded">
               <div className="card-body">
-                {/* Hiển thị danh sách bình luận */}
                 <div className="mb-4">
                   {filteredComments.length > 0 ? (
                     filteredComments.map((comment, index) => (
-                      <div className="media mb-4" key={index}>
+                      <div
+                        className="media mb-4 p-3 bg-white rounded border"
+                        key={index}
+                      >
                         <div className="media-body">
                           <h6 className="mt-0 d-flex align-items-center">
                             <img
                               src={
-                                comment.avatar && comment.avatar.startsWith("http")
+                                comment.avatar &&
+                                comment.avatar.startsWith("http")
                                   ? comment.avatar
-                                  : "https://static-00.iconduck.com/assets.00/avatar-default-symbolic-icon-256x256-q0fen40c.png" // Hình ảnh mặc định
+                                  : "https://static-00.iconduck.com/assets.00/avatar-default-symbolic-icon-256x256-q0fen40c.png"
                               }
                               alt={comment.fullname}
                               className="comment-avatar"
@@ -232,9 +241,11 @@ const DetailBlog = () => {
                                 marginRight: "10px",
                               }}
                             />
-                            {comment.fullname}
+                            <span className="text-primary font-weight-bold">
+                              {comment.fullname}
+                            </span>
                           </h6>
-                          <p>{comment.content}</p>
+                          <p className="mb-1">{comment.content}</p>
                           <small className="text-muted">
                             {new Date(comment.created_at).toLocaleString()}
                           </small>
@@ -242,22 +253,32 @@ const DetailBlog = () => {
                       </div>
                     ))
                   ) : (
-                    <p>Chưa có bình luận nào!</p>
+                    <div className="alert alert-info">
+                      Chưa có bình luận nào!
+                    </div>
                   )}
                 </div>
 
-                {/* Form gửi bình luận */}
                 {isLoggedIn && (
                   <form onSubmit={handleCommentSubmit}>
                     <div className="form-group">
                       <textarea
-                        className={`form-control ${errors.content ? 'is-invalid' : ''}`}
+                        className={`form-control bg-white text-dark ${
+                          errors.content ? "is-invalid" : ""
+                        }`}
                         rows="3"
                         placeholder="Nhập bình luận..."
                         value={newComment.content}
-                        onChange={(e) => setNewComment({ ...newComment, content: e.target.value })}
+                        onChange={(e) =>
+                          setNewComment({
+                            ...newComment,
+                            content: e.target.value,
+                          })
+                        }
                       />
-                      {errors.content && <div className="invalid-feedback ">{errors.content}</div>}
+                      {errors.content && (
+                        <div className="invalid-feedback">{errors.content}</div>
+                      )}
                     </div>
                     <button type="submit" className="btn btn-primary mt-3">
                       Gửi Bình Luận
@@ -265,13 +286,43 @@ const DetailBlog = () => {
                   </form>
                 )}
                 {!isLoggedIn && (
-                  <p className="text-muted">Bạn cần đăng nhập để bình luận!</p>
+                  <div className="alert alert-warning" role="alert">
+                    Bạn phải <Link to="/login">đăng nhập</Link> để có thể bình
+                    luận.
+                  </div>
                 )}
               </div>
             </div>
           </div>
+
+          <div className="container mt-5">
+            <h3 className="text-center mb-4">Có thể bạn quan tâm</h3>
+            <div className="row">
+              {relatedPosts.map((post) => (
+                <div className="col-lg-4 mb-4" key={post.id}>
+                  <div
+                    className="card border-0 shadow-sm"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleBlogClick(post.title)}
+                  >
+                    <img
+                      className="card-img-top"
+                      src={post.poster}
+                      alt={post.title}
+                    />
+                    <div className="card-body">
+                      <h5 className="card-title">{post.title}</h5>
+                      <p className="card-text text-muted">{post.description}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      ) : null}
+      ) : (
+        <p>Blog không tồn tại!</p>
+      )}
     </div>
   );
 };
