@@ -32,6 +32,8 @@ export default function Pay() {
   const [discount, setDiscount] = useState(0);
   const [reservation_code, setReservationCode] = useState(""); // Lưu reservation_code
   const [tableId, setTableId] = useState(null); // Store table_id
+  const [orderId, setOrderId] = useState("");
+  const [userId, setUserId] = useState(null);
   const [tableNumber, setTableNumber] = useState("");
 
   useEffect(() => {
@@ -48,14 +50,22 @@ export default function Pay() {
     }
 
     setReservationCode(generateReservationCode());
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const user = JSON.parse(userData);
+      setUserId(user.id); // Lưu userId
+      console.log("User ID:", user.id); // Log user ID để kiểm tra
+    }
+
+    setOrderId(generateOrderId());
   }, [dispatch]);
 
   useEffect(() => {
     if (customerInfo.party_size && tables.length > 0) {
       const assignedTable = assignTable(customerInfo.party_size);
       if (assignedTable) {
-        setTableId(assignedTable.id); // Lưu ID của bàn
-        setTableNumber(assignedTable.number); // Sử dụng đúng trường 'number' từ cơ sở dữ liệu
+        setTableId(assignedTable.id);
+        setTableNumber(assignedTable.number);
       } else {
         setTableNumber("Không có bàn trống");
       }
@@ -146,7 +156,8 @@ export default function Pay() {
       applyVoucher(selectedCode);
       setVoucherCode("");
     } else {
-      setSelectedPromotion("");
+      setDiscount(0);
+      setSelectedPromotion(""); // Reset if no promotion selected
     }
   };
 
@@ -167,8 +178,16 @@ export default function Pay() {
         discount,
         deposit: depositAmount,
         promotion_id: selectedPromotion || null,
+        user_id: userId,
       };
 
+
+      console.log("Final Total Payment:", finalTotal);
+      console.log("Selected Promotion ID:", selectedPromotion);
+      console.log("Selected Table ID:", tableId);
+      console.log("User ID:", userId);
+
+      // Dispatch reservation action
       const reservation = await dispatch(addNewReservation(orderData));
 
       localStorage.removeItem("customerInfo");

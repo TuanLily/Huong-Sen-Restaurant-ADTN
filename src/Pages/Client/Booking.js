@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import { fetchTable } from "../../Actions/TableActions";
 
 export default function Booking() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const tables = useSelector((state) => state.table.table);
 
   const {
     register,
@@ -25,72 +23,52 @@ export default function Booking() {
     status: 1,
   });
 
-  const [tableId, setTableId] = useState(null); // Store table_id
-  const [tableNumber, setTableNumber] = useState("");
-  const [orderId, setOrderId] = useState("");
-
   useEffect(() => {
-    dispatch(fetchTable());
     const savedData = localStorage.getItem("customerInfo");
+    const userData = localStorage.getItem("user");
+
+    // Kiểm tra xem dữ liệu người dùng có tồn tại không và đặt những giá trị đó trước
+    if (userData) {
+      const user = JSON.parse(userData);
+      setValue("fullname", user.fullname || "");
+      setValue("email", user.email || "");
+      setValue("tel", user.tel || "");
+    }
+
+    // Nếu thông tin khách hàng tồn tại, hãy đặt các giá trị đó (điều này có thể ghi đè lên dữ liệu người dùng)
     if (savedData) {
       const customerInfo = JSON.parse(savedData);
       Object.keys(customerInfo).forEach((key) => {
         setValue(key, customerInfo[key]);
       });
     }
-    setOrderId(generateOrderId());
   }, [dispatch, setValue]);
 
-  const generateOrderId = () => {
-    const randomNumber = Math.floor(10000000 + Math.random() * 90000000);
-    const orderId = `HS${randomNumber}`;
-    localStorage.setItem("orderId", orderId); // Lưu mã orderId vào localStorage
-    return orderId;
-  };
-
-  useEffect(() => {
-    const savedData = JSON.parse(localStorage.getItem("customerInfo"));
-    if (savedData?.party_size && tables.length > 0) {
-      const assignedTable = assignTable(savedData.party_size);
-      if (assignedTable) {
-        setTableId(assignedTable.id); // Store table_id
-        setTableNumber(assignedTable.number); // Store table number
-      } else {
-        setTableNumber("Không có bàn trống");
-      }
+   // Lưu dữ liệu biểu mẫu hiện tại vào local storage khi nhấn "Tiếp theo"
+   const handleNext = (data) => {
+    // Lấy dữ liệu người dùng và trích xuất id
+    const userData = localStorage.getItem("user");
+    let userId = null;
+    if (userData) {
+      const user = JSON.parse(userData);
+      userId = user.id;
+      console.log("Lấy được id:", userId);
     }
-  }, [tables]);
-
-  // Hàm để gán bàn đúng dựa trên kích thước bữa tiệc và tính khả dụng
-  const assignTable = (party_size) => {
-    const availableTables = tables
-      .filter((table) => {
-        if (party_size <= 2) {
-          return table.capacity === 2 && table.status === 1;
-        } else if (party_size <= 4) {
-          return table.capacity === 4 && table.status === 1;
-        } else if (party_size <= 6) {
-          return table.capacity === 6 && table.status === 1;
-        } else if (party_size <= 8) {
-          return table.capacity === 8 && table.status === 1;
-        } else {
-          return table.capacity > 8 && table.status === 1;
-        }
-      })
-      .sort((a, b) => a.number - b.number);
-
-    return availableTables.length > 0 ? availableTables[0] : null;
-  };
-
-  // Lưu dữ liệu hiện tại của form vào local storage khi nhấn "Tiếp theo"
-  const handleNext = (data) => {
-    localStorage.setItem("customerInfo", JSON.stringify(data));
-    navigate("/order");
+  
+    // Thêm id vào đối tượng data
+    const dataWithUserId = { ...data, user_id: userId };
+  
+    // Lưu dữ liệu có id vào local storage
+    localStorage.setItem("customerInfo", JSON.stringify(dataWithUserId));
     console.log(
-      "Saved customer info:",
+      "Thông tin khách hàng:",
       JSON.parse(localStorage.getItem("customerInfo"))
     );
+  
+    // Chuyển hướng đến trang đặt món
+    navigate("/order");
   };
+  
 
   return (
     <div>
