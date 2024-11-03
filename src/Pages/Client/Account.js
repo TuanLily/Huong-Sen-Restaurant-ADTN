@@ -52,8 +52,8 @@ function Account() {
     const [activeTab, setActiveTab] = useState('updateInfo');
     const [isLoading, setIsLoading] = useState(false);
     const [userId, setUserId] = useState(null);
-    const [initialAvatar, setInitialAvatar] = useState(null);
-    const [initialPassword, setInitialPassword] = useState('');
+    const [, setInitialAvatar] = useState(null);
+    const [, setInitialPassword] = useState('');
     const [fullAddress, setFullAddress] = useState('');
     const [membershipLevel, setMembershipLevel] = useState('');
     const [activeInfoCardTab, setActiveInfoCardTab] = useState(membershipLevel);
@@ -66,12 +66,24 @@ function Account() {
     };
 
     const membershipLevels = {};
+    console.log("Check membershipTiersData:: ", membershipTiersData)
     membershipTiersData.membership_tiers.forEach(tier => {
-        const [condition, benefits] = tier.description.split("\r\n\r\n");
-        membershipLevels[tier.name] = {
-            condition: condition.replace("Điều kiện: ", ""),
-            benefits: benefits.replace("Ưu đãi: ", "")
-        };
+        console.log("Check tier:: ", tier)
+        
+        // Kiểm tra xem tier.description có tồn tại không
+        if (tier.description) {
+            const [condition, benefits] = tier.description.split("\r\n\r\n");
+
+            console.log("Check [condition, benefits] ::", [condition, benefits])
+            membershipLevels[tier.name] = {
+                condition: condition ? condition.replace("Điều kiện: ", "") : "", // Kiểm tra condition
+                benefits: benefits ? benefits.replace("Ưu đãi: ", "") : "" // Kiểm tra benefits
+            };
+
+            console.log("Check membershipLevels[tier.name]:: ", membershipLevels[tier.name])
+        } else {
+            console.warn(`Tier description is undefined for tier: ${tier.name}`);
+        }
     });
 
 
@@ -411,186 +423,186 @@ function Account() {
                                                                         <p><strong>Ưu đãi</strong>: {membershipLevels[level].benefits}</p>
                                                                     </div>
                                                                 ))}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            </div>
                                         )}
 
-                                    {activeTab === 'updateInfo' && (
-                                        <form onSubmit={handleSubmit(handleUpdateProfile)}>
-                                            <div className="row">
-                                                <div className="col-md-6">
-                                                    <div className="form-floating mb-3">
-                                                        <input
-                                                            type="text"
-                                                            className="form-control"
-                                                            id="fullname"
-                                                            placeholder="Họ và Tên"
-                                                            {...register('fullname', { required: "Họ và tên là bắt buộc" })}
-                                                        />
-                                                        <label htmlFor="fullname">Họ và Tên</label>
-                                                        {errors.fullname && <span className="text-danger">{errors.fullname.message}</span>}
+                                        {activeTab === 'updateInfo' && (
+                                            <form onSubmit={handleSubmit(handleUpdateProfile)}>
+                                                <div className="row">
+                                                    <div className="col-md-6">
+                                                        <div className="form-floating mb-3">
+                                                            <input
+                                                                type="text"
+                                                                className="form-control"
+                                                                id="fullname"
+                                                                placeholder="Họ và Tên"
+                                                                {...register('fullname', { required: "Họ và tên là bắt buộc" })}
+                                                            />
+                                                            <label htmlFor="fullname">Họ và Tên</label>
+                                                            {errors.fullname && <span className="text-danger">{errors.fullname.message}</span>}
+                                                        </div>
+                                                        <div className="form-floating mb-3">
+                                                            <input
+                                                                type="email"
+                                                                className="form-control"
+                                                                id="email"
+                                                                placeholder="Email"
+                                                                {...register('email', { required: "Email là bắt buộc" })}
+                                                            />
+                                                            <label htmlFor="email">Email</label>
+                                                            {errors.email && <span className="text-danger">{errors.email.message}</span>}
+                                                        </div>
+                                                        <div className="form-floating mb-3">
+                                                            <input
+                                                                type="tel"
+                                                                className="form-control"
+                                                                id="tel"
+                                                                placeholder="Số Điện Thoại"
+                                                                {...register('tel', {
+                                                                    required: 'Số điện thoại là bắt buộc',
+                                                                    pattern: {
+                                                                        value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+                                                                        message: 'Số điện thoại không đúng định dạng',
+                                                                    },
+                                                                })}
+                                                            />
+                                                            <label htmlFor="tel">Số Điện Thoại</label>
+                                                            {errors.tel && <p className="text-danger">{errors.tel.message}</p>}
+                                                        </div>
+                                                        <div className="mb-3">
+                                                            <label htmlFor="avatar">Ảnh đại diện</label>
+                                                            <ImageUploadComponent
+                                                                id="avatar"
+                                                                onImageUpload={handleImageUpload}
+                                                            />
+                                                        </div>
                                                     </div>
-                                                    <div className="form-floating mb-3">
-                                                        <input
-                                                            type="email"
-                                                            className="form-control"
-                                                            id="email"
-                                                            placeholder="Email"
-                                                            {...register('email', { required: "Email là bắt buộc" })}
-                                                        />
-                                                        <label htmlFor="email">Email</label>
-                                                        {errors.email && <span className="text-danger">{errors.email.message}</span>}
-                                                    </div>
-                                                    <div className="form-floating mb-3">
-                                                        <input
-                                                            type="tel"
-                                                            className="form-control"
-                                                            id="tel"
-                                                            placeholder="Số Điện Thoại"
-                                                            {...register('tel', {
-                                                                required: 'Số điện thoại là bắt buộc',
-                                                                pattern: {
-                                                                    value: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
-                                                                    message: 'Số điện thoại không đúng định dạng',
-                                                                },
-                                                            })}
-                                                        />
-                                                        <label htmlFor="tel">Số Điện Thoại</label>
-                                                        {errors.tel && <p className="text-danger">{errors.tel.message}</p>}
-                                                    </div>
-                                                    <div className="mb-3">
-                                                        <label htmlFor="avatar">Ảnh đại diện</label>
-                                                        <ImageUploadComponent
-                                                            id="avatar"
-                                                            onImageUpload={handleImageUpload}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="col-md-6">
-                                                    <div className='form-floating'>
-                                                        <label htmlFor="address" style={{ marginTop: -10, opacity: '50%' }}>Địa chỉ</label>
-                                                        <AddressSelector
-                                                            onChange={handleAddressChange}
-                                                            initialAddress={profile.address}
-                                                        />
-                                                        {errors.address && <p className="text-danger">{errors.address.message}</p>}
-                                                    </div>
+                                                    <div className="col-md-6">
+                                                        <div className='form-floating'>
+                                                            <label htmlFor="address" style={{ marginTop: -10, opacity: '50%' }}>Địa chỉ</label>
+                                                            <AddressSelector
+                                                                onChange={handleAddressChange}
+                                                                initialAddress={profile.address}
+                                                            />
+                                                            {errors.address && <p className="text-danger">{errors.address.message}</p>}
+                                                        </div>
 
-                                                </div>
-                                                <div className="col-12 mt-3">
-                                                    <button className="btn btn-primary w-100 py-3 rounded-pill" type="submit">Cập Nhật</button>
-                                                </div>
-                                                <div className="col-12 mt-2">
-                                                    <button className="btn btn-secondary w-100 py-3 rounded-pill" type="reset">Đặt Lại</button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    )}
-                                    {activeTab === 'changePassword' && (
-                                        <form onSubmit={handleSubmit(handleChangePassword)}>
-                                            <div className="row g-3">
-                                                <div className="col-12 position-relative">
-                                                    <div className="form-floating">
-                                                        <input
-                                                            type={showPassword.currentPassword ? "text" : "password"}
-                                                            className="form-control"
-                                                            id="currentPassword"
-                                                            placeholder="Mật Khẩu Cũ"
-                                                            {...register('currentPassword', {
-                                                                required: "Mật khẩu cũ là bắt buộc",
-                                                                minLength: {
-                                                                    value: 8,
-                                                                    message: 'Mật khẩu phải có ít nhất 8 ký tự',
-                                                                },
-                                                                pattern: {
-                                                                    value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-                                                                    message: 'Mật khẩu phải bao gồm số và ký tự đặc biệt',
-                                                                },
-                                                            })}
-                                                        />
-                                                        <label htmlFor="currentPassword">Mật Khẩu Cũ</label>
-                                                        <i
-                                                            className={`fa ${showPassword.currentPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
-                                                            onClick={() => togglePasswordVisibility('currentPassword')}
-                                                            style={{ cursor: 'pointer' }}
-                                                        />
-                                                        {errors.currentPassword && <span className="text-danger">{errors.currentPassword.message}</span>}
-                                                        {error && <span className="text-danger">{error}</span>}
+                                                    </div>
+                                                    <div className="col-12 mt-3">
+                                                        <button className="btn btn-primary w-100 py-3 rounded-pill" type="submit">Cập Nhật</button>
+                                                    </div>
+                                                    <div className="col-12 mt-2">
+                                                        <button className="btn btn-secondary w-100 py-3 rounded-pill" type="reset">Đặt Lại</button>
                                                     </div>
                                                 </div>
-                                                <div className="col-12 position-relative">
-                                                    <div className="form-floating">
-                                                        <input
-                                                            type={showPassword.newPassword ? "text" : "password"}
-                                                            className="form-control"
-                                                            id="newPassword"
-                                                            placeholder="Mật Khẩu Mới"
-                                                            {...register('newPassword', {
-                                                                required: 'Mật khẩu là bắt buộc',
-                                                                minLength: {
-                                                                    value: 8,
-                                                                    message: 'Mật khẩu phải có ít nhất 8 ký tự',
-                                                                },
-                                                                pattern: {
-                                                                    value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-                                                                    message: 'Mật khẩu phải bao gồm số và ký tự đặc biệt',
-                                                                },
-                                                            })}
-                                                        />
-                                                        <label htmlFor="newPassword">Mật Khẩu Mới</label>
-                                                        <i
-                                                            className={`fa ${showPassword.newPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
-                                                            onClick={() => togglePasswordVisibility('newPassword')}
-                                                            style={{ cursor: 'pointer' }}
-                                                        />
-                                                        {errors.newPassword && <span className="text-danger">{errors.newPassword.message}</span>}
+                                            </form>
+                                        )}
+                                        {activeTab === 'changePassword' && (
+                                            <form onSubmit={handleSubmit(handleChangePassword)}>
+                                                <div className="row g-3">
+                                                    <div className="col-12 position-relative">
+                                                        <div className="form-floating">
+                                                            <input
+                                                                type={showPassword.currentPassword ? "text" : "password"}
+                                                                className="form-control"
+                                                                id="currentPassword"
+                                                                placeholder="Mật Khẩu Cũ"
+                                                                {...register('currentPassword', {
+                                                                    required: "Mật khẩu cũ là bắt buộc",
+                                                                    minLength: {
+                                                                        value: 8,
+                                                                        message: 'Mật khẩu phải có ít nhất 8 ký tự',
+                                                                    },
+                                                                    pattern: {
+                                                                        value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+                                                                        message: 'Mật khẩu phải bao gồm số và ký tự đặc biệt',
+                                                                    },
+                                                                })}
+                                                            />
+                                                            <label htmlFor="currentPassword">Mật Khẩu Cũ</label>
+                                                            <i
+                                                                className={`fa ${showPassword.currentPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
+                                                                onClick={() => togglePasswordVisibility('currentPassword')}
+                                                                style={{ cursor: 'pointer' }}
+                                                            />
+                                                            {errors.currentPassword && <span className="text-danger">{errors.currentPassword.message}</span>}
+                                                            {error && <span className="text-danger">{error}</span>}
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-12 position-relative">
+                                                        <div className="form-floating">
+                                                            <input
+                                                                type={showPassword.newPassword ? "text" : "password"}
+                                                                className="form-control"
+                                                                id="newPassword"
+                                                                placeholder="Mật Khẩu Mới"
+                                                                {...register('newPassword', {
+                                                                    required: 'Mật khẩu là bắt buộc',
+                                                                    minLength: {
+                                                                        value: 8,
+                                                                        message: 'Mật khẩu phải có ít nhất 8 ký tự',
+                                                                    },
+                                                                    pattern: {
+                                                                        value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
+                                                                        message: 'Mật khẩu phải bao gồm số và ký tự đặc biệt',
+                                                                    },
+                                                                })}
+                                                            />
+                                                            <label htmlFor="newPassword">Mật Khẩu Mới</label>
+                                                            <i
+                                                                className={`fa ${showPassword.newPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
+                                                                onClick={() => togglePasswordVisibility('newPassword')}
+                                                                style={{ cursor: 'pointer' }}
+                                                            />
+                                                            {errors.newPassword && <span className="text-danger">{errors.newPassword.message}</span>}
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-12 position-relative">
+                                                        <div className="form-floating">
+                                                            <input
+                                                                type={showPassword.confirmNewPassword ? "text" : "password"}
+                                                                className="form-control"
+                                                                id="confirmNewPassword"
+                                                                placeholder="Nhập Lại Mật Khẩu Mới"
+                                                                {...register('confirmNewPassword', {
+                                                                    required: 'Xác nhận mật khẩu là bắt buộc',
+                                                                    validate: (value) =>
+                                                                        value === getValues('newPassword') || 'Mật khẩu không khớp',
+                                                                })}
+                                                            />
+                                                            <label htmlFor="confirmNewPassword">Nhập Lại Mật Khẩu Mới</label>
+                                                            <i
+                                                                className={`fa ${showPassword.confirmNewPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
+                                                                onClick={() => togglePasswordVisibility('confirmNewPassword')}
+                                                                style={{ cursor: 'pointer' }}
+                                                            />
+                                                            {errors.confirmNewPassword && <span className="text-danger">{errors.confirmNewPassword.message}</span>}
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-12">
+                                                        <button className="btn btn-primary w-100 py-3 rounded-pill" type="submit">Đổi Mật Khẩu</button>
+                                                    </div>
+                                                    <div className="col-12">
+                                                        <button className="btn btn-secondary w-100 py-3 rounded-pill" type="reset">Đặt Lại</button>
                                                     </div>
                                                 </div>
-                                                <div className="col-12 position-relative">
-                                                    <div className="form-floating">
-                                                        <input
-                                                            type={showPassword.confirmNewPassword ? "text" : "password"}
-                                                            className="form-control"
-                                                            id="confirmNewPassword"
-                                                            placeholder="Nhập Lại Mật Khẩu Mới"
-                                                            {...register('confirmNewPassword', {
-                                                                required: 'Xác nhận mật khẩu là bắt buộc',
-                                                                validate: (value) =>
-                                                                    value === getValues('newPassword') || 'Mật khẩu không khớp',
-                                                            })}
-                                                        />
-                                                        <label htmlFor="confirmNewPassword">Nhập Lại Mật Khẩu Mới</label>
-                                                        <i
-                                                            className={`fa ${showPassword.confirmNewPassword ? 'fa-eye-slash' : 'fa-eye'} position-absolute top-50 end-0 translate-middle-y pe-3`}
-                                                            onClick={() => togglePasswordVisibility('confirmNewPassword')}
-                                                            style={{ cursor: 'pointer' }}
-                                                        />
-                                                        {errors.confirmNewPassword && <span className="text-danger">{errors.confirmNewPassword.message}</span>}
-                                                    </div>
-                                                </div>
-                                                <div className="col-12">
-                                                    <button className="btn btn-primary w-100 py-3 rounded-pill" type="submit">Đổi Mật Khẩu</button>
-                                                </div>
-                                                <div className="col-12">
-                                                    <button className="btn btn-secondary w-100 py-3 rounded-pill" type="reset">Đặt Lại</button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    )}
+                                            </form>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
+                        {/* Hiển thị thông báo ở đây*/}
+                        <SuccessAlert open={alert.open && alert.severity === 'success'} onClose={() => setAlert({ ...alert, open: false })} message={alert.message} />
+                        <DangerAlert open={alert.open && alert.severity === 'error'} onClose={() => setAlert({ ...alert, open: false })} message={alert.message} />
                     </div>
-                    {/* Hiển thị thông báo ở đây*/}
-                    <SuccessAlert open={alert.open && alert.severity === 'success'} onClose={() => setAlert({ ...alert, open: false })} message={alert.message} />
-                    <DangerAlert open={alert.open && alert.severity === 'error'} onClose={() => setAlert({ ...alert, open: false })} message={alert.message} />
-                </div>
-        </>
-    )
-}
+                </>
+            )
+            }
 
         </div >
     );

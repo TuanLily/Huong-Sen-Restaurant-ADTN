@@ -49,7 +49,6 @@ export default function Pay() {
       setSelectedProducts(JSON.parse(savedProducts));
     }
 
-    setReservationCode(generateReservationCode());
     const userData = localStorage.getItem("user");
     if (userData) {
       const user = JSON.parse(userData);
@@ -57,7 +56,7 @@ export default function Pay() {
       console.log("User ID:", user.id); // Log user ID để kiểm tra
     }
 
-    setOrderId(generateOrderId());
+    setReservationCode(generateReservationCode());
   }, [dispatch]);
 
   useEffect(() => {
@@ -204,8 +203,6 @@ export default function Pay() {
           return dispatch(addNewReservationDetail(reservationDetail));
         })
       );
-
-      localStorage.clear();
 
       const momoResponse = await dispatch(
         requestMomoPayment(reservation.id, depositAmount, reservation_code)
