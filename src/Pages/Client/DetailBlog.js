@@ -11,6 +11,7 @@ import {
   fetchCommentBlog,
 } from "../../Actions/CommentBlogActions";
 import { jwtDecode as jwt_decode } from "jwt-decode";
+import { SuccessAlert } from "../../Components/Alert/Alert"; // Import SuccessAlert
 
 const DetailBlog = () => {
   const { slug } = useParams();
@@ -30,6 +31,7 @@ const DetailBlog = () => {
   });
   const [filteredComments, setFilteredComments] = useState([]);
   const [errors, setErrors] = useState({});
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
@@ -113,18 +115,10 @@ const DetailBlog = () => {
 
     dispatch(addCommentBlog(commentData))
       .then(() => {
-        const newCommentEntry = {
-          ...commentData,
-          created_at: new Date().toISOString(),
-          fullname: "Tên Người Dùng",
-          avatar: "URL Avatar",
-        };
-
-        setFilteredComments((prevComments) => [
-          ...prevComments,
-          newCommentEntry,
-        ]);
+        // After successfully adding a comment, fetch the latest comments
+        dispatch(fetchCommentBlog("", 1, 10)); // Adjust parameters as needed
         setNewComment((prevComment) => ({ ...prevComment, content: "" }));
+        setShowSuccessAlert(true);
       })
       .catch((error) => {
         console.error("Lỗi khi thêm bình luận:", error);
@@ -210,14 +204,21 @@ const DetailBlog = () => {
             </div>
           </div>
 
-          {/* Phần bình luận */}
+          <SuccessAlert
+            open={showSuccessAlert}
+            onClose={() => setShowSuccessAlert(false)}
+            message="Bình luận đã được thêm thành công!"
+          />
+
           {/* Phần bình luận */}
           <div className="container mt-5">
             <h3 className="text-center mb-4">Bình Luận</h3>
             <div className="comment-card card bg-light border-0 shadow-sm p-3 mb-5 rounded">
               <div className="card-body">
                 <div className="mb-4">
-                  {filteredComments.length > 0 ? (
+                  {commentState.loading ? (
+                    <Spinner /> // Show spinner while comments are loading
+                  ) : filteredComments.length > 0 ? (
                     filteredComments.map((comment, index) => (
                       <div
                         className="media mb-4 p-3 bg-white rounded border"

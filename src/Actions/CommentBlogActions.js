@@ -33,7 +33,7 @@ export const setCurrentPage = (page) => ({
     payload: page
 });
 
-export const fetchCommentBlog = (content = '', page = 1, pageSize = 10) => {
+export const fetchCommentBlog = (content = '', page = 1, pageSize = 20) => {
     return dispatch => {
         dispatch(fetchCommentBlogRequest());
 
@@ -64,16 +64,19 @@ export const fetchCommentBlog = (content = '', page = 1, pageSize = 10) => {
 
 // Add Permissions Action
 export const addCommentBlog = (commentblog) => {
-    return dispatch => {
+    return (dispatch) => {
         dispatch(fetchCommentBlogRequest());
 
-        http.post(`${API_ENDPOINT}/${ClientConfig.routes.commentBlog}`, commentblog)
+        // Return the promise so .then() can be used in the component
+        return http.post(`${API_ENDPOINT}/${ClientConfig.routes.commentBlog}`, commentblog)
             .then((response) => {
                 dispatch(fetchCommentBlogSuccess([response.data], 1, 1, 1));
+                return response; // Return the response to allow chaining
             })
             .catch(error => {
                 const errorMsg = error.message;
                 dispatch(fetchCommentBlogFailure(errorMsg));
+                throw error; // Rethrow the error to handle it in .catch()
             });
     };
 };

@@ -9,7 +9,7 @@ const initialState = {
     allCommentBlog: [],
     commentBlog: [],
     currentPage: 1,
-    pageSize: 5,
+    pageSize: 20,
     loading: false,
     error: '',
     totalCount: 0,
