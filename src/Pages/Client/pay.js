@@ -32,9 +32,10 @@ export default function Pay() {
   const [discount, setDiscount] = useState(0);
   const [reservation_code, setReservationCode] = useState(""); // Lưu reservation_code
   const [tableId, setTableId] = useState(null); // Store table_id
-  const [orderId, setOrderId] = useState("");
   const [userId, setUserId] = useState(null);
   const [tableNumber, setTableNumber] = useState("");
+  const [isDepositChecked, setIsDepositChecked] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState(""); // State để lưu phương thức thanh toán
 
   useEffect(() => {
     dispatch(fetchTable());
@@ -180,7 +181,6 @@ export default function Pay() {
         user_id: userId,
       };
 
-
       console.log("Final Total Payment:", finalTotal);
       console.log("Selected Promotion ID:", selectedPromotion);
       console.log("Selected Table ID:", tableId);
@@ -204,12 +204,20 @@ export default function Pay() {
         })
       );
 
-      const momoResponse = await dispatch(
-        requestMomoPayment(reservation.id, depositAmount, reservation_code)
-      );
-
-      if (momoResponse && momoResponse.payUrl) {
-        window.location.href = momoResponse.payUrl;
+      if (paymentMethod === "MOMO") {
+        const momoResponse = await dispatch(
+          requestMomoPayment(reservation.id, depositAmount, reservation_code)
+        );
+        if (momoResponse && momoResponse.payUrl) {
+          window.location.href = momoResponse.payUrl;
+        }
+      } else if (paymentMethod === "VNPay") {
+        alert("Tính năng VNPay hiện chưa được hỗ trợ.");
+      } else if (paymentMethod === "cash") {
+        alert(
+          "Thanh toán trực tiếp đã được xác nhận. Vui lòng thanh toán tại quầy."
+        );
+        navigate("/order-summary");
       }
     } catch (error) {
       console.error("Lỗi khi xác nhận đơn hàng:", error);
@@ -390,19 +398,55 @@ export default function Pay() {
               <hr />
               {/* Payment Method */}
               <label className="d-flex justify-content-between fw-bold">
-                Phương thức thanh toán
+                Hình thức thanh toán
               </label>
-              <input type="radio" name="payment-method" /> Thanh toán 30% hóa
-              đơn <br />
-              <hr />
-              <input type="radio" name="payment-method" /> Thanh toán chuyển
-              khoản <br />
-              <hr />
-              {/* Final total */}
-              <div className="d-flex justify-content-between align-items-center">
-                <span>Tổng thanh toán:</span>
-                <span className="fw-bold">{formatPrice(finalTotal)}</span>
+              <div>
+                <input
+                  type="checkbox"
+                  checked={isDepositChecked}
+                  onChange={() => setIsDepositChecked(!isDepositChecked)}
+                />{" "}
+                Thanh toán 30% hóa đơn
               </div>
+              <hr />
+              <div>
+                <label className="fw-bold">Phương thức thanh toán</label>
+                <div>
+                  <input
+                    type="radio"
+                    id="momo"
+                    name="paymentMethod"
+                    value="MOMO"
+                    checked={paymentMethod === "MOMO"}
+                    onChange={() => setPaymentMethod("MOMO")}
+                  />
+                  <label htmlFor="momo"> Thanh toán bằng MOMO</label>
+                </div>
+                <div>
+                  <input
+                    type="radio"
+                    id="vnpay"
+                    name="paymentMethod"
+                    value="VNPay"
+                    checked={paymentMethod === "VNPay"}
+                    onChange={() => setPaymentMethod("VNPay")}
+                  />
+                  <label htmlFor="vnpay"> Thanh toán bằng VNPay</label>
+                </div>
+                <div>
+                  <input
+                    type="radio"
+                    id="cash"
+                    name="paymentMethod"
+                    value="cash"
+                    checked={paymentMethod === "cash"}
+                    onChange={() => setPaymentMethod("cash")}
+                  />
+                  <label htmlFor="cash">  Thanh toán bằng Tiền mặt</label>
+                </div>
+              </div>
+              <hr />
+
               {/* Buttons for confirmation and going back */}
               <div className="d-flex justify-content-between mt-3">
                 <NavLink to="/order" className="w-30">
@@ -411,8 +455,8 @@ export default function Pay() {
                 <button
                   className="btn btn-primary w-70"
                   onClick={handleCompleteBooking}
-                >
-                  Xác nhận đơn hàng
+                  disabled={!isDepositChecked || !paymentMethod}                >
+                  Xác nhận thanh toán
                 </button>
               </div>
             </div>

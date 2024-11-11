@@ -1,21 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductDetailBySlug } from "../../Actions/ProductDetailActions";
 import { fetchProduct } from "../../Actions/ProductActions";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import unidecode from "unidecode";
 
 const DetailProduct = () => {
   const { slug } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const productDetailState = useSelector((state) => state.product_detail);
   const productState = useSelector((state) => state.product);
-
-  const [quantity, setQuantity] = useState(1);
-
+  
+  const prevScrollY = useRef(0); // To store the previous scroll position
+  
   useEffect(() => {
     dispatch(fetchProductDetailBySlug(slug));
     dispatch(fetchProduct());
+    prevScrollY.current = window.scrollY; // Save the current scroll position
   }, [dispatch, slug]);
+
+  useEffect(() => {
+    window.scrollTo(0, prevScrollY.current); // Restore the previous scroll position
+  }, [slug]); // When slug changes, scroll to the previous position
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -24,12 +31,20 @@ const DetailProduct = () => {
     }).format(price);
   };
 
-  const handleIncreaseQuantity = () => {
-    setQuantity((prevQuantity) => prevQuantity + 1);
+  // Function to create slug from product name
+  const createSlug = (name) => {
+    return unidecode(name)
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-+/, "")
+      .replace(/-+$/, "");
   };
 
-  const handleDecreaseQuantity = () => {
-    setQuantity((prevQuantity) => (prevQuantity > 1 ? prevQuantity - 1 : 1));
+  // Function to handle click and navigate to product detail page
+  const handleProductClick = (name) => {
+    const slug = createSlug(name);
+    navigate(`/product-detail/${slug}.html`, { replace: true });
   };
 
   const relatedProducts = productState.product.filter(
@@ -37,14 +52,14 @@ const DetailProduct = () => {
       product.categories_id ===
         productDetailState.productDetail?.categories_id &&
       product.id !== productDetailState.productDetail?.id &&
-      product.status === 1 // Filter related products with status 1
+      product.status === 1
   );
 
   const featuredProducts = productState.product
-    .filter((product) => product.status === 1) // Filter featured products with status 1
-    .sort(() => Math.random() - 0.5); // Shuffle the array randomly
+    .filter((product) => product.status === 1)
+    .sort(() => Math.random() - 0.5);
 
-  const randomFeaturedProducts = featuredProducts.slice(0, 4); // Select first 4 random products
+  const randomFeaturedProducts = featuredProducts.slice(0, 4);
 
   return (
     <>
@@ -93,7 +108,7 @@ const DetailProduct = () => {
                     </h4>
                     <h5 className="product-price">
                       {formatPrice(
-                        productDetailState.productDetail?.price -
+                        productDetailState.productDetail?.price - 
                           (productDetailState.productDetail?.sale_price || 0)
                       )}
                     </h5>
@@ -102,33 +117,6 @@ const DetailProduct = () => {
                         {formatPrice(productDetailState.productDetail?.price)}
                       </p>
                     )}
-                    <div
-                      className="input-group quantity mb-5"
-                      style={{ width: "100px" }}
-                    >
-                      <div className="input-group-btn">
-                        <button
-                          className="btn btn-sm btn-minus rounded-circle bg-light border"
-                          onClick={handleDecreaseQuantity}
-                        >
-                          <i className="fa fa-minus"></i>
-                        </button>
-                      </div>
-                      <input
-                        type="text"
-                        className="form-control form-control-sm text-center border-0"
-                        value={quantity}
-                        readOnly
-                      />
-                      <div className="input-group-btn">
-                        <button
-                          className="btn btn-sm btn-plus rounded-circle bg-light border"
-                          onClick={handleIncreaseQuantity}
-                        >
-                          <i className="fa fa-plus"></i>
-                        </button>
-                      </div>
-                    </div>
                     <button className="btn-book-table">Đặt bàn ngay</button>
                   </div>
                 </div>
@@ -170,6 +158,8 @@ const DetailProduct = () => {
                     <div
                       className="d-flex align-items-center justify-content-start mb-4"
                       key={product.id}
+                      onClick={() => handleProductClick(product.name)}
+                      style={{ cursor: "pointer" }}
                     >
                       <div
                         className="rounded"
@@ -183,7 +173,6 @@ const DetailProduct = () => {
                       </div>
                       <div className="ms-3">
                         <h6 className="mb-2">{product.name}</h6>
-
                         <div className="d-flex mb-2">
                           <h5 className="fw-bold me-2">
                             {formatPrice(
@@ -196,7 +185,7 @@ const DetailProduct = () => {
                   ))}
                   <div className="d-flex justify-content-center my-4">
                     <a
-                      href="#"
+                      href="/menu"
                       className="btn border border-secondary px-4 py-3 rounded-pill text-primary w-100"
                     >
                       Xem thêm
@@ -209,7 +198,12 @@ const DetailProduct = () => {
           <h1 className="fw-bold mb-4">Sản phẩm liên quan</h1>
           <div className="related-products">
             {relatedProducts.map((product) => (
-              <div className="related-product-item" key={product.id}>
+              <div
+                className="related-product-item"
+                key={product.id}
+                onClick={() => handleProductClick(product.name)}
+                style={{ cursor: "pointer" }}
+              >
                 <img
                   src={product.image}
                   className="img-fluid rounded-top"
