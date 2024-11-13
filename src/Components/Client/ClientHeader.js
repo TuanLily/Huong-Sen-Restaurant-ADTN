@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useUser } from '../../Context/UserContext';
 import normalAvatar from '../../Assets/Client/Images/default-avatar.png';
 
 export default function ClientHeader() {
   const { user, setUser } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -16,6 +17,7 @@ export default function ClientHeader() {
   const handleLogout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
+    navigate('/');
     setUser(null);
   };
 
