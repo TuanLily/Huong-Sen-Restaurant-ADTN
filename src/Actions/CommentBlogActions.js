@@ -37,7 +37,8 @@ export const fetchCommentBlog = (content = '', page = 1, pageSize = 20) => {
     return dispatch => {
         dispatch(fetchCommentBlogRequest());
 
-        const url = new URL(`${API_ENDPOINT}/${ClientConfig.routes.commentBlog}`);
+        const url = new URL(`${API_ENDPOINT}/public/${ClientConfig.routes.commentBlog}`);
+        console.log (url);
         
         if (content) {
             url.searchParams.append('search', content);
@@ -48,6 +49,7 @@ export const fetchCommentBlog = (content = '', page = 1, pageSize = 20) => {
         // Thực hiện gọi API để lấy danh sách bình luận
         http.get(url.toString())
             .then(response => {
+                console.log (response.data);
                 // Nhận thêm dữ liệu từ API: fullname, avatar
                 const { results, totalCount, totalPages, currentPage } = response.data;
 

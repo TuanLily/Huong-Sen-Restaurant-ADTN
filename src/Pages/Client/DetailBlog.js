@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBlogDetailBySlug } from "../../Actions/BlogDetailActions";
 import { Link, useParams } from "react-router-dom";
@@ -91,12 +91,54 @@ const DetailBlog = () => {
     navigate(`/blog-detail/${slug}.html`);
   };
 
-  const relatedPosts = Array.isArray(blogState.blog)
-    ? blogState.blog
+  const formatMessageTimestamp = (timestamp) => {
+    const now = new Date();
+    const timeDifference = now - new Date(timestamp); // Ensure timestamp is treated as Date
+    const minutesDifference = Math.floor(timeDifference / (1000 * 60));
+  
+    // Format the timestamp in dd-MM-yyyy HH:mm format
+    const formatCustom = (date) => {
+      const pad = (num) => num.toString().padStart(2, '0');
+      const day = pad(date.getDate());
+      const month = pad(date.getMonth() + 1); // Months are zero-indexed
+      const year = date.getFullYear();
+      const hours = pad(date.getHours());
+      const minutes = pad(date.getMinutes());
+      
+      return `${day}-${month}-${year} ${hours}:${minutes}`;
+    };
+  
+    // Display time difference in a readable format
+    if (minutesDifference < 1) {
+      return "Mới nhất"; // "Just now"
+    } else if (minutesDifference < 60) {
+      return `${minutesDifference} phút trước`; // e.g., "5 minutes ago"
+    } else if (timeDifference < 24 * 60 * 60 * 1000) {
+      const hoursDifference = Math.floor(minutesDifference / 60);
+      return `${hoursDifference} giờ trước`; // e.g., "2 hours ago"
+    } else {
+      // Return formatted timestamp as dd-MM-yyyy HH:mm
+      return formatCustom(new Date(timestamp)); // return in dd-MM-yyyy HH:mm format
+    }
+  };
+  
+
+  // const relatedPosts = Array.isArray(blogState.blog)
+  // ? blogState.blog
+  //   .filter((blog) => blog.id !== blogDetailState.blogDetail?.id)
+  //   .sort(() => Math.random() - 0.5) // Trộn ngẫu nhiên
+  //   .slice(0, 3) // Chỉ lấy 3 bài viết ngẫu nhiên
+  // : [];
+
+  const relatedPosts = useMemo(() => {
+    if (Array.isArray(blogState.blog)) {
+      return blogState.blog
         .filter((blog) => blog.id !== blogDetailState.blogDetail?.id)
-        .sort(() => Math.random() - 0.5) // Trộn ngẫu nhiên
-        .slice(0, 3) // Chỉ lấy 3 bài viết ngẫu nhiên
-    : [];
+        .sort(() => Math.random() - 0.5) // Shuffle randomly
+        .slice(0, 3); // Take only 3 random posts
+    }
+    return [];
+  }, [blogState.blog, blogDetailState.blogDetail]);
 
   const handleCommentSubmit = (e) => {
     e.preventDefault();
@@ -248,7 +290,9 @@ const DetailBlog = () => {
                           </h6>
                           <p className="mb-1">{comment.content}</p>
                           <small className="text-muted">
-                            {new Date(comment.created_at).toLocaleString()}
+                            
+                            
+                            {formatMessageTimestamp(comment.created_at)}
                           </small>
                         </div>
                       </div>
