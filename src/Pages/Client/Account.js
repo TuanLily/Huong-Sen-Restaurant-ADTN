@@ -69,7 +69,7 @@ function Account() {
     console.log("Check membershipTiersData:: ", membershipTiersData)
     membershipTiersData.membership_tiers.forEach(tier => {
         console.log("Check tier:: ", tier)
-        
+
         // Kiểm tra xem tier.description có tồn tại không
         if (tier.description) {
             const [condition, benefits] = tier.description.split("\r\n\r\n");
@@ -178,30 +178,31 @@ function Account() {
     };
 
     const handleUpdateProfile = async (data) => {
-        console.log('check data', data);
         if (!userId) {
             console.error('User ID is missing');
             return;
         }
-
+    
+        // Giữ nguyên avatar cũ nếu không thay đổi avatar
         const updatedProfile = {
             ...data,
-            address: fullAddress // Sử dụng fullAddress thay vì data.address
+            address: fullAddress, // Sử dụng fullAddress thay vì data.address
+            avatar: data.avatar || profile.avatar // Nếu không có avatar mới thì giữ avatar cũ
         };
-
+    
         try {
             await dispatch(updateProfile(userId, updatedProfile));
             localStorage.setItem('user', JSON.stringify(updatedProfile));
-
+    
             setAlert({
                 open: true,
                 message: 'Cập nhật thông tin thành công!',
                 severity: 'success'
             });
-
+    
             // Cập nhật state profile
             setProfile(updatedProfile);
-
+    
         } catch (error) {
             console.error('Error updating profile:', error);
             setAlert({
@@ -211,6 +212,7 @@ function Account() {
             });
         }
     };
+    
 
     useEffect(() => {
         const alertStatus = localStorage.getItem('profileUpdateStatus');
@@ -304,7 +306,19 @@ function Account() {
                             <div className="row g-4">
                                 <div className="col-md-4">
                                     <div className="bg-white p-4 rounded text-center">
-                                        <img src={profile.avatar || normalAvatar} alt="Avatar" className="img-fluid rounded-circle mb-3" width={140} />
+                                        <div className="d-flex justify-content-center align-items-center">
+                                            <div
+                                                className="avatar-wrapper rounded-circle overflow-hidden d-flex justify-content-center align-items-center"
+                                                style={{ width: 140, height: 140 }}
+                                            >
+                                                <img
+                                                    src={profile.avatar || normalAvatar}
+                                                    alt="Avatar"
+                                                    className="img-fluid"
+                                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                                />
+                                            </div>
+                                        </div>
                                         <br />
                                         <h5 className="section-title ff-secondary fw-normal text-primary">Họ và Tên</h5>
                                         <p>{profile.fullname}</p>

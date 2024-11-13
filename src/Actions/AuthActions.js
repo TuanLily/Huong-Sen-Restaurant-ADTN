@@ -33,6 +33,12 @@ export const showErrorAlert = (message) => ({
     payload: message,
 });
 
+const getErrorMessage = (error) => {
+    return error.response?.data?.message || error.message || "Đã xảy ra lỗi. Vui lòng thử lại!";
+};
+
+
+
 // Hàm để kiểm tra người dùng trong cơ sở dữ liệu
 export const checkEmailExists = async (email) => {
     try {
@@ -51,40 +57,38 @@ export const fetchGoogleAuth = (userData) => {
         dispatch(fetchAuthRequest());
         try {
             const response = await http.post(`${API_ENDPOINT}${API_DATA.authOGoogle}`, userData);
-            if (response.status === 200) {
-                const data = response.data;
-                dispatch(fetchAuthSuccess(data));
-                // Lưu thông tin người dùng vào localStorage
-                localStorage.setItem('user', JSON.stringify(data.user));
-                localStorage.setItem('accessToken', data.accessToken);
-            } else {
-                dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
-            }
+            const data = response.data;
+            dispatch(fetchAuthSuccess(data));
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('accessToken', data.accessToken);
+            dispatch(showSuccessAlert('Đăng nhập Google thành công!'));
         } catch (error) {
-            dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
+            const errorMsg = getErrorMessage(error.response.data);
+            dispatch(fetchAuthFailure(errorMsg));
+            dispatch(showErrorAlert(errorMsg));
         }
     };
 };
+
 
 export const fetchFacebookeAuth = (userData) => {
     return async dispatch => {
         dispatch(fetchAuthRequest());
         try {
             const response = await http.post(`${API_ENDPOINT}${API_DATA.authOFacebook}`, userData);
-            if (response.status === 200) {
-                const data = response.data;
-                dispatch(fetchAuthSuccess(data));
-                // Lưu thông tin người dùng vào localStorage
-                localStorage.setItem('user', JSON.stringify(data.user));
-                localStorage.setItem('accessToken', data.accessToken);
-            } else {
-                dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
-            }
+            const data = response.data;
+            dispatch(fetchAuthSuccess(data));
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('accessToken', data.accessToken);
+            dispatch(showSuccessAlert('Đăng nhập Facebook thành công!'));
         } catch (error) {
-            dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
+            const errorMsg = getErrorMessage(error.response.data);
+            dispatch(fetchAuthFailure(errorMsg));
+            dispatch(showErrorAlert(errorMsg));
         }
     };
 };
+
 
 
 
@@ -93,20 +97,21 @@ export const fetchLogin = (email, password) => {
         dispatch(fetchAuthRequest());
         try {
             const response = await http.post(`${API_ENDPOINT}${API_DATA.login}`, { email, password });
-            if (response.status === 200) {
-                const data = response.data;
-                console.log(data);
-                dispatch(fetchAuthSuccess(data));
-                localStorage.setItem('user', JSON.stringify(data.user));
-                localStorage.setItem('accessToken', data.accessToken);
-            } else {
-                dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
-            }
+            const data = response.data;
+            dispatch(fetchAuthSuccess(data));
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('accessToken', data.accessToken);
+            dispatch(showSuccessAlert('Đăng nhập thành công!'));
         } catch (error) {
-            dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
+            const errorMsg = getErrorMessage(error.response.data);
+            console.log("Check errorMsg:: ", errorMsg)
+
+            dispatch(fetchAuthFailure(errorMsg));
+            dispatch(showErrorAlert(errorMsg));
         }
     };
 };
+
 
 export const checkAuthStatus = () => {
     return dispatch => {
@@ -125,41 +130,30 @@ export const addNewCustomer = (customerData) => {
     return async dispatch => {
         dispatch(fetchAuthRequest());
         try {
-            // Gửi dữ liệu đến API
             const response = await http.post(`${API_ENDPOINT}${API_DATA.register}`, customerData);
-            if (response.status === 201) { // Đăng ký thành công, thường thì mã trạng thái là 201
-                const data = response.data;
-                console.log(data);
-                dispatch(fetchAuthSuccess(data));
-            } else {
-                dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
-            }
+            const data = response.data;
+            dispatch(fetchAuthSuccess(data));
+            dispatch(showSuccessAlert('Đăng ký tài khoản thành công!'));
         } catch (error) {
-            // Xử lý lỗi nếu có
-            dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
+            const errorMsg = getErrorMessage(error.response.data);
+            dispatch(fetchAuthFailure(errorMsg));
+            dispatch(showErrorAlert(errorMsg));
         }
     };
 };
+
 
 export const forgotPassword = (email) => {
     return async dispatch => {
         dispatch(fetchAuthRequest());
         try {
-            // Gửi dữ liệu đến API
             const response = await http.post(`${API_ENDPOINT}${API_DATA.forgotPassword}`, { email });
-            if (response.status === 200) { // Yêu cầu thành công, mã trạng thái là 200
-                const data = response.data;
-                console.log(data)
-                dispatch(fetchAuthSuccess(data));
-                dispatch(showSuccessAlert('Email đặt lại mật khẩu đã được gửi'));
-            } else {
-                dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
-                dispatch(showErrorAlert('Không thể gửi email đặt lại mật khẩu'));
-            }
+            dispatch(fetchAuthSuccess(response.data));
+            dispatch(showSuccessAlert('Email đặt lại mật khẩu đã được gửi thành công!'));
         } catch (error) {
-            // Xử lý lỗi nếu có
-            dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
-            dispatch(showErrorAlert(error.response ? error.response.data.message : error.message));
+            const errorMsg = getErrorMessage(error.response.data);
+            dispatch(fetchAuthFailure(errorMsg));
+            dispatch(showErrorAlert(errorMsg));
         }
     };
 };
@@ -169,18 +163,12 @@ export const changePassword = (token, newPassword) => {
         dispatch(fetchAuthRequest());
         try {
             const response = await http.post(`${API_ENDPOINT}${API_DATA.changePassword}`, { token, newPassword });
-            if (response.status === 200) {
-                const data = response.data;
-                console.log(data)
-                dispatch(fetchAuthSuccess(data));
-                dispatch(showSuccessAlert('Đổi mật khẩu thành công'));
-            } else {
-                dispatch(fetchAuthFailure('Unexpected response status: ' + response.status));
-                dispatch(showErrorAlert('Không thể đổi mật khẩu'));
-            }
+            dispatch(fetchAuthSuccess(response.data));
+            dispatch(showSuccessAlert('Đổi mật khẩu thành công!'));
         } catch (error) {
-            dispatch(fetchAuthFailure(error.response ? error.response.data.message : error.message));
-            dispatch(showErrorAlert(error.response ? error.response.data.message : error.message));
+            const errorMsg = getErrorMessage(error.response.data);
+            dispatch(fetchAuthFailure(errorMsg));
+            dispatch(showErrorAlert(errorMsg));
         }
     };
 };
