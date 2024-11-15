@@ -4,6 +4,7 @@ import { fetchProductDetailBySlug } from "../../Actions/ProductDetailActions";
 import { fetchProduct } from "../../Actions/ProductActions";
 import { useParams, useNavigate } from "react-router-dom";
 import unidecode from "unidecode";
+import Spinner from "../../Components/Client/Spinner";
 
 const DetailProduct = () => {
   const { slug } = useParams();
@@ -61,6 +62,10 @@ const DetailProduct = () => {
 
   const randomFeaturedProducts = featuredProducts.slice(0, 4);
 
+  if (productDetailState.loading) {
+    return <Spinner />; // Hiển thị spinner nếu đang tải dữ liệu
+  }
+
   return (
     <>
       <div className="container-fluid py-5 bg-dark hero-header mb-5">
@@ -117,7 +122,8 @@ const DetailProduct = () => {
                         {formatPrice(productDetailState.productDetail?.price)}
                       </p>
                     )}
-                    <button className="btn-book-table">Đặt bàn ngay</button>
+                    <a href="/booking"><button className="btn-book-table">Đặt bàn ngay</button>
+</a>
                   </div>
                 </div>
                 <div className="col-lg-12">
