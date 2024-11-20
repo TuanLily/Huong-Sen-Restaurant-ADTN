@@ -34,6 +34,17 @@ export default function Menu() {
     }).format(price);
   };
 
+  // Hàm tạo slug từ tên sản phẩm
+  const createSlug = (name) => {
+    return unidecode(name) // Chuyển đổi ký tự tiếng Việt thành ký tự không dấu
+      .toLowerCase() // Chuyển thành chữ thường
+      .replace(/[^a-z0-9]/g, "-") // Thay thế ký tự không phải chữ cái hoặc số bằng dấu -
+      .replace(/-+/g, "-") // Thay thế nhiều dấu - bằng 1 dấu -
+      .replace(/^-+/, "") // Xóa dấu - ở đầu chuỗi
+      .replace(/-+$/, ""); // Xóa dấu - ở cuối chuỗi
+  };
+
+
   const handleProductClick = (name) => {
     const slug = createSlug(name);
     navigate(`/product-detail/${slug}.html`);
@@ -78,11 +89,11 @@ export default function Menu() {
       <div className="container-fluid">
         <div className="row justify-content-center">
           {/* Sidebar */}
-          <div className="col-lg-3 col-md-4 bg-light" style={{ 
-            minHeight: '100vh', 
-            padding: '20px', 
-            boxShadow: '2px 0 5px rgba(0,0,0,0.1)', 
-            overflowY: 'auto' 
+          <div className="col-lg-3 col-md-4 bg-light" style={{
+            minHeight: '100vh',
+            padding: '20px',
+            boxShadow: '2px 0 5px rgba(0,0,0,0.1)',
+            overflowY: 'auto'
           }}>
             <div className="text-center">
               <h4 className="mb-4 ff-secondary fw-normal section-title" style={{ fontWeight: 'bold', color: '#FEA100' }}>THỰC ĐƠN</h4>

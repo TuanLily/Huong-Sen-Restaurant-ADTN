@@ -34,6 +34,8 @@ export default function Pay() {
   const [tableId, setTableId] = useState(null); // Store table_id
   const [userId, setUserId] = useState(null);
   const [tableNumber, setTableNumber] = useState("");
+  const [depositAmount, setDepositAmount] = useState(0);
+  const [remainingAmount, setRemainingAmount] = useState(0);
   const [isDepositChecked, setIsDepositChecked] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(""); // State để lưu phương thức thanh toán
 
@@ -164,6 +166,20 @@ export default function Pay() {
   const validPromotions = promotions.filter(
     (promo) => new Date(promo.valid_to) >= new Date() && promo.quantity > 0
   );
+
+  const handleDepositChange = (e) => {
+    const isChecked = e.target.checked;
+    setIsDepositChecked(isChecked);
+    if (isChecked) {
+      const deposit = finalTotal * 0.3;
+      const remaining = finalTotal * 0.7;
+      setDepositAmount(deposit);
+      setRemainingAmount(remaining);
+    } else {
+      setDepositAmount(0);
+      setRemainingAmount(0);
+    }
+  };
 
   const handleCompleteBooking = async () => {
     try {
@@ -382,7 +398,7 @@ export default function Pay() {
               </div>
               {/* Order total */}
               <div className="d-flex justify-content-between align-items-center">
-                <span>Tổng tiền:</span>
+                <span>Tạm tính:</span>
                 <span>{formatPrice(total_amount)}</span>
               </div>
               {/* Discount */}
@@ -396,18 +412,33 @@ export default function Pay() {
                 <span>{formatPrice(total_amount * 0.1)}</span>
               </div>
               <hr />
+              <p className="fw-bold">
+                Tổng thanh toán:{" "}
+                <span className="text-warning">{formatPrice(finalTotal)}</span>
+              </p>
+              <hr />
               {/* Payment Method */}
               <label className="d-flex justify-content-between fw-bold">
                 Hình thức thanh toán
               </label>
               <div>
-                <input
-                  type="checkbox"
-                  checked={isDepositChecked}
-                  onChange={() => setIsDepositChecked(!isDepositChecked)}
-                />{" "}
-                Thanh toán 30% hóa đơn
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={isDepositChecked}
+                    onChange={handleDepositChange}
+                  />
+                  ㅤThanh toán 30% hóa đơn
+                </label>
               </div>
+
+              {isDepositChecked && (
+                <div>
+                  <label>ㅤ- Tiền cọc (30%): {formatPrice(depositAmount)}</label>
+                  <label>ㅤ- Còn lại (70%): {formatPrice(remainingAmount)}</label>
+                </div>
+              )}
+
               <hr />
               <div>
                 <label className="fw-bold">Phương thức thanh toán</label>
@@ -420,9 +451,9 @@ export default function Pay() {
                     checked={paymentMethod === "MOMO"}
                     onChange={() => setPaymentMethod("MOMO")}
                   />
-                  <label htmlFor="momo"> Thanh toán bằng MOMO</label>
+                  <label htmlFor="momo">ㅤThanh toán bằng MOMO</label>
                 </div>
-                <div>
+                {/* <div>
                   <input
                     type="radio"
                     id="vnpay"
@@ -443,7 +474,7 @@ export default function Pay() {
                     onChange={() => setPaymentMethod("cash")}
                   />
                   <label htmlFor="cash">  Thanh toán bằng Tiền mặt</label>
-                </div>
+                </div> */}
               </div>
               <hr />
 
@@ -455,7 +486,8 @@ export default function Pay() {
                 <button
                   className="btn btn-primary w-70"
                   onClick={handleCompleteBooking}
-                  disabled={!isDepositChecked || !paymentMethod}                >
+                  disabled={!isDepositChecked || !paymentMethod}
+                >
                   Xác nhận thanh toán
                 </button>
               </div>
