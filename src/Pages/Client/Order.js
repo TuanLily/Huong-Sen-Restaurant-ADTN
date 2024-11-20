@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductHoatDong } from "../../Actions/ProductActions";
 import { fetchProductCategoryHoatDong } from "../../Actions/ProductCategoryActions";
+import { DangerAlert } from '../../Components/Alert/Alert';
 
 export default function Order() {
   const dispatch = useDispatch();
@@ -10,6 +11,7 @@ export default function Order() {
   const productCategoryState = useSelector((state) => state.product_category);
   const loading = useSelector((state) => state.product.loading);
   const error = useSelector((state) => state.product.error);
+  const navigate = useNavigate();
 
   const [customerInfo, setCustomerInfo] = useState({
     fullname: "",
@@ -23,6 +25,8 @@ export default function Order() {
 
   const [selectedProducts, setSelectedProducts] = useState({});
   const [selectedCategory, setSelectedCategory] = useState(null); // State cho danh mục sản phẩm
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
     dispatch(fetchProductHoatDong());
@@ -82,6 +86,10 @@ export default function Order() {
     });
   };
 
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
+
   const handleNext = () => {
     const filteredProducts = Object.entries(selectedProducts).reduce(
       (acc, [id, product]) => {
@@ -93,8 +101,15 @@ export default function Order() {
       {}
     );
 
+    if (Object.keys(filteredProducts).length === 0) {
+      setSnackbarMessage("Vui lòng chọn ít nhất một sản phẩm.");
+      setOpenSnackbar(true);
+      return;
+    }
+
     localStorage.setItem("selectedProducts", JSON.stringify(filteredProducts));
-    console.log(filteredProducts);
+    console.log("Filtered products saved to localStorage:", filteredProducts);
+    navigate('/pay');
   };
 
   const formatPrice = (price) => {
@@ -197,9 +212,8 @@ export default function Order() {
                 onClick={() => setSelectedCategory(null)}
               >
                 <a
-                  className={`nav-link ${
-                    selectedCategory === null ? "active" : ""
-                  }`}
+                  className={`nav-link ${selectedCategory === null ? "active" : ""
+                    }`}
                 >
                   Tất cả
                 </a>
@@ -211,9 +225,8 @@ export default function Order() {
                   onClick={() => setSelectedCategory(category.id)}
                 >
                   <a
-                    className={`nav-link ${
-                      selectedCategory === category.id ? "active" : ""
-                    }`}
+                    className={`nav-link ${selectedCategory === category.id ? "active" : ""
+                      }`}
                   >
                     {category.name}
                   </a>
@@ -299,7 +312,10 @@ export default function Order() {
                 <NavLink
                   to="/pay"
                   className="btn btn-primary"
-                  onClick={handleNext}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNext();
+                  }}
                 >
                   Tiếp theo
                 </NavLink>
@@ -308,6 +324,12 @@ export default function Order() {
           </div>
         </div>
       </div>
+
+      <DangerAlert 
+        open={openSnackbar} 
+        onClose={handleCloseSnackbar} 
+        message={snackbarMessage} 
+      />
     </div>
   );
 }
