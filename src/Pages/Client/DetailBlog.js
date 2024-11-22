@@ -12,6 +12,7 @@ import {
 } from "../../Actions/CommentBlogActions";
 import { jwtDecode as jwt_decode } from "jwt-decode";
 import { SuccessAlert } from "../../Components/Alert/Alert"; // Import SuccessAlert
+import normalAvatar from "../../Assets/Client/Images/default-avatar.png";
 
 const DetailBlog = () => {
   const { slug } = useParams();
@@ -95,19 +96,19 @@ const DetailBlog = () => {
     const now = new Date();
     const timeDifference = now - new Date(timestamp); // Ensure timestamp is treated as Date
     const minutesDifference = Math.floor(timeDifference / (1000 * 60));
-  
+
     // Format the timestamp in dd-MM-yyyy HH:mm format
     const formatCustom = (date) => {
-      const pad = (num) => num.toString().padStart(2, '0');
+      const pad = (num) => num.toString().padStart(2, "0");
       const day = pad(date.getDate());
       const month = pad(date.getMonth() + 1); // Months are zero-indexed
       const year = date.getFullYear();
       const hours = pad(date.getHours());
       const minutes = pad(date.getMinutes());
-      
+
       return `${day}-${month}-${year} ${hours}:${minutes}`;
     };
-  
+
     // Display time difference in a readable format
     if (minutesDifference < 1) {
       return "Mới nhất"; // "Just now"
@@ -121,7 +122,6 @@ const DetailBlog = () => {
       return formatCustom(new Date(timestamp)); // return in dd-MM-yyyy HH:mm format
     }
   };
-  
 
   // const relatedPosts = Array.isArray(blogState.blog)
   // ? blogState.blog
@@ -273,9 +273,9 @@ const DetailBlog = () => {
                                 comment.avatar &&
                                 comment.avatar.startsWith("http")
                                   ? comment.avatar
-                                  : "https://static-00.iconduck.com/assets.00/avatar-default-symbolic-icon-256x256-q0fen40c.png"
+                                  : normalAvatar
                               }
-                              alt={comment.fullname}
+                              alt={comment.fullname || "Default Avatar"}
                               className="comment-avatar"
                               style={{
                                 width: "40px",
@@ -289,11 +289,17 @@ const DetailBlog = () => {
                             </span>
                           </h6>
                           <p className="mb-1">{comment.content}</p>
-                          <small className="text-muted">
-                            
-                            
-                            {formatMessageTimestamp(comment.created_at)}
-                          </small>
+                          <div className="d-flex justify-content-between align-items-center">
+                            <small className="text-muted">
+                              {formatMessageTimestamp(comment.created_at)}
+                            </small>
+                            <button
+                              className="btn text-muted btn-link btn-sm p-0"
+                              style={{ fontSize: "12px" }}
+                            >
+                              Xóa bình luận
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))
