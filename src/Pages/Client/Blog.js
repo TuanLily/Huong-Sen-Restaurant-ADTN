@@ -14,19 +14,8 @@ export default function Blog() {
     dispatch(fetchBlog());
   }, [dispatch]);
 
-  // Function to create slug from blog title
-  const createSlug = (title) => {
-    return unidecode(title)
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-+/, "")
-      .replace(/-+$/, "");
-  };
-
   // Function to handle blog click
-  const handleBlogClick = (title) => {
-    const slug = createSlug(title);
+  const handleBlogClick = (slug) => {
     navigate(`/blog-detail/${slug}.html`);
   };
 
@@ -61,7 +50,7 @@ export default function Blog() {
           <div className="col-md-9">
             <div className="row">
               {/* Show loading or error state */}
-              {blogState.loading && <Spinner/>}
+              {blogState.loading && <Spinner />}
               {blogState.error && <div>Error: {blogState.error}</div>}
 
               {/* Map over the blog posts */}
@@ -69,38 +58,37 @@ export default function Blog() {
                 blogState.blog?.length > 0 &&
                 blogState.blog.map((blog) => (
                   <div className="col-md-4 mb-4" key={blog.id}>
-  <div
-    className="blog-card"
-    onClick={() => handleBlogClick(blog.title)}
-    style={{
-      cursor: "pointer",
-      borderRadius: "8px",
-      overflow: "hidden",
-      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      transition: "transform 0.3s ease",
-      background: "white",
-    }}
-  >
-    <img
-      src={
-        blog.poster ||
-        "https://images.rawpixel.com/image_social_square/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA0L2pvYjcwOS0yMy12LmpwZw.jpg"
-      }
-      className="card-img-top"
-      alt={blog.title}
-      style={{
-        height: "200px",
-        objectFit: "cover",
-        width: "100%",
-      }}
-    />
-    <div className="card-body">
-      <h5 className="card-title">{blog.title.slice(0, 50)}</h5>
-      <p className="card-text">{blog.author}</p>
-    </div>
-  </div>
-</div>
-
+                    <div
+                      className="blog-card"
+                      onClick={() => handleBlogClick(blog.slug)}
+                      style={{
+                        cursor: "pointer",
+                        borderRadius: "8px",
+                        overflow: "hidden",
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                        transition: "transform 0.3s ease",
+                        background: "white",
+                      }}
+                    >
+                      <img
+                        src={
+                          blog.poster ||
+                          "https://images.rawpixel.com/image_social_square/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA0L2pvYjcwOS0yMy12LmpwZw.jpg"
+                        }
+                        className="card-img-top"
+                        alt={blog.title}
+                        style={{
+                          height: "200px",
+                          objectFit: "cover",
+                          width: "100%",
+                        }}
+                      />
+                      <div className="card-body">
+                        <h5 className="card-title">{blog.title.slice(0, 50)}</h5>
+                        <p className="card-text">{blog.author}</p>
+                      </div>
+                    </div>
+                  </div>
                 ))}
 
               {/* If no blogs are found */}
@@ -119,14 +107,14 @@ export default function Blog() {
                   <div
                     className="list-group mt-3"
                     key={blog.id}
-                    onClick={() => handleBlogClick(blog.title)}
+                    onClick={() => handleBlogClick(blog.slug)}
                     style={{
                       cursor: "pointer",
                       borderRadius: "8px",
                       overflow: "hidden",
                       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
                       transition: "transform 0.3s ease",
-                      backgroundColor: "#fff", // Nền trắng giống bài viết
+                      backgroundColor: "#fff",
                     }}
                   >
                     <a
@@ -136,7 +124,7 @@ export default function Blog() {
                         textDecoration: "none",
                         display: "flex",
                         alignItems: "center",
-                        color: "inherit", // Đảm bảo màu chữ không thay đổi
+                        color: "inherit",
                       }}
                     >
                       <div style={{ flex: 1, padding: "10px" }}>

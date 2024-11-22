@@ -77,18 +77,7 @@ const DetailBlog = () => {
     setFilteredComments(comments);
   }, [commentState.commentBlog, blogDetailState.blogDetail]);
 
-  const createSlug = (title) => {
-    return unidecode(title)
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-+/, "")
-      .replace(/-+$/, "");
-  };
-
-  const handleBlogClick = (title) => {
-    const slug = createSlug(title);
-    window.scrollTo(0, 0);
+  const handleBlogClick = (slug) => {
     navigate(`/blog-detail/${slug}.html`);
   };
 
@@ -354,7 +343,7 @@ const DetailBlog = () => {
                   <div
                     className="card border-0 shadow-sm"
                     style={{ cursor: "pointer" }}
-                    onClick={() => handleBlogClick(post.title)}
+                    onClick={() => handleBlogClick(post.slug)}
                   >
                     <img
                       className="card-img-top"
