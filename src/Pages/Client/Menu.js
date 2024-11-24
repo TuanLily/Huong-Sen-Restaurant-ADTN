@@ -11,13 +11,16 @@ import {
 import unidecode from "unidecode";
 import { Link, useNavigate } from "react-router-dom";
 import Spinner from "../../Components/Client/Spinner";
+import Pagination from '@mui/material/Pagination';
 
 export default function Menu() {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Sử dụng useNavigate để điều hướng
+  const navigate = useNavigate();
   const productCategoryState = useSelector((state) => state.product_category);
   const productState = useSelector((state) => state.product);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 20; //TODO setting limit/trang ở đây
 
   useEffect(() => {
     dispatch(fetchListProductCategory());
@@ -31,22 +34,6 @@ export default function Menu() {
     }).format(price);
   };
 
-  const listProduct = (category_id) => {
-    return productState.product.filter(
-      (product) => product.categories_id === category_id
-    );
-  };
-
-  // Hàm tạo slug từ tên sản phẩm
-  const createSlug = (name) => {
-    return unidecode(name) // Chuyển đổi ký tự tiếng Việt thành ký tự không dấu
-      .toLowerCase() // Chuyển thành chữ thường
-      .replace(/[^a-z0-9]/g, "-") // Thay thế ký tự không phải chữ cái hoặc số bằng dấu -
-      .replace(/-+/g, "-") // Thay thế nhiều dấu - bằng 1 dấu -
-      .replace(/^-+/, "") // Xóa dấu - ở đầu chuỗi
-      .replace(/-+$/, ""); // Xóa dấu - ở cuối chuỗi
-  };
-
   const handleProductClick = (name) => {
     const slug = createSlug(name);
     navigate(`/product-detail/${slug}.html`);
@@ -54,11 +41,18 @@ export default function Menu() {
 
   const handleCategoryClick = (categoryId) => {
     setSelectedCategory(categoryId);
+    setCurrentPage(1);
   };
 
   const productsInCategorySelected = selectedCategory
     ? productState.product.filter((product) => product.categories_id === selectedCategory)
     : productState.product;
+
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = productsInCategorySelected.slice(indexOfFirstProduct, indexOfLastProduct);
+
+  const totalPages = Math.ceil(productsInCategorySelected.length / productsPerPage);
 
   return (
     <div>
@@ -141,12 +135,12 @@ export default function Menu() {
                     <div className="tab-content">
                       <div id="tab-1" className="tab-pane fade show p-0 active">
                         <div className="row" style={{ rowGap: "20px" }}>
-                          {productsInCategorySelected.length === 0 ? (
+                          {currentProducts.length === 0 ? (
                             <div className="text-center" style={{ marginTop: '20px', fontSize: '1.2rem', color: '#333' }}>
                               Đang cập nhật thêm món ăn...
                             </div>
                           ) : (
-                            productsInCategorySelected.map((product) => (
+                            currentProducts.map((product) => (
                               <div className="col-lg-6" key={product.id}>
                                 <div
                                   className="d-flex align-items-center"
@@ -272,6 +266,19 @@ export default function Menu() {
                 </div>
               );
             })}
+
+            {/* Hiển thị phân trang nếu có nhiều hơn 10 sản phẩm */}
+            {selectedCategory !== null && totalPages > 1 && (
+              <div className="d-flex justify-content-center align-items-center mt-3">
+                <Pagination
+                  count={totalPages}
+                  page={currentPage}
+                  onChange={(event, value) => setCurrentPage(value)}
+                  color="primary"
+                  variant="outlined"
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
