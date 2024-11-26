@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchBlogDetailBySlug } from "../../Actions/BlogDetailActions";
 import { Link, useParams } from "react-router-dom";
-import { fetchBlog } from "../../Actions/BlogActions";
+import { fetchBlog, fetchBlogWithoutPagi } from "../../Actions/BlogActions";
 import unidecode from "unidecode";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../Components/Client/Spinner";
@@ -21,6 +21,8 @@ const DetailBlog = () => {
 
   const blogDetailState = useSelector((state) => state.blog_detail);
   const blogState = useSelector((state) => state.blog);
+
+  // console.log("Check blogState:: ", blogState)
   const commentState = useSelector((state) => state.comment_blog);
 
   const [userId, setUserId] = useState(null);
@@ -48,9 +50,12 @@ const DetailBlog = () => {
 
   useEffect(() => {
     dispatch(fetchBlogDetailBySlug(slug));
-    dispatch(fetchBlog());
     dispatch(fetchCommentBlog());
   }, [dispatch, slug]);
+
+  useEffect(() => {
+    dispatch(fetchBlogWithoutPagi());
+  }, [dispatch]);
 
   useEffect(() => {
     if (userId) {
@@ -128,6 +133,8 @@ const DetailBlog = () => {
     }
     return [];
   }, [blogState.blog, blogDetailState.blogDetail]);
+
+  // console.log("CHCK relatedPosts:: ", relatedPosts)
 
   const handleCommentSubmit = (e) => {
     e.preventDefault();
@@ -260,7 +267,7 @@ const DetailBlog = () => {
                             <img
                               src={
                                 comment.avatar &&
-                                comment.avatar.startsWith("http")
+                                  comment.avatar.startsWith("http")
                                   ? comment.avatar
                                   : normalAvatar
                               }
@@ -303,9 +310,8 @@ const DetailBlog = () => {
                   <form onSubmit={handleCommentSubmit}>
                     <div className="form-group">
                       <textarea
-                        className={`form-control bg-white text-dark ${
-                          errors.content ? "is-invalid" : ""
-                        }`}
+                        className={`form-control bg-white text-dark ${errors.content ? "is-invalid" : ""
+                          }`}
                         rows="3"
                         placeholder="Nhập bình luận..."
                         value={newComment.content}
