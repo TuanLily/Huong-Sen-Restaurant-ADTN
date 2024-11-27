@@ -8,8 +8,9 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "../../Components/Client/Spinner";
 import {
   addCommentBlog,
-  fetchCommentBlog,
+  fetchCommentBlog, deleteCommentBlog
 } from "../../Actions/CommentBlogActions";
+import DialogConfirm from '../../Components/Dialog/Dialog';
 import { jwtDecode as jwt_decode } from "jwt-decode";
 import { SuccessAlert } from "../../Components/Alert/Alert"; // Import SuccessAlert
 import normalAvatar from "../../Assets/Client/Images/default-avatar.png";
@@ -21,6 +22,24 @@ const DetailBlog = () => {
 
   const blogDetailState = useSelector((state) => state.blog_detail);
   const blogState = useSelector((state) => state.blog);
+
+  const [open, setOpen] = useState(false);
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const [selectedID, setSelectedID] = useState(null);
+
+  const handleClickOpen = (id) => {
+    setSelectedID(id);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedID(null);
+  };
+
+  const handleSuccessClose = () => {
+    setOpenSuccess(false);
+  };
 
   // console.log("Check blogState:: ", blogState)
   const commentState = useSelector((state) => state.comment_blog);
@@ -163,6 +182,26 @@ const DetailBlog = () => {
       });
   };
 
+  const handleDeleteComment = async () => {
+    const accessToken = localStorage.getItem("accessToken");
+  
+    if (!accessToken) {
+      alert("Bạn cần đăng nhập để thực hiện hành động này!");
+      return;
+    }
+
+    if (selectedID) {
+      try {
+        await dispatch(deleteCommentBlog(selectedID))
+        handleClose();
+        setOpenSuccess(true); // Hiển thị thông báo thành công
+      } catch (error) {
+        console.error("Error delete:", error);
+      }
+    }
+  
+  };
+
   return (
     <div>
       {/* Blog Detail UI */}
@@ -289,12 +328,18 @@ const DetailBlog = () => {
                             <small className="text-muted">
                               {formatMessageTimestamp(comment.created_at)}
                             </small>
-                            <button
+                            {/* <button
                               className="btn text-muted btn-link btn-sm p-0"
                               style={{ fontSize: "12px" }}
                             >
                               Xóa bình luận
-                            </button>
+                            </button> */}
+                            {userId === comment.user_id && (
+                              <button className="btn text-muted btn-link btn-sm p-0"
+                              style={{ fontSize: "12px" }} onClick={() => handleClickOpen(comment.id)}>
+                                Xóa
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -369,6 +414,7 @@ const DetailBlog = () => {
       ) : (
         <p>Blog không tồn tại!</p>
       )}
+      <DialogConfirm open={open} onClose={handleClose} onConfirm={() => handleDeleteComment(0)} />
     </div>
   );
 };
