@@ -20,9 +20,13 @@ export default function Blog() {
   };
 
   useEffect(() => {
-    const page = getCurrentPageFromUrl();
-    setCurrentPage(page); // Cập nhật trang hiện tại từ URL
-    dispatch(fetchBlog(page, blogState.pageSize)); // Lấy danh sách bài viết với trang hiện tại
+    const fetchData = async () => {
+      const page = getCurrentPageFromUrl();
+      setCurrentPage(page); // Cập nhật trang hiện tại từ URL
+      await dispatch(fetchBlog(page, blogState.pageSize)); // Sử dụng await để đợi fetchBlog hoàn thành
+    };
+
+    fetchData(); // Gọi hàm async
   }, [dispatch, location.search]); // Lấy lại khi vị trí thay đổi
 
   // Hàm xử lý khi nhấp vào bài viết

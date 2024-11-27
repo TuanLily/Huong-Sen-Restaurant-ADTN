@@ -32,7 +32,7 @@ const blogReducer = (state = initialState, action) => {
                 totalCount: action.payload.totalCount,
                 totalPages: action.payload.totalPages,
                 currentPage: action.payload.currentPage,
-                blogs: action.payload.results.slice(0, state.pageSize),
+                blogs: action.payload.results  ? action.payload.results.slice(0, state.pageSize) : [],
             };
         case FETCH_BLOG_FAILURE:
             return {
