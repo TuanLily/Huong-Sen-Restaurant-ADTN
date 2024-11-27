@@ -18,13 +18,13 @@ export default function MyBookingDetail() {
     const getUserIdFromToken = useCallback(() => {
         const accessToken = localStorage.getItem('accessToken');
         if (accessToken) {
-        try {
-            const decodedToken = jwt_decode(accessToken);
-            return decodedToken.id; // Trả về user_id từ token
-        } catch (error) {
-            console.error('Error decoding token:', error);
-            return null;
-        }
+            try {
+                const decodedToken = jwt_decode(accessToken);
+                return decodedToken.id; // Trả về user_id từ token
+            } catch (error) {
+                console.error('Error decoding token:', error);
+                return null;
+            }
         }
         return null;
     }, []);
@@ -43,12 +43,12 @@ export default function MyBookingDetail() {
     };
 
     const statusMapping = {
-        1: { text: 'Chờ thanh toán cọc', class: 'badge bg-warning' },    
+        1: { text: 'Chờ thanh toán cọc', class: 'badge bg-warning' },
         2: { text: 'Hết hạn thanh toán cọc', class: 'badge bg-info' },
-        3: { text: 'Đã thanh toán cọc', class: 'badge bg-primary' },     
-        0: { text: 'Hủy đơn', class: 'badge bg-danger' },             
+        3: { text: 'Đã thanh toán cọc', class: 'badge bg-primary' },
+        0: { text: 'Hủy đơn', class: 'badge bg-danger' },
         4: { text: 'Chờ thanh toán toàn bộ đơn', class: 'badge bg-success' },
-        5: { text: 'Hoàn thành đơn', class: 'badge bg-secondary' }       
+        5: { text: 'Hoàn thành đơn', class: 'badge bg-secondary' }
     };
 
     if (!getUserIdFromToken()) {
@@ -124,7 +124,7 @@ export default function MyBookingDetail() {
                                     }
                                 `}
                             </style>
-                            
+
                             {/* Header */}
                             <div className="invoice-header">
                                 <img src={logo} alt="navbar brand" />
@@ -132,7 +132,7 @@ export default function MyBookingDetail() {
                                 <p>Địa chỉ: Tầng 8, Số 2 Tôn Thất Tùng, Đống Đa - Hà Nội</p>
                                 <p>Điện thoại: 190030060 | Email: support@elise.vn</p>
                             </div>
-                            
+
                             {/* Thông tin khách hàng */}
                             <div className="invoice-info">
                                 <h3>Thông tin khách hàng</h3>
@@ -141,7 +141,7 @@ export default function MyBookingDetail() {
                                 <p><strong>Email:</strong> {reservationState.reservation[0].email}</p>
                                 <p><strong>Ngày đặt:</strong> {reservationState.reservation[0].reservation_date.substring(0, 10)} | <strong>Số người:</strong> {reservationState.reservation[0].party_size} | <strong>Số bàn:</strong> {reservationState.reservation[0].tableName ? reservationState.reservation[0].tableName : 'Chưa có'}</p>
                             </div>
-                            
+
                             {/* Chi tiết đơn hàng */}
                             <div className="invoice-details">
                                 <h3>Chi tiết đơn hàng</h3>
@@ -177,7 +177,7 @@ export default function MyBookingDetail() {
                                 </table>
                                 <div className='mt-2'><strong>Ghi chú:</strong> {reservationState.reservation[0].note ? reservationState.reservation[0].note : 'Không có'}</div>
                             </div>
-                            
+
                             {/* Thông tin thanh toán */}
                             {reservationDetailState.reservationDetail.length > 0 && (() => {
                                 const reservation = reservationState.reservation[0];
@@ -200,7 +200,7 @@ export default function MyBookingDetail() {
                                         <div>
                                             <h3>Thông tin thanh toán</h3>
                                             <p><strong>Đã cọc:</strong> {formatCurrency(deposit)}</p>
-                                            <p><strong>Còn lại:</strong> {formatCurrency(remaining)}</p>
+                                            <p><strong>Còn lại:</strong> {reservation.status == 5 ? 0 : formatCurrency(remaining)}</p>
                                             <p><strong>Trạng thái:</strong> {statusMapping[reservation.status].text}</p>
                                         </div>
                                     </div>

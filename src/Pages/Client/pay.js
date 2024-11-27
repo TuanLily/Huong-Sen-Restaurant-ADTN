@@ -9,6 +9,7 @@ import {
 } from "../../Actions/ReservationActions";
 import { addNewReservationDetail } from "../../Actions/Reservation_detailActions";
 import { useNavigate } from "react-router-dom";
+import { SuccessAlert, DangerAlert } from '../../Components/Alert/Alert';
 
 export default function Pay() {
   const navigate = useNavigate();
@@ -38,6 +39,8 @@ export default function Pay() {
   const [remainingAmount, setRemainingAmount] = useState(0);
   const [isDepositChecked, setIsDepositChecked] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(""); // State để lưu phương thức thanh toán
+  const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
+  const [openDangerAlert, setOpenDangerAlert] = useState(false);
 
   useEffect(() => {
     dispatch(fetchTable());
@@ -145,10 +148,11 @@ export default function Pay() {
       setDiscount(promotion.discount);
       setSelectedPromotion(promotion.id);
       setVoucherCode("");
+      setOpenSuccessAlert(true);
     } else {
       setDiscount(0);
       setSelectedPromotion("");
-      alert("Mã giảm giá không hợp lệ hoặc đã hết hạn.");
+      setOpenDangerAlert(true);
     }
   };
 
@@ -495,6 +499,8 @@ export default function Pay() {
           </div>
         </div>
       </div>
+      <SuccessAlert open={openSuccessAlert} onClose={() => setOpenSuccessAlert(false)} message="Voucher đã được sử dụng!" />
+      <DangerAlert open={openDangerAlert} onClose={() => setOpenDangerAlert(false)} message="Mã giảm giá không hợp lệ hoặc đã hết hạn." />
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProductHoatDong } from "../../Actions/ProductActions";
-import { fetchProductCategoryHoatDong } from "../../Actions/ProductCategoryActions";
+import { fetchMenu, fetchProductHoatDong } from "../../Actions/ProductActions";
+import { fetchListProductCategory, fetchProductCategoryHoatDong } from "../../Actions/ProductCategoryActions";
 import { DangerAlert } from "../../Components/Alert/Alert";
 
 export default function Order() {
@@ -29,8 +29,8 @@ export default function Order() {
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
-    dispatch(fetchProductHoatDong());
-    dispatch(fetchProductCategoryHoatDong());
+    dispatch(fetchMenu());
+    dispatch(fetchListProductCategory());
 
     const savedData = localStorage.getItem("customerInfo");
     if (savedData) {
