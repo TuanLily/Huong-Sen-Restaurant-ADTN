@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductHoatDong } from "../../Actions/ProductActions";
 import { fetchProductCategoryHoatDong } from "../../Actions/ProductCategoryActions";
-import { DangerAlert } from '../../Components/Alert/Alert';
+import { DangerAlert } from "../../Components/Alert/Alert";
 
 export default function Order() {
   const dispatch = useDispatch();
@@ -26,7 +26,7 @@ export default function Order() {
   const [selectedProducts, setSelectedProducts] = useState({});
   const [selectedCategory, setSelectedCategory] = useState(null); // State cho danh mục sản phẩm
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
     dispatch(fetchProductHoatDong());
@@ -109,7 +109,7 @@ export default function Order() {
 
     localStorage.setItem("selectedProducts", JSON.stringify(filteredProducts));
     console.log("Filtered products saved to localStorage:", filteredProducts);
-    navigate('/pay');
+    navigate("/pay");
   };
 
   const formatPrice = (price) => {
@@ -212,26 +212,30 @@ export default function Order() {
                 onClick={() => setSelectedCategory(null)}
               >
                 <a
-                  className={`nav-link ${selectedCategory === null ? "active" : ""
-                    }`}
+                  className={`nav-link ${
+                    selectedCategory === null ? "active" : ""
+                  }`}
                 >
                   Tất cả
                 </a>
               </li>
-              {productCategoryState.product_category.map((category) => (
-                <li
-                  className="nav-item"
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                >
-                  <a
-                    className={`nav-link ${selectedCategory === category.id ? "active" : ""
-                      }`}
+              {productCategoryState.product_category
+                .filter((category) => category.name !== "Chưa phân loại") // Lọc bỏ danh mục "Chưa phân loại"
+                .map((category) => (
+                  <li
+                    className="nav-item"
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
                   >
-                    {category.name}
-                  </a>
-                </li>
-              ))}
+                    <a
+                      className={`nav-link ${
+                        selectedCategory === category.id ? "active" : ""
+                      }`}
+                    >
+                      {category.name}
+                    </a>
+                  </li>
+                ))}
             </ul>
 
             <div className="col-md-12 bg-light p-4">
@@ -325,10 +329,10 @@ export default function Order() {
         </div>
       </div>
 
-      <DangerAlert 
-        open={openSnackbar} 
-        onClose={handleCloseSnackbar} 
-        message={snackbarMessage} 
+      <DangerAlert
+        open={openSnackbar}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
       />
     </div>
   );
