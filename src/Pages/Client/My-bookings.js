@@ -234,7 +234,7 @@ export default function MyBooking() {
                         </div>
                         <div style={{ flex: '1 1 30%' }}>
                           <p className="mb-2">
-                            <strong>Ngày đặt:</strong> {booking.created_at.substring(0, 10)}
+                            <strong>Ngày đặt:</strong> {new Date(booking.reservation_date).toLocaleDateString('vi-VN').substring(0, 10)}
                           </p>
                           <p className="mb-2">
                             <strong>Số bàn:</strong> {booking.tableName ? booking.tableName : 'Chưa có'}
@@ -248,7 +248,7 @@ export default function MyBooking() {
                           <strong>Số tiền còn lại:</strong> {formatCurrency(booking.total_amount ? booking.deposit ? booking.total_amount - booking.deposit : booking.total_amount : 0)}
                         </p>
                         <div>
-                          {(statusInfo.text == 'Chờ thanh toán cọc' || statusInfo.text == 'Hết hạn thanh toán cọc') && (
+                          {(statusInfo.text == 'Chờ thanh toán cọc') && (
                             <button className="btn btn-outline-secondary btn-sm mt-2 me-2" onClick={() => handleClickOpen(booking.id)} style={{ padding: '0.25rem 0.75rem' }}>
                               Hủy Đơn
                             </button>
