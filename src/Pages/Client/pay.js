@@ -32,9 +32,7 @@ export default function Pay() {
   const [selectedPromotion, setSelectedPromotion] = useState("");
   const [discount, setDiscount] = useState(0);
   const [reservation_code, setReservationCode] = useState(""); // Lưu reservation_code
-  const [tableId, setTableId] = useState(null); // Store table_id
   const [userId, setUserId] = useState(null);
-  const [tableNumber, setTableNumber] = useState("");
   const [depositAmount, setDepositAmount] = useState(0);
   const [remainingAmount, setRemainingAmount] = useState(0);
   const [isDepositChecked, setIsDepositChecked] = useState(false);
@@ -59,23 +57,11 @@ export default function Pay() {
     if (userData) {
       const user = JSON.parse(userData);
       setUserId(user.id); // Lưu userId
-      console.log("User ID:", user.id); // Log user ID để kiểm tra
+      // console.log("User ID:", user.id); // Log user ID để kiểm tra
     }
 
     setReservationCode(generateReservationCode());
   }, [dispatch]);
-
-  useEffect(() => {
-    if (customerInfo.party_size && tables.length > 0) {
-      const assignedTable = assignTable(customerInfo.party_size);
-      if (assignedTable) {
-        setTableId(assignedTable.id);
-        setTableNumber(assignedTable.number);
-      } else {
-        setTableNumber("Không có bàn trống");
-      }
-    }
-  }, [customerInfo.party_size, tables]);
 
   useEffect(() => {
     dispatch(fetchPromotion());
@@ -111,26 +97,6 @@ export default function Pay() {
       discountedTotal: total - discountAmount,
       finalTotal: total - discountAmount + tax,
     };
-  };
-
-  const assignTable = (party_size) => {
-    const availableTables = tables
-      .filter((table) => {
-        if (party_size <= 2) {
-          return table.capacity === 2 && table.status === 1;
-        } else if (party_size <= 4) {
-          return table.capacity === 4 && table.status === 1;
-        } else if (party_size <= 6) {
-          return table.capacity === 6 && table.status === 1;
-        } else if (party_size <= 8) {
-          return table.capacity === 8 && table.status === 1;
-        } else {
-          return table.capacity > 8 && table.status === 1;
-        }
-      })
-      .sort((a, b) => a.number - b.number);
-
-    return availableTables.length > 0 ? availableTables[0] : null;
   };
 
   const total_amount = calculateTotalPrice();
@@ -192,8 +158,6 @@ export default function Pay() {
       const orderData = {
         ...customerInfo,
         reservation_code,
-        tableNumber,
-        table_id: tableId,
         total_amount: finalTotal,
         discount,
         deposit: depositAmount,
@@ -201,10 +165,10 @@ export default function Pay() {
         user_id: userId,
       };
 
-      console.log("Final Total Payment:", finalTotal);
-      console.log("Selected Promotion ID:", selectedPromotion);
-      console.log("Selected Table ID:", tableId);
-      console.log("User ID:", userId);
+      // console.log("Final Total Payment:", finalTotal);
+      // console.log("Selected Promotion ID:", selectedPromotion);
+      // console.log("Selected Table ID:", tableId);
+      // console.log("User ID:", userId);
 
       // Dispatch reservation action
       const reservation = await dispatch(addNewReservation(orderData));
@@ -301,7 +265,6 @@ export default function Pay() {
                   {formatTime(customerInfo.reservation_date)}
                 </p>
               </div>
-              <p className="mb-0 fw-bold">Bàn số: {tableNumber}</p>
               <p className="mb-0 fw-bold">
                 Số người: {customerInfo.party_size} người
               </p>
