@@ -139,7 +139,7 @@ export default function MyBookingDetail() {
                                 <p><strong>Tên:</strong> {reservationState.reservation[0].fullname} | <strong>Mã:</strong> {reservationState.reservation[0].reservation_code ? reservationState.reservation[0].reservation_code : 'Chưa biết'}</p>
                                 <p><strong>Phone:</strong> {reservationState.reservation[0].tel}</p>
                                 <p><strong>Email:</strong> {reservationState.reservation[0].email}</p>
-                                <p><strong>Ngày đặt:</strong> {new Date(reservationState.reservation[0].reservation_date).toLocaleDateString('vi-VN').substring(0, 10)} | <strong>Số người:</strong> {reservationState.reservation[0].party_size} | <strong>Số bàn:</strong> {reservationState.reservation[0].tableName ? reservationState.reservation[0].tableName : 'Chưa có'}</p>
+                                <p><strong>Ngày đặt:</strong> {new Date(reservationState.reservation[0].reservation_date).toLocaleDateString('vi-VN').substring(0, 10)} | <strong>Số người:</strong> {reservationState.reservation[0].party_size}</p>
                             </div>
 
                             {/* Chi tiết đơn hàng */}

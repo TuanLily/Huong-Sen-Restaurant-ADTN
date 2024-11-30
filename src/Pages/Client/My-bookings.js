@@ -236,9 +236,9 @@ export default function MyBooking() {
                           <p className="mb-2">
                             <strong>Ngày đặt:</strong> {new Date(booking.reservation_date).toLocaleDateString('vi-VN').substring(0, 10)}
                           </p>
-                          <p className="mb-2">
+                          {/* <p className="mb-2">
                             <strong>Số bàn:</strong> {booking.tableName ? booking.tableName : 'Chưa có'}
-                          </p>
+                          </p> */}
                         </div>
                       </div>
 
