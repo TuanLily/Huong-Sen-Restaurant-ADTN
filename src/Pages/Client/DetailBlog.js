@@ -8,13 +8,15 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "../../Components/Client/Spinner";
 import {
   addCommentBlog,
-  fetchCommentBlog, deleteCommentBlog
+  fetchCommentBlog,
+  deleteCommentBlog,
+  updateCommentBlog,
 } from "../../Actions/CommentBlogActions";
-import DialogConfirm from '../../Components/Dialog/Dialog';
+import DialogConfirm from "../../Components/Dialog/Dialog";
 import { jwtDecode as jwt_decode } from "jwt-decode";
 import { SuccessAlert } from "../../Components/Alert/Alert"; // Import SuccessAlert
 import normalAvatar from "../../Assets/Client/Images/default-avatar.png";
-
+import DialogEditComment from "../../Components/Dialog/DialogEditComment";
 const DetailBlog = () => {
   const { slug } = useParams();
   const dispatch = useDispatch();
@@ -27,18 +29,37 @@ const DetailBlog = () => {
   const [openSuccess, setOpenSuccess] = useState(false);
   const [selectedID, setSelectedID] = useState(null);
 
-  const handleClickOpen = (id) => {
+  const [editingContent, setEditingContent] = useState(""); // Define setEditingContent
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false); // Trạng thái mở Dialog sửa
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false); // Trạng thái mở Dialog xóa
+
+  // Hàm mở Dialog xóa
+  const handleClickOpen = (type, id, content) => {
     setSelectedID(id);
-    setOpen(true);
+
+    if (type === "edit") {
+      setEditingContent(content); // Set nội dung cần sửa vào state
+      setIsEditDialogOpen(true); // Mở Dialog sửa
+      setIsDeleteDialogOpen(false); // Đảm bảo Dialog xóa không mở
+    } else if (type === "delete") {
+      setIsDeleteDialogOpen(true); // Mở Dialog xóa
+      setIsEditDialogOpen(false); // Đảm bảo Dialog sửa không mở
+    }
   };
 
+  // Hàm mở Dialog sửa
+  // const handleClickOpenEditComment = (id, content) => {
+  //   setSelectedID(id);
+  //   setEditingContent(content); // Set nội dung cần sửa vào state
+  //   setIsEditDialogOpen(true); // Mở Dialog sửa
+  //   setIsDeleteDialogOpen(false); // Đảm bảo Dialog xóa không mở
+  // };
+
+  // Hàm đóng các Dialog
   const handleClose = () => {
-    setOpen(false);
-    setSelectedID(null);
-  };
-
-  const handleSuccessClose = () => {
-    setOpenSuccess(false);
+    setIsDeleteDialogOpen(false); // Đóng Dialog xóa
+    setIsEditDialogOpen(false); // Đóng Dialog sửa
+    setSelectedID(null); // Reset selectedID
   };
 
   // console.log("Check blogState:: ", blogState)
@@ -184,7 +205,7 @@ const DetailBlog = () => {
 
   const handleDeleteComment = async () => {
     const accessToken = localStorage.getItem("accessToken");
-  
+
     if (!accessToken) {
       alert("Bạn cần đăng nhập để thực hiện hành động này!");
       return;
@@ -192,14 +213,26 @@ const DetailBlog = () => {
 
     if (selectedID) {
       try {
-        await dispatch(deleteCommentBlog(selectedID))
+        await dispatch(deleteCommentBlog(selectedID));
         handleClose();
+        setShowSuccessAlert(true);
         setOpenSuccess(true); // Hiển thị thông báo thành công
       } catch (error) {
         console.error("Error delete:", error);
       }
     }
-  
+  };
+
+  const handleEditComment = async () => {
+    if (selectedID && editingContent) {
+      await dispatch(
+        updateCommentBlog(selectedID, { content: editingContent })
+      );
+      setShowSuccessAlert(true);
+      setIsEditDialogOpen(false);
+      setEditingContent(""); // Clear content after successful edit
+      setSelectedID(null); // Reset selectedID
+    }
   };
 
   return (
@@ -284,7 +317,7 @@ const DetailBlog = () => {
           <SuccessAlert
             open={showSuccessAlert}
             onClose={() => setShowSuccessAlert(false)}
-            message="Bình luận đã được thêm thành công!"
+            message="Thao tác thành công!"
           />
 
           {/* Phần bình luận */}
@@ -294,7 +327,7 @@ const DetailBlog = () => {
               <div className="card-body">
                 <div className="mb-4">
                   {commentState.loading ? (
-                    <Spinner /> // Show spinner while comments are loading
+                    <Spinner /> // Hiển thị spinner trong khi đang tải bình luận
                   ) : filteredComments.length > 0 ? (
                     filteredComments.map((comment, index) => (
                       <div
@@ -306,7 +339,7 @@ const DetailBlog = () => {
                             <img
                               src={
                                 comment.avatar &&
-                                  comment.avatar.startsWith("http")
+                                comment.avatar.startsWith("http")
                                   ? comment.avatar
                                   : normalAvatar
                               }
@@ -328,17 +361,39 @@ const DetailBlog = () => {
                             <small className="text-muted">
                               {formatMessageTimestamp(comment.created_at)}
                             </small>
-                            {/* <button
-                              className="btn text-muted btn-link btn-sm p-0"
-                              style={{ fontSize: "12px" }}
-                            >
-                              Xóa bình luận
-                            </button> */}
+
+                            {/* Hiển thị nút "Sửa" và "Xóa" nếu người dùng là chủ sở hữu bình luận */}
                             {userId === comment.user_id && (
-                              <button className="btn text-muted btn-link btn-sm p-0"
-                              style={{ fontSize: "12px" }} onClick={() => handleClickOpen(comment.id)}>
-                                Xóa
-                              </button>
+                              <div className="comment-actions">
+                                {/* Nút "Sửa" */}
+                                <button
+                                  className="btn text-muted btn-link btn-sm p-0"
+                                  style={{
+                                    fontSize: "12px",
+                                    marginRight: "10px",
+                                  }} // Thêm khoảng cách bên phải
+                                  onClick={() =>
+                                    handleClickOpen(
+                                      "edit",
+                                      comment.id,
+                                      comment.content
+                                    )
+                                  }
+                                >
+                                  Sửa
+                                </button>
+
+                                {/* Nút "Xóa" */}
+                                <button
+                                  className="btn text-muted btn-link btn-sm p-0"
+                                  style={{ fontSize: "12px" }}
+                                  onClick={() =>
+                                    handleClickOpen("delete", comment.id)
+                                  } // Mở modal xóa
+                                >
+                                  Xóa
+                                </button>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -355,8 +410,9 @@ const DetailBlog = () => {
                   <form onSubmit={handleCommentSubmit}>
                     <div className="form-group">
                       <textarea
-                        className={`form-control bg-white text-dark ${errors.content ? "is-invalid" : ""
-                          }`}
+                        className={`form-control bg-white text-dark ${
+                          errors.content ? "is-invalid" : ""
+                        }`}
                         rows="3"
                         placeholder="Nhập bình luận..."
                         value={newComment.content}
@@ -414,7 +470,21 @@ const DetailBlog = () => {
       ) : (
         <p>Blog không tồn tại!</p>
       )}
-      <DialogConfirm open={open} onClose={handleClose} onConfirm={() => handleDeleteComment(0)} />
+
+      <DialogEditComment
+        open={isEditDialogOpen} // Mở Dialog sửa khi isEditDialogOpen là true
+        content={editingContent}
+        onChange={(e) => setEditingContent(e.target.value)} // Cập nhật nội dung khi thay đổi
+        onClose={handleClose} // Đóng Dialog
+        onSave={handleEditComment} // Lưu bình luận đã chỉnh sửa
+      />
+
+      <DialogConfirm
+        open={isDeleteDialogOpen} // Mở Dialog xóa khi isDeleteDialogOpen là true
+        onClose={handleClose} // Đóng Dialog xóa
+        onConfirm={handleDeleteComment} // Xác nhận xóa bình luận
+        message="Bạn có chắc chắn muốn xóa bình luận này?"
+      />
     </div>
   );
 };
