@@ -7,6 +7,7 @@ import DialogConfirm from '../../Components/Dialog/Dialog';
 import CustomPagination from '../../Components/Pagination/CustomPagination';
 import SpinnerSink from '../../Components/Client/SniperSink';
 import { SuccessAlert } from '../../Components/Alert/Alert';
+import { formatDateTime } from '../../Utils/FormatDateTime';
 import { jwtDecode as jwt_decode } from 'jwt-decode';
 
 export default function MyBooking() {
@@ -234,7 +235,7 @@ export default function MyBooking() {
                         </div>
                         <div style={{ flex: '1 1 30%' }}>
                           <p className="mb-2">
-                            <strong>Ngày đặt:</strong> {new Date(booking.reservation_date).toLocaleDateString('vi-VN').substring(0, 10)}
+                            <strong>Ngày đặt:</strong> {formatDateTime(booking.reservation_date)}
                           </p>
                           {/* <p className="mb-2">
                             <strong>Số bàn:</strong> {booking.tableName ? booking.tableName : 'Chưa có'}
