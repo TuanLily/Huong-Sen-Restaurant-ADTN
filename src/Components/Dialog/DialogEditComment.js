@@ -6,15 +6,14 @@ const DialogEditComment = ({ open, content, onChange, onClose, onSave }) => {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Sửa Bình Luận</DialogTitle>
       <DialogContent>
-      <TextField
-  autoFocus
-  fullWidth
-  value={content}
-  onChange={onChange}
-  variant="outlined"
-  
-/>
-
+        <TextField
+          autoFocus
+          fullWidth
+          value={content}
+          onChange={onChange}
+          variant="outlined"
+          InputProps={{ style: { width: '400px' } }}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">
