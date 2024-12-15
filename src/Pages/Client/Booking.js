@@ -1,27 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 
 export default function Booking() {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false); // State for controlling the modal visibility
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm({
-    reservation_code: "",
-    fullname: "",
-    email: "",
-    reservation_date: "",
-    party_size: "",
-    tel: "",
-    note: "",
-    status: 1,
-  });
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (!userData) {
+      setShowModal(true); // Hiển thị modal nếu không có dữ liệu người dùng
+    }
+  }, []);
 
   useEffect(() => {
     const savedData = localStorage.getItem("customerInfo");
@@ -42,36 +34,58 @@ export default function Booking() {
         setValue(key, customerInfo[key]);
       });
     }
-  }, [dispatch, setValue]);
+  }, [setValue]);
 
-   // Lưu dữ liệu biểu mẫu hiện tại vào local storage khi nhấn "Tiếp theo"
-   const handleNext = (data) => {
-    // Lấy dữ liệu người dùng và trích xuất id
+  // Lưu dữ liệu biểu mẫu hiện tại vào local storage khi nhấn "Tiếp theo"
+  const handleNext = (data) => {
     const userData = localStorage.getItem("user");
     let userId = null;
     if (userData) {
       const user = JSON.parse(userData);
       userId = user.id;
-      console.log("Lấy được id:", userId);
     }
-  
-    // Thêm id vào đối tượng data
+
     const dataWithUserId = { ...data, user_id: userId };
-  
-    // Lưu dữ liệu có id vào local storage
     localStorage.setItem("customerInfo", JSON.stringify(dataWithUserId));
-    console.log(
-      "Thông tin khách hàng:",
-      JSON.parse(localStorage.getItem("customerInfo"))
-    );
-  
-    // Chuyển hướng đến trang đặt món
     navigate("/order");
   };
-  
+
+  const handleRedirectToLogin = () => {
+    setShowModal(false);
+    navigate("/login");
+  };
+
+  const handleCancel = () => {
+    setShowModal(false);
+    navigate("/");  // Điều hướng về trang chủ khi nhấn "Hủy"
+  };
 
   return (
     <div>
+      {/* Popup Modal */}
+      {showModal && (
+        <div className="modal show" tabIndex="-1" style={{ display: "block", background: "rgba(0, 0, 0, 0.5)" }}>
+          <div className="modal-dialog d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Thông báo</h5>
+              </div>
+              <div className="modal-body">
+                <p>Bạn cần đăng nhập để tiếp tục. Bạn có muốn chuyển đến trang đăng nhập không?</p>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" onClick={handleCancel}>
+                  Hủy
+                </button>
+                <button type="button" className="btn btn-primary" onClick={handleRedirectToLogin}>
+                  Đi đến đăng nhập
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="container-fluid p-0 py-5 bg-dark hero-header mb-5">
         <div className="container text-center my-5 pt-5 pb-4">
           <h1 className="display-3 text-white mb-3 animated slideInDown">
@@ -82,10 +96,7 @@ export default function Booking() {
               <li className="breadcrumb-item">
                 <Link to="/">Trang chủ</Link>
               </li>
-              <li
-                className="breadcrumb-item text-white active"
-                aria-current="page"
-              >
+              <li className="breadcrumb-item text-white active" aria-current="page">
                 Đặt bàn
               </li>
             </ol>
