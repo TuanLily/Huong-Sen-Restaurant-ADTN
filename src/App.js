@@ -27,7 +27,6 @@ function ProtectedRoute({ children }) {
 
   useEffect(() => {
     if (!isChecking && !isAuthenticated) {
-      alert("Bạn cần đăng nhập để truy cập trang này!");
       navigate('/login', { state: { from: location }, replace: true });
     }
   }, [isChecking, isAuthenticated, navigate, location]);
