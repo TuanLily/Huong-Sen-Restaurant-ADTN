@@ -54,9 +54,10 @@ function ChatPopup() {
   const predefinedMessages = [
     "Xin chào",
     "Địa chỉ của nhà hàng?",
-    "Phương thức liên hệ với nhà hàng?",
+    "Liên hệ với nhà hàng như nào?",
+    "Nhà hàng có chỗ gửi xe không, gửi xe có bị tính phí không?",
     "Giờ hoạt động của nhà hàng?",
-    "Làm nào để đặt bàn?",
+    "Đặt bàn như nào?",
     "Gặp nhân viên tư vấn!",
   ];
 
@@ -615,7 +616,16 @@ function ChatPopup() {
                       },
                     }}
                   />
-                  <IconButton onClick={handleEmojiButtonClick} sx={{ mr: 1 }}>
+                  <IconButton 
+                    onClick={handleSendMessage}
+                    sx={{ mr: 1, display: { xs: 'flex', sm: 'flex', md: 'none' } }}
+                  >
+                    <SendIcon sx={{ color: '#ffa115' }} />
+                  </IconButton>
+                  <IconButton 
+                    onClick={handleEmojiButtonClick} 
+                    sx={{ mr: 1, display: { xs: 'none', md: 'flex' } }}
+                  >
                     <EmojiEmotionsIcon />
                   </IconButton>
                   <Popover
