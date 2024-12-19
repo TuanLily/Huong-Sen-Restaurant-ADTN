@@ -161,7 +161,7 @@ export default function Order() {
 
       <div className="container-xxl py-5 px-0">
   <div className="row g-0">
-    <div className="col-4 bg-warning p-5">
+    <div className="col-lg-4 col-md-6 bg-warning p-5">
       <div className="text-center mb-4">
         <h1 className="text-white section-title ff-secondary">
           Thông tin đặt bàn
@@ -187,7 +187,7 @@ export default function Order() {
       </p>
     </div>
 
-    <div className="col-8 bg-light p-5">
+    <div className="col-lg-8 col-md-6 bg-light p-5">
       <ul className="nav nav-tabs">
         <li className="nav-item" onClick={() => setSelectedCategory(null)}>
           <a

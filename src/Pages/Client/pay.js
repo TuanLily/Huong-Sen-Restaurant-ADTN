@@ -241,8 +241,8 @@ export default function Pay() {
       >
         <div className="row justify-content-center">
           {/* Customer Information */}
-          <div className="col-md-6">
-            <div className="p-4 bg-white shadow-sm mb-3">
+          <div className="col-12 col-md-6 mb-3">
+            <div className="p-4 bg-white shadow-sm">
               <h2 className="text-warning fw-bold ff-secondary">
                 Thông tin khách hàng
               </h2>
@@ -253,8 +253,8 @@ export default function Pay() {
           </div>
 
           {/* Order Information */}
-          <div className="col-md-6">
-            <div className="p-4 bg-white shadow-sm mb-3">
+          <div className="col-12 col-md-6 mb-3">
+            <div className="p-4 bg-white shadow-sm">
               <h2 className="text-warning fw-bold ff-secondary">
                 Thông tin đơn đặt bàn
               </h2>
@@ -274,8 +274,8 @@ export default function Pay() {
 
         {/* Selected Products */}
         <div className="row justify-content-center">
-          <div className="col-md-8">
-            <h5 className="text-warning fw-bold mb-3">
+          <div className="col-12 col-md-8 mb-3">
+            <h5 className="text-warning fw-bold mb-3 mx-3 mx-md-0">
               Đơn hàng ({Object.keys(selectedProducts).length} sản phẩm)
             </h5>
             <hr />
@@ -290,10 +290,10 @@ export default function Pay() {
                           "../../Assets/Client/Images/placeholder.png"
                         }
                         alt={product.name}
-                        className="me-3"
+                        className="me-3 img-fluid"
                         style={{
-                          width: "60px",
-                          height: "60px",
+                          maxWidth: "60px",
+                          height: "auto",
                           objectFit: "cover",
                           borderRadius: "5px",
                         }}
@@ -320,7 +320,7 @@ export default function Pay() {
           </div>
 
           {/* Order Summary */}
-          <div className="col-md-4">
+          <div className="col-12 col-md-4">
             <div className="bg-white shadow-sm p-4">
               <h5 className="text-warning fw-bold">Tóm tắt đơn hàng</h5>
               {/* Input for manual voucher code */}

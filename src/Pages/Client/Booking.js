@@ -221,10 +221,6 @@ export default function Booking() {
                             value: 1,
                             message: "Số người ăn tối thiểu 1 người"
                           },
-                          max: {
-                            value: 8,
-                            message: "Số người ăn không được vượt quá 8 người"
-                          },
                           valueAsNumber: true
                         })}
                       />
