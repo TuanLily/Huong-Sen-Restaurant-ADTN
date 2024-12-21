@@ -41,14 +41,21 @@ export default function Pay() {
   const [openDangerAlert, setOpenDangerAlert] = useState(false);
 
   useEffect(() => {
+    const savedCustomerInfo = localStorage.getItem("customerInfo");
+    const savedProducts = localStorage.getItem("selectedProducts");
+
+    // Kiểm tra nếu customerInfo và selectedProducts tồn tại
+    if (!savedCustomerInfo && !savedProducts) {
+      navigate("/"); // Chuyển hướng về trang chính
+      return; // Ngăn không cho tiếp tục thực hiện
+    }
+
     dispatch(fetchTable());
 
-    const savedCustomerInfo = localStorage.getItem("customerInfo");
     if (savedCustomerInfo) {
       setCustomerInfo(JSON.parse(savedCustomerInfo));
     }
 
-    const savedProducts = localStorage.getItem("selectedProducts");
     if (savedProducts) {
       setSelectedProducts(JSON.parse(savedProducts));
     }
@@ -61,7 +68,7 @@ export default function Pay() {
     }
 
     setReservationCode(generateReservationCode());
-  }, [dispatch]);
+  }, [dispatch, navigate]);
 
   useEffect(() => {
     dispatch(fetchPromotion());
