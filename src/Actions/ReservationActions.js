@@ -53,14 +53,19 @@ export const requestMomoPayment = (reservationId, amount, reservation_code ) => 
   };
 
 export const requestMomoPayUrl = (reservationId, amount) => async dispatch => {
-    try {
-        const response = await http.post('http://localhost:6969/api/public/payment/get_pay_url', {
+    // try {
+    //     const response = await http.post('http://localhost:6969/api/public/payment/get_pay_url', {
+    //     reservationId,
+    //     amount,
+    //     });
+    //     return response.data; // Trả về dữ liệu để xử lý tiếp
+    // } catch (error) {
+    //     console.error("Error in MoMo payment request:", error);
+    //     throw error;
+    // }
+    const response = await http.post('http://localhost:6969/api/public/payment/get_pay_url', {
         reservationId,
         amount,
         });
         return response.data; // Trả về dữ liệu để xử lý tiếp
-    } catch (error) {
-        console.error("Error in MoMo payment request:", error);
-        throw error;
-    }
 };

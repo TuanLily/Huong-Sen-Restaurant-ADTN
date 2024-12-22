@@ -200,7 +200,7 @@ export default function MyBookingDetail() {
                                         </div>
                                         <div>
                                             <h3>Thông tin thanh toán</h3>
-                                            <p><strong>Đã cọc:</strong> {formatCurrency(deposit)}</p>
+                                            <p><strong>Tiền cọc:</strong> {formatCurrency(deposit)}</p>
                                             <p><strong>Còn lại:</strong> {reservation.status == 5 ? 0 : formatCurrency(remaining)}</p>
                                             <p><strong>Trạng thái:</strong> {statusMapping[reservation.status].text}</p>
                                         </div>

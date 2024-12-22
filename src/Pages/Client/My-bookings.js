@@ -139,6 +139,19 @@ export default function MyBooking() {
     5: { text: 'Hoàn thành đơn', class: 'badge bg-secondary' }       
   };
 
+  const monney = (status, total_amount, deposit) => {
+    console.log (status, total_amount, deposit)
+    if (status == 0 || status == 1 || status == 2) {
+      return "<strong>Số tiền thanh toán:</strong> " + formatCurrency (deposit);
+    } else if (status == 3) {
+      return "<strong>Số tiền còn lại:</strong> " + formatCurrency (total_amount - deposit);
+    } else if (status == 4) {
+      return "<strong>Số tiền còn lại:</strong> " + formatCurrency (total_amount);
+    } else {
+      return "<strong>Số tiền còn lại:</strong> " + formatCurrency (0);
+    }
+  }
+
   return (
     <div>
       {/* Hero Section */}
@@ -245,9 +258,7 @@ export default function MyBooking() {
 
                       {/* Payment Info and Action Button */}
                       <div className="col-md-4 col-sm-12 text-md-end text-left mt-3 mt-md-0">
-                        <p className="mb-2">
-                          <strong>Số tiền còn lại:</strong> {formatCurrency(booking.total_amount ? booking.deposit ? booking.total_amount - booking.deposit : booking.total_amount : 0)}
-                        </p>
+                        <p className="mb-2" dangerouslySetInnerHTML={{ __html: monney(booking.status, booking.total_amount, booking.deposit) }} />
                         <div>
                           {(statusInfo.text == 'Chờ thanh toán cọc') && (
                             <button className="btn btn-outline-secondary btn-sm mt-2 me-2" onClick={() => handleClickOpen(booking.id)} style={{ padding: '0.25rem 0.75rem' }}>
