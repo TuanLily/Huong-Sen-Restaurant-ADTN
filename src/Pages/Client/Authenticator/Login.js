@@ -45,117 +45,89 @@ export default function Login() {
     };
 
     return (
-        <div>
-            <div className="container-fluid py-5 bg-dark hero-header mb-5">
+        <div className="min-vh-100 ">
+            <div className="container-fluid py-5 bg-dark hero-header">
             </div>
-            <div className="container">
-                <div className="row justify-content-center">
-                    <div className="col-md-8">
-                        <div className="card rounded-3 shadow d-flex flex-column flex-md-row">
-                            <div className="col-12 col-md-4 d-flex justify-content-center align-items-center p-3">
-                                <img
-                                    src="../../../Assets/Client/Images/huong-sen-logo.png"
-                                    alt="IMG"
-                                    className="img-fluid"
-                                    style={{ maxWidth: '60%', height: 'auto' }}
-                                />
+            <div className="container my-3">
+                <div className="row justify-content-center ">
+                    <div className="col-12 col-lg-6">
+                        {/* Logo */}
+                        <div className="text-center mb-4">
+                            <img
+                                src="../../../Assets/Client/Images/huong-sen-logo.png"
+                                alt="Lotus Logo"
+                                className="img-fluid"
+                                style={{ maxWidth: '150px' }}
+                            />
+                        </div>
+
+                        {/* Social Login Options */}
+                        <div className="text-center mb-4">
+                            <h5 className="mb-3">Đăng nhập với</h5>
+                            <div className="d-flex justify-content-center gap-3">
+                                <button className="btn btn-light shadow-sm">
+                                    <GoogleAuth />
+                                </button>
+                                <button className="btn btn-light shadow-sm">
+                                    <FacebookAuth />
+                                </button>
                             </div>
-                            <div className="col-12 col-md-8 p-3">
-                                <div className="card-body">
-                                    <form onSubmit={handleSubmit(onSubmit)}>
-                                        <h2 className="text-center mb-4">Đăng nhập</h2>
-                                        <div className="form-group mb-3">
-                                            <label htmlFor="email" className="form-label">Email</label>
-                                            <div className="input-group">
-                                                <span className="input-group-text">
-                                                    <i className="fa fa-envelope" aria-hidden="true"></i>
-                                                </span>
-                                                <input
-                                                    type="email"
-                                                    className={`form-control ${errors.email ? "is-invalid" : ""}`}
-                                                    id="email"
-                                                    placeholder="Nhập Email"
-                                                    {...register('email', {
-                                                        required: 'Email là bắt buộc',
-                                                        pattern: {
-                                                            value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                                                            message: 'Email không hợp lệ'
-                                                        }
-                                                    })}
-                                                />
-                                            </div>
-                                            {errors.email && <p className="text-danger">{errors.email.message}</p>}
-                                        </div>
+                        </div>
 
-                                        <div className="form-group mb-3">
-                                            <label htmlFor="password" className="form-label">Mật khẩu</label>
-                                            <div className="input-group">
-                                                <span className="input-group-text">
-                                                    <i className="fa fa-lock" aria-hidden="true"></i>
-                                                </span>
-                                                <input
-                                                    type={passwordVisible ? 'text' : 'password'}
-                                                    className={`form-control ${errors.password ? "is-invalid" : ""}`}
-                                                    id="password"
-                                                    placeholder="Nhập mật khẩu"
-                                                    {...register('password', {
-                                                        required: 'Mật khẩu là bắt buộc',
-                                                        minLength: {
-                                                            value: 8,
-                                                            message: 'Mật khẩu phải có ít nhất 8 ký tự'
-                                                        },
-                                                        pattern: {
-                                                            value: /^(?=.*[A-Z])(?=.*[!@#$%^&*])/,
-                                                            message: 'Mật khẩu phải bao gồm ít nhất một chữ in hoa và một ký tự đặc biệt'
-                                                        }
-                                                    })}
-                                                />
-                                                <span className="input-group-text" onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
-                                                    <i className={passwordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'} aria-hidden="true"></i>
-                                                </span>
-                                            </div>
-                                            {errors.password && <p className="text-danger">{errors.password.message}</p>}
-                                        </div>
+                        {/* Divider */}
+                        <div className="d-flex align-items-center my-4">
+                            <hr className="flex-grow-1" />
+                            <span className="mx-3 text-muted">hoặc</span>
+                            <hr className="flex-grow-1" />
+                        </div>
 
-                                        {loading && <Spinner />}
-                                        {error && <p className="text-danger">{error}</p>}
-                                        {serverError && <p className="text-danger">{serverError}</p>}
-
-                                        <div className="d-grid gap-2">
-                                            <button type="submit" className="btn btn-primary btn-block rounded-pill" disabled={loading}>
-                                                {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
-                                            </button>
-                                        </div>
-
-                                        <div className="text-center mt-3">
-                                            <span>Quên </span>
-                                            <Link to="/forgot-password" className="link-primary">Tài khoản / Mật khẩu?</Link>
-                                        </div>
-
-                                        <div className="text-center mt-3">
-                                            <span>Hoặc đăng nhập bằng</span>
-                                            <div className="mt-2 d-flex align-items-center justify-content-center">
-                                                <GoogleAuth />
-                                                <FacebookAuth />
-                                            </div>
-                                        </div>
-
-                                        <div className="text-center mt-4">
-                                            <Link to="/" className="link-primary me-3">
-                                                <i className="fa-solid fa-arrow-left ms-2"></i>  Trở lại
-                                            </Link>
-                                            <Link to="/register" className="link-primary">
-                                                Đăng Ký Mới
-                                                <i className="fa fa-long-arrow-right ms-2" aria-hidden="true"></i>
-                                            </Link>
-                                        </div>
-                                    </form>
+                        {/* Login Form */}
+                        <div className="p-4 shadow-sm rounded">
+                            <form onSubmit={handleSubmit(onSubmit)}>
+                                <div className="mb-3">
+                                    <label className="form-label">Nhập số điện thoại</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Số điện thoại"
+                                        {...register('phone')}
+                                    />
                                 </div>
-                            </div>
+
+                                <div className="mb-3">
+                                    <label className="form-label">Nhập mật khẩu</label>
+                                    <input
+                                        type="password"
+                                        className="form-control"
+                                        placeholder="Mật khẩu"
+                                        {...register('password')}
+                                    />
+                                </div>
+
+                                <div className="d-flex justify-content-between align-items-center mb-3 float-end">
+                                    <a href="/forgot-password" className="text-decoration-none text-muted">
+                                        Quên mật khẩu?
+                                    </a>
+                                </div>
+
+                                <button type="submit" className="btn btn-primary w-100">Đăng nhập</button>
+                            </form>
+                        </div>
+
+                        {/* Register Option */}
+                        <div className="text-center mt-3">
+                            <p className="mb-1">
+                                Bạn chưa có tài khoản?{' '}
+                                <a href="/register" className="text-primary text-decoration-none">Đăng ký ngay</a>
+                            </p>
+                            <a href="/policy" className="text-secondary text-decoration-underline">
+                                Xem chính sách của nhà hàng
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     );
 }

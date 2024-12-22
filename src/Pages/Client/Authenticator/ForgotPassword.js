@@ -37,7 +37,7 @@ export default function ForgotPassword() {
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-8">
-                        <div className="card rounded-3 shadow">
+                        <div className="shadow-sm rounded">
                             <div className="card-body p-4">
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <h2 className="text-center mb-4">Quên mật khẩu</h2>
@@ -45,7 +45,7 @@ export default function ForgotPassword() {
                                     <div className="form-group mb-3">
                                         <label htmlFor="email" className="form-label">Email</label>
                                         <div className="input-group">
-                                            <span className="input-group-text">
+                                            <span className="input-group-text bg-white">
                                                 <i className="fa fa-envelope" aria-hidden="true"></i>
                                             </span>
                                             <input
@@ -66,10 +66,12 @@ export default function ForgotPassword() {
                                     </div>
 
                                     <div className="d-grid gap-2">
-                                        <button type="submit" className="btn btn-primary btn-block rounded-pill">Gửi yêu cầu</button>
+                                        <button type="submit" className="btn btn-warning btn-lg text-white">
+                                            Gửi yêu cầu
+                                        </button>
                                     </div>
 
-                                    <div className="text-center mt-4">
+                                    <div className="mt-4">
                                         <Link to="/login" className="link-primary me-3">
                                             <i className="fa-solid fa-arrow-left ms-2"></i> Trở lại
                                         </Link>

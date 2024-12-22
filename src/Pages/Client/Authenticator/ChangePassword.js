@@ -61,7 +61,7 @@ export default function ChangePassword() {
             <div className="container">
                 <div className="row justify-content-center">
                     <div className="col-md-8">
-                        <div className="card rounded-3 shadow">
+                        <div className="shadow-sm rounded">
                             <div className="card-body p-4">
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     <h2 className="text-center mb-4">Đổi mật khẩu</h2>
@@ -69,7 +69,7 @@ export default function ChangePassword() {
                                     <div className="form-group mb-3">
                                         <label htmlFor="newPassword" className="form-label">Mật khẩu mới</label>
                                         <div className="input-group">
-                                            <span className="input-group-text">
+                                            <span className="input-group-text bg-white">
                                                 <i className="fa fa-lock" aria-hidden="true"></i>
                                             </span>
                                             <input
@@ -89,7 +89,7 @@ export default function ChangePassword() {
                                                     },
                                                 })}
                                             />
-                                            <span className="input-group-text" onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
+                                            <span className="input-group-text bg-white" onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
                                                 <i className={passwordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'} aria-hidden="true"></i>
                                             </span>
                                         </div>
@@ -99,7 +99,7 @@ export default function ChangePassword() {
                                     <div className="form-group mb-3">
                                         <label htmlFor="confirmNewPassword" className="form-label">Xác nhận mật khẩu mới</label>
                                         <div className="input-group">
-                                            <span className="input-group-text">
+                                            <span className="input-group-text bg-white">
                                                 <i className="fa fa-lock" aria-hidden="true"></i>
                                             </span>
                                             <input
@@ -113,7 +113,7 @@ export default function ChangePassword() {
                                                         value === watch('newPassword') || 'Mật khẩu xác nhận không khớp'
                                                 })}
                                             />
-                                            <span className="input-group-text" onClick={toggleConfirmPasswordVisibility} style={{ cursor: 'pointer' }}>
+                                            <span className="input-group-text bg-white" onClick={toggleConfirmPasswordVisibility} style={{ cursor: 'pointer' }}>
                                                 <i className={confirmPasswordVisible ? 'fa fa-eye-slash' : 'fa fa-eye'} aria-hidden="true"></i>
                                             </span>
                                         </div>
@@ -121,7 +121,7 @@ export default function ChangePassword() {
                                     </div>
 
                                     <div className="d-grid gap-2">
-                                        <button type="submit" className="btn btn-primary btn-block rounded-pill">
+                                        <button type="submit" className="btn btn-warning btn-lg text-white">
                                             {loading ? <Spinner /> : 'Gửi yêu cầu'}
                                         </button>
                                     </div>

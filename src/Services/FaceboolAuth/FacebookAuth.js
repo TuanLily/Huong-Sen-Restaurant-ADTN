@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import logoFb from '../../Assets/Client/Images/facebook.png';
-import { fetchAuthSuccess, fetchFacebookeAuth } from '../../Actions/AuthActions';
+import { fetchAuthSuccess, fetchFacebookAuth } from '../../Actions/AuthActions';
 import { DangerAlert } from '../../Components/Alert/Alert';
 import Spinner from '../../Components/Client/Spinner';
 
@@ -31,26 +31,22 @@ const FacebookAuth = () => {
             setLoading(false);
         } else if (authState.auth) {
             setLoading(false);
-            // Điều hướng người dùng tới trang chủ sau khi đăng nhập thành công
-            navigate('/');
         }
-    }, [authState, navigate]);
+    }, [authState]);
 
     // Xử lý khi đăng nhập Facebook thành công
     const handleSuccess = async (response) => {
         setLoading(true);
         try {
-            console.log("check response:", response)
             const { name, email, picture } = response.data;
             const userData = {
                 fullname: name,
                 email: email,
-                avatar: picture.data.url, 
+                avatar: picture.data.url,
             };
 
-            await dispatch(fetchFacebookeAuth(userData));
+            await dispatch(fetchFacebookAuth(userData));
 
-            // Sau khi dispatch, lấy thông tin người dùng và token từ redux state
             const storedUser = localStorage.getItem('user');
             const accessToken = localStorage.getItem('accessToken');
 
@@ -91,13 +87,11 @@ const FacebookAuth = () => {
                 >
                     <button className="btn btn-light btn-sm mx-2 d-flex justify-content-center align-items-center">
                         <img src={logoFb} alt="Facebook Logo" className="google-icon" width={20} height={20} />
-                        <span className='mx-2'>Facebook</span>
+                        <span className="mx-2">Facebook</span>
                     </button>
                 </LoginSocialFacebook>
-
             )}
 
-            {/* Hiển thị alert khi có lỗi */}
             <DangerAlert
                 open={alertOpen}
                 onClose={handleCloseAlert}

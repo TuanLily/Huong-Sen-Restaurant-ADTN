@@ -71,7 +71,7 @@ export const fetchGoogleAuth = (userData) => {
 };
 
 
-export const fetchFacebookeAuth = (userData) => {
+export const fetchFacebookAuth = (userData) => {
     return async dispatch => {
         dispatch(fetchAuthRequest());
         try {

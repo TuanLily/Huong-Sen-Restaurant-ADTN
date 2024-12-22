@@ -92,17 +92,32 @@ export default function Register() {
 
     return (
         <div>
-            <div className="container-fluid py-5 bg-dark hero-header mb-5"></div>
-            <div className="container">
+            <div className="container-fluid py-5 bg-dark hero-header"></div>
+            <div className="container my-3">
                 <div className="row justify-content-center">
                     <div className="col-md-8">
-                        <div className="card rounded-3 shadow d-flex flex-row">
+                        {/* Logo */}
+                        <div className="text-center mb-4">
+                            <img
+                                src="../../../Assets/Client/Images/huong-sen-logo.png"
+                                alt="Lotus Logo"
+                                className="img-fluid"
+                                style={{ maxWidth: '150px' }}
+                            />
+                        </div>
+
+                        {/* Social Login Options */}
+                        <div className="text-center mb-4">
+                            <h2>
+                                Đăng ký tài khoản thành viên
+                            </h2>
+                        </div>
+
+                        <div className=" d-flex flex-row shadow-sm rounded">
                             <div className="col-md-12 p-3">
                                 <div className="card-body">
                                     <form onSubmit={handleSubmit(onSubmit)}>
-                                        <h2 className="text-center mb-4">
-                                            Đăng ký tài khoản thành viên
-                                        </h2>
+
                                         <div className="row">
                                             <div className="col-md-6">
                                                 <div className="form-group mb-3">
@@ -110,7 +125,7 @@ export default function Register() {
                                                         Họ và Tên
                                                     </label>
                                                     <div className="input-group">
-                                                        <span className="input-group-text">
+                                                        <span className="input-group-text bg-white">
                                                             <i className="fa fa-user" aria-hidden="true"></i>
                                                         </span>
                                                         <input
@@ -136,7 +151,7 @@ export default function Register() {
                                                         Email
                                                     </label>
                                                     <div className="input-group">
-                                                        <span className="input-group-text">
+                                                        <span className="input-group-text bg-white">
                                                             <i className="fa fa-envelope" aria-hidden="true"></i>
                                                         </span>
                                                         <input
@@ -181,7 +196,7 @@ export default function Register() {
                                                         Số điện thoại
                                                     </label>
                                                     <div className="input-group">
-                                                        <span className="input-group-text">
+                                                        <span className="input-group-text bg-white">
                                                             <i className="fa fa-phone" aria-hidden="true"></i>
                                                         </span>
                                                         <input
@@ -208,7 +223,7 @@ export default function Register() {
                                                         Mật khẩu
                                                     </label>
                                                     <div className="input-group">
-                                                        <span className="input-group-text">
+                                                        <span className="input-group-text bg-white">
                                                             <i className="fa fa-lock" aria-hidden="true"></i>
                                                         </span>
                                                         <input
@@ -229,7 +244,7 @@ export default function Register() {
                                                             })}
                                                         />
                                                         <span
-                                                            className="input-group-text"
+                                                            className="input-group-text bg-white"
                                                             onClick={togglePasswordVisibility}
                                                             style={{ cursor: "pointer" }}
                                                         >
@@ -251,7 +266,7 @@ export default function Register() {
                                                         Xác nhận mật khẩu
                                                     </label>
                                                     <div className="input-group">
-                                                        <span className="input-group-text">
+                                                        <span className="input-group-text bg-white">
                                                             <i className="fa fa-lock" aria-hidden="true"></i>
                                                         </span>
                                                         <input
@@ -266,7 +281,7 @@ export default function Register() {
                                                             })}
                                                         />
                                                         <span
-                                                            className="input-group-text"
+                                                            className="input-group-text bg-white"
                                                             onClick={toggleConfirmPasswordVisibility}
                                                             style={{ cursor: "pointer" }}
                                                         >
@@ -296,6 +311,7 @@ export default function Register() {
                                                         type="text"
                                                         className={`form-control ${errors.address ? 'is-invalid' : ''}`}
                                                         readOnly
+                                                        placeholder="Địa chỉ chi tiết xem ở đây..."
                                                         {...register("address", {
                                                             required: "Địa chỉ là bắt buộc",
                                                             validate: (value) =>
@@ -313,10 +329,7 @@ export default function Register() {
                                         </div>
 
                                         <div className="d-grid gap-2">
-                                            <button
-                                                type="submit"
-                                                className="btn btn-primary btn-block rounded-pill"
-                                            >
+                                            <button type="submit" className="btn btn-warning btn-lg text-white">
                                                 Đăng ký
                                             </button>
                                         </div>
