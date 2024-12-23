@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { fetchReservations, updateReservations, setCurrentPage } from '../../Actions/MyBookingActions';
-import { requestMomoPayUrl } from "../../Actions/ReservationActions";
+import { requestMomoPayUrl, requestMomoPaymentBalance } from "../../Actions/ReservationActions";
 import DialogConfirm from '../../Components/Dialog/Dialog';
 import CustomPagination from '../../Components/Pagination/CustomPagination';
 import SpinnerSink from '../../Components/Client/SniperSink';
@@ -117,6 +117,14 @@ export default function MyBooking() {
     }
   }
 
+  const payBalance = async (reservationId, amount) => {
+    const momoResponse = await dispatch(requestMomoPaymentBalance(reservationId, amount));
+
+    if (momoResponse && momoResponse.payUrl) {
+      window.location.href = momoResponse.payUrl;
+    }
+  }
+
   const formatCurrency = (value) => {
     return `${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VND`;
   };
@@ -146,7 +154,7 @@ export default function MyBooking() {
     } else if (status == 3) {
       return "<strong>Số tiền còn lại:</strong> " + formatCurrency (total_amount - deposit);
     } else if (status == 4) {
-      return "<strong>Số tiền còn lại:</strong> " + formatCurrency (total_amount);
+      return "<strong>Số tiền còn lại:</strong> " + formatCurrency (total_amount - deposit);
     } else {
       return "<strong>Số tiền còn lại:</strong> " + formatCurrency (0);
     }
@@ -270,6 +278,11 @@ export default function MyBooking() {
                           </button>
                           {(statusInfo.text === 'Chờ thanh toán cọc') && (
                             <button className="btn btn-primary btn-sm mt-2 ms-2" onClick={() => pay(booking.id , booking.deposit)} style={{ padding: '0.25rem 0.75rem' }}>
+                              Thanh toán
+                            </button>
+                          )}
+                          {(statusInfo.text === 'Chờ thanh toán toàn bộ đơn') && (
+                            <button className="btn btn-primary btn-sm mt-2 ms-2" onClick={() => payBalance(booking.id , booking.total_amount - booking.deposit)} style={{ padding: '0.25rem 0.75rem' }}>
                               Thanh toán
                             </button>
                           )}
