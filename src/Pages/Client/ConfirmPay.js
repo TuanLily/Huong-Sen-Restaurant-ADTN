@@ -105,6 +105,11 @@ export default function Booking() {
                   Xem lịch sử đặt bàn
                 </Button>
               </p>
+              {/* New Note Section */}
+              <div className="alert alert-warning mt-4">
+                <strong>Lưu ý:</strong> Nếu quý khách đến trễ quá 30 phút, nhà hàng sẽ
+                huỷ bàn và không hoàn lại cọc.
+              </div>
             </div>
           </div>
         </div>

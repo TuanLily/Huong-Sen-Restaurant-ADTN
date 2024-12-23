@@ -15,7 +15,6 @@ export default function Pay() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const promotions = useSelector((state) => state.promotion.promotion);
-  const tables = useSelector((state) => state.table.table);
 
   const [customerInfo, setCustomerInfo] = useState({
     fullname: "",
@@ -33,9 +32,6 @@ export default function Pay() {
   const [discount, setDiscount] = useState(0);
   const [reservation_code, setReservationCode] = useState(""); // Lưu reservation_code
   const [userId, setUserId] = useState(null);
-  const [depositAmount, setDepositAmount] = useState(0);
-  const [remainingAmount, setRemainingAmount] = useState(0);
-  const [isDepositChecked, setIsDepositChecked] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(""); // State để lưu phương thức thanh toán
   const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
   const [openDangerAlert, setOpenDangerAlert] = useState(false);
@@ -144,19 +140,9 @@ export default function Pay() {
     (promo) => new Date(promo.valid_to) >= new Date() && promo.quantity > 0
   );
 
-  const handleDepositChange = (e) => {
-    const isChecked = e.target.checked;
-    setIsDepositChecked(isChecked);
-    if (isChecked) {
+ 
       const deposit = finalTotal * 0.3;
       const remaining = finalTotal * 0.7;
-      setDepositAmount(deposit);
-      setRemainingAmount(remaining);
-    } else {
-      setDepositAmount(0);
-      setRemainingAmount(0);
-    }
-  };
 
   const handleCompleteBooking = async () => {
     try {
@@ -286,7 +272,7 @@ export default function Pay() {
               Đơn hàng ({Object.keys(selectedProducts).length} sản phẩm)
             </h5>
             <hr />
-            <div style={{ maxHeight: "600px", overflowY: "auto" }}>
+            <div style={{ maxHeight: "550px", overflowY: "auto", scrollbarWidth: "none" }}>
               {Object.values(selectedProducts).map((product) => (
                 <div key={product.id} className="bg-white shadow-sm mb-2 p-3">
                   <div className="d-flex justify-content-between align-items-center">
@@ -359,7 +345,7 @@ export default function Pay() {
                     }
                     onChange={(e) => handlePromotionSelect(e.target.value)}
                   >
-                    <option value="">Chọn mã khuyến mãi</option>
+                    <option value="">Chọn mã giảm giá</option>
                     {validPromotions.map((promotion) => (
                       <option key={promotion.id} value={promotion.code_name}>
                         {promotion.code_name} ({promotion.discount}%)
@@ -367,7 +353,7 @@ export default function Pay() {
                     ))}
                   </select>
                 ) : (
-                  <p>Không có khuyến mãi hiện tại.</p>
+                  <p>Không có mã giảm gia hiện tại.</p>
                 )}
               </div>
               {/* Order total */}
@@ -393,29 +379,16 @@ export default function Pay() {
               <hr />
               {/* Payment Method */}
               <label className="d-flex justify-content-between fw-bold">
-                Hình thức thanh toán
+                Phương thức thanh toán
               </label>
-              <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={isDepositChecked}
-                    onChange={handleDepositChange}
-                  />
-                  ㅤThanh toán 30% hóa đơn
-                </label>
-              </div>
 
-              {isDepositChecked && (
                 <div>
-                  <label>ㅤ- Tiền cọc (30%): {formatPrice(depositAmount)}</label>
-                  <label>ㅤ- Còn lại (70%): {formatPrice(remainingAmount)}</label>
+                  <label>ㅤ- Cọc (30%) hóa đơn: {formatPrice(deposit)}</label>
+                  <label>ㅤ- Còn lại (70%): {formatPrice(remaining)}</label>
                 </div>
-              )}
 
               <hr />
               <div>
-                <label className="fw-bold">Phương thức thanh toán</label>
                 <div>
                   <input
                     type="radio"
@@ -427,7 +400,7 @@ export default function Pay() {
                   />
                   <label htmlFor="momo">ㅤThanh toán bằng MOMO</label>
                 </div>
-                {/* <div>
+                <div>
                   <input
                     type="radio"
                     id="vnpay"
@@ -436,21 +409,12 @@ export default function Pay() {
                     checked={paymentMethod === "VNPay"}
                     onChange={() => setPaymentMethod("VNPay")}
                   />
-                  <label htmlFor="vnpay"> Thanh toán bằng VNPay</label>
+                  <label htmlFor="vnpay"> ㅤThanh toán bằng VNPay</label>
                 </div>
-                <div>
-                  <input
-                    type="radio"
-                    id="cash"
-                    name="paymentMethod"
-                    value="cash"
-                    checked={paymentMethod === "cash"}
-                    onChange={() => setPaymentMethod("cash")}
-                  />
-                  <label htmlFor="cash">  Thanh toán bằng Tiền mặt</label>
-                </div> */}
               </div>
               <hr />
+              <label><strong>Lưu ý:</strong> Nếu quý khách đến trễ quá 30 phút, nhà hàng sẽ
+                  huỷ bàn và không hoàn lại cọc.</label>
 
               {/* Buttons for confirmation and going back */}
               <div className="d-flex justify-content-between mt-3">
@@ -460,7 +424,8 @@ export default function Pay() {
                 <button
                   className="btn btn-primary w-70"
                   onClick={handleCompleteBooking}
-                  disabled={!isDepositChecked || !paymentMethod}
+                  disabled={!paymentMethod}
+
                 >
                   Xác nhận thanh toán
                 </button>
@@ -471,6 +436,7 @@ export default function Pay() {
       </div>
       <SuccessAlert open={openSuccessAlert} onClose={() => setOpenSuccessAlert(false)} message="Voucher đã được sử dụng!" />
       <DangerAlert open={openDangerAlert} onClose={() => setOpenDangerAlert(false)} message="Mã giảm giá không hợp lệ hoặc đã hết hạn." />
+      <DangerAlert open={openDangerAlert} onClose={() => setOpenDangerAlert(false)} message="Tính năng VNPay hiện chưa được hỗ trợ." />
     </div>
   );
 }

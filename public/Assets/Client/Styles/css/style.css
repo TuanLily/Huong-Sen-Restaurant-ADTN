@@ -493,3 +493,13 @@
     font-size: 16px;
     color: #333;
 }
+
+.scrollable-list {
+    max-height: 300px; /* Chiều cao tối đa */
+    overflow-y: auto; /* Cuộn dọc */
+    overflow-x: hidden;
+  }
+  
+  .scrollable-list::-webkit-scrollbar {
+    display: none; /* Ẩn thanh cuộn trên Chrome, Edge và Safari */
+  }
