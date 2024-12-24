@@ -2,12 +2,15 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { fetchReservations, updateReservations, setCurrentPage } from '../../Actions/MyBookingActions';
+import { fetchReservationdetail } from '../../Actions/ReservationDetailOfTrangActions';
 import { requestMomoPayUrl, requestMomoPaymentBalance } from "../../Actions/ReservationActions";
 import DialogConfirm from '../../Components/Dialog/Dialog';
 import CustomPagination from '../../Components/Pagination/CustomPagination';
 import SpinnerSink from '../../Components/Client/SniperSink';
 import { SuccessAlert } from '../../Components/Alert/Alert';
 import { formatDateTime } from '../../Utils/FormatDateTime';
+import { ChangeDishModal } from '../../Components/FormPopup/ChangeDishModal';
+import { canCancelReservation } from '../../Components/FormPopup/canCancel';
 import { jwtDecode as jwt_decode } from 'jwt-decode';
 
 export default function MyBooking() {
@@ -44,6 +47,7 @@ export default function MyBooking() {
   };
 
   const reservationState = useSelector(state => state.my_booking);
+  const reservationDetailState = useSelector(state => state.my_booking_detail);
 
   const query = new URLSearchParams(location.search);
   const urlPage = parseInt(query.get('page')) || 1;
@@ -51,6 +55,23 @@ export default function MyBooking() {
   const [open, setOpen] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
+
+  // State để quản lý modal thay đổi món ăn
+  const [showChangeDishModal, setShowChangeDishModal] = useState(false);
+  const [customerInfo, setCustomerInfo] = useState();
+  const [selectedDishes, setSelectedDishes] = useState([]);  // Dữ liệu các món ăn đã đặt
+
+  useEffect(() => {
+    if (selectedReservation) {
+      dispatch(fetchReservationdetail(selectedReservation));
+    }
+  }, [selectedReservation, dispatch]);
+
+  useEffect(() => {
+    if (reservationDetailState && reservationDetailState.reservationDetail) {
+      setSelectedDishes(reservationDetailState.reservationDetail);
+    }
+  }, [reservationDetailState]);
 
   // Lấy accessToken từ localStorage và decode ra user_id
   const getUserIdFromToken = useCallback(() => {
@@ -90,6 +111,28 @@ export default function MyBooking() {
 
   const handleSuccessClose = () => {
     setOpenSuccess(false);
+  };
+
+  // Hàm mở modal thay đổi món ăn
+  const handleChangeDish = (reservationId, customerInfo) => {
+    setSelectedReservation(reservationId); // Lưu id của đơn đặt
+    setCustomerInfo(customerInfo);
+    setShowChangeDishModal(true); // Mở modal
+  };  
+
+  // Hàm đóng modal
+  const handleCloseChangeDishModal = () => {
+    setShowChangeDishModal(false);
+    setSelectedDishes([]);  // Đặt lại món ăn
+  };
+
+  // Hàm xác nhận thay đổi món ăn
+  const handleConfirmChangeDish = (updatedDishes) => {
+    // Đóng modal sau khi xác nhận thay đổi
+    setShowChangeDishModal(false);
+
+    // Hiển thị thông báo thành công
+    setOpenSuccess(true);
   };
 
   const handleUpdateStatus = async (st) => {
@@ -148,7 +191,6 @@ export default function MyBooking() {
   };
 
   const monney = (status, total_amount, deposit) => {
-    console.log (status, total_amount, deposit)
     if (status == 0 || status == 1 || status == 2) {
       return "<strong>Số tiền thanh toán:</strong> " + formatCurrency (deposit);
     } else if (status == 3) {
@@ -286,6 +328,26 @@ export default function MyBooking() {
                               Thanh toán
                             </button>
                           )}
+                          {(statusInfo.text === 'Chờ thanh toán toàn bộ đơn' || statusInfo.text === 'Đã thanh toán cọc') && (canCancelReservation(booking.reservation_date)) && (
+                            <button
+                              className="btn btn-outline-secondary btn-sm mt-2 ms-2"
+                              style={{
+                                padding: '0.25rem 0.75rem',
+                                backgroundColor: '#f8f9fa', // Màu nền nhạt
+                                color: '#6c757d',          // Màu chữ xám nhạt
+                                borderColor: '#ced4da',    // Viền màu xám nhạt
+                                boxShadow: 'none'          // Loại bỏ đổ bóng
+                              }}
+                              onClick={() => handleChangeDish(booking.id, {
+                                fullname: booking.fullname,
+                                email: booking.email,
+                                tel: booking.tel,
+                                reservation_code: booking.reservation_code
+                              })}
+                            >
+                              Yêu cầu thay đổi món ăn
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -304,6 +366,24 @@ export default function MyBooking() {
           onPageChange={handlePageChange} 
         />
       </div>
+
+      {/* Modal thay đổi món ăn */}
+      {showChangeDishModal && (
+        <>
+          {/* Lớp phủ mờ */}
+          <div className="overlay" onClick={handleCloseChangeDishModal}></div>
+
+          <ChangeDishModal
+            show={showChangeDishModal}
+            onHide={handleCloseChangeDishModal}
+            onConfirm={handleConfirmChangeDish}
+            dishes={selectedDishes} // Truyền danh sách món ăn đã chọn
+            customerInfo={customerInfo}
+            setOpenSuccess={setOpenSuccess}
+          />
+        </>
+      )}
+
       <SuccessAlert open={openSuccess} onClose={handleSuccessClose} message="Thao tác thành công!" />
       <DialogConfirm open={open} onClose={handleClose} onConfirm={() => handleUpdateStatus(0)} />
     </div>

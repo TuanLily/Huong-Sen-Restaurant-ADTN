@@ -21,5 +21,6 @@ export const API_DATA = {
   reservation_detail: "/public/reservation_detail",
   table: "/public/table",
   membership: "public/membership",
-  membership_tiers: "public/membership_tiers"
+  membership_tiers: "public/membership_tiers",
+  sendEmail: "/email/send"
 };
