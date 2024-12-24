@@ -13,6 +13,7 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
   const [selectedCategory, setSelectedCategory] = useState(null); // Trạng thái để theo dõi danh mục được chọn
   const [isSending, setIsSending] = useState(false); // Thêm trạng thái gửi email
   const [errorMessage, setErrorMessage] = useState(""); // Thêm state để lưu thông báo lỗi
+  const [privacyPolicyChecked, setPrivacyPolicyChecked] = useState(false);
   
   const dispatch = useDispatch();
   const products = useSelector((state) => state.product);
@@ -212,13 +213,34 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
               </ul>
             </div>
 
+            <hr />
+
+            {/* Checkbox chính sách */}
+            <div className="form-check">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="privacyPolicy"
+                checked={privacyPolicyChecked}
+                onChange={(e) => setPrivacyPolicyChecked(e.target.checked)}
+              />
+              <label className="form-check-label" htmlFor="privacyPolicy">
+                Tôi đã hiểu <span style= {{color: '#007bff'}}>Chỉ được yêu cầu đổi món trước ngày đặt 2h.</span>
+              </label>
+            </div>
+            {dishList.length === 0 && !privacyPolicyChecked && (
+              <p style={{ color: "red", marginTop: "10px" }}>
+                Bạn phải chọn ít nhất một món và đồng ý với chính sách quyền riêng tư!
+              </p>
+            )}
+
           </div>
 
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onHide}>
               Đóng
             </button>
-            <button type="button" className="btn btn-primary" disabled={dishList.length === 0} onClick={handleConfirm}>
+            <button type="button" className="btn btn-primary" disabled={dishList.length === 0 || !privacyPolicyChecked} onClick={handleConfirm}>
               Xác nhận
             </button>
           </div>

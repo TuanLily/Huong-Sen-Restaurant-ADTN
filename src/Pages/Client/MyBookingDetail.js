@@ -208,6 +208,11 @@ export default function MyBookingDetail() {
                                 );
                             })()}
 
+                            {reservationState.reservation[0].deposit > reservationState.reservation[0].total_amount && (
+                                <span style={{ fontSize: '15px', color: 'red' }}>
+                                    Do bạn đã thanh toán cọc trước khi yêu cầu đổi món và tổng tiền hiện đang nhỏ hơn tiền cọc, khi bạn đến ăn nhà hàng sẽ trả lại bạn.
+                                </span>
+                            )}
 
                             {/* Nút in và quay lại */}
                             <div style={{ textAlign: 'center', marginTop: '20px' }} className="print-buttons">

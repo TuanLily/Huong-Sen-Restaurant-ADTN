@@ -1,21 +1,26 @@
-import { differenceInHours } from 'date-fns';
+import { differenceInHours } from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 
-// Hàm kiểm tra có thể hủy đặt chỗ không
 export const canCancelReservation = (reservationDate) => {
-  const timeZoneOffset = 7 * 60 * 60 * 1000; // Múi giờ +7, tính bằng mili giây
+  const timeZone = "Asia/Ho_Chi_Minh"; // Múi giờ Việt Nam
 
   // Lấy thời gian hiện tại
   const now = new Date();
-  // Cộng thêm offset múi giờ vào thời gian hiện tại
-  const zonedNow = new Date(now.getTime() + timeZoneOffset);
 
-  // Chuyển đổi thời gian đặt chỗ sang múi giờ Việt Nam
-  const zonedReservationDate = new Date(new Date(reservationDate).getTime() + timeZoneOffset);
+  // Chuyển thời gian hiện tại sang múi giờ Việt Nam
+  const zonedNow = toZonedTime(now, timeZone);
+
+  // Chuyển thời gian đặt chỗ từ UTC sang múi giờ Việt Nam
+  const zonedReservationDate = toZonedTime(new Date(reservationDate), timeZone);
 
   // Tính sự khác biệt giờ giữa thời gian đặt chỗ và thời gian hiện tại
   const hoursDifference = differenceInHours(zonedReservationDate, zonedNow);
 
-  // Nếu sự khác biệt lớn hơn 2 giờ thì có thể hủy, ngược lại thì không thể hủy
+  console.log("UTC Reservation Date:", reservationDate);
+  console.log("Zoned Reservation Date:", zonedReservationDate);
+  console.log("Current Zoned Time:", zonedNow);
+  console.log("Hours Difference:", hoursDifference);
+
+  // Kiểm tra nếu thời gian còn hơn 2 giờ thì có thể hủy
   return hoursDifference >= 2;
 };
-

@@ -323,7 +323,7 @@ export default function MyBooking() {
                               Thanh toán
                             </button>
                           )}
-                          {(statusInfo.text === 'Chờ thanh toán toàn bộ đơn') && (
+                          {(statusInfo.text === 'Chờ thanh toán toàn bộ đơn') && (booking.deposit < booking.total_amount) && (
                             <button className="btn btn-primary btn-sm mt-2 ms-2" onClick={() => payBalance(booking.id , booking.total_amount - booking.deposit)} style={{ padding: '0.25rem 0.75rem' }}>
                               Thanh toán
                             </button>
@@ -350,6 +350,11 @@ export default function MyBooking() {
                           )}
                         </div>
                       </div>
+                      {booking.deposit > booking.total_amount && (
+                        <span style={{ fontSize: '12px', color: 'red' }}>
+                          Do bạn đã thanh toán cọc trước khi yêu cầu đổi món và tổng tiền hiện đang nhỏ hơn tiền cọc, khi bạn đến ăn nhà hàng sẽ trả lại bạn.
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
