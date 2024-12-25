@@ -192,9 +192,23 @@ export default function Booking() {
                         placeholder="Date & Time"
                         {...register("reservation_date", {
                           required: "Thời gian là bắt buộc",
+                          validate: (value) => {
+                            const selectedDate = new Date(value);
+                            const now = new Date();
+                            const minTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+                            
+                            if (selectedDate < minTime) {
+                              return "Vui lòng đặt bàn trước ít nhất 2 giờ";
+                            }
+                            
+                            return true;
+                          }
                         })}
                         step={300}
                         min={new Date(new Date().getTime() + 2 * 60 * 60 * 1000)
+                          .toISOString()
+                          .slice(0, 16)}
+                        max={new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
                           .toISOString()
                           .slice(0, 16)}
                       />
@@ -220,6 +234,10 @@ export default function Booking() {
                           min: {
                             value: 1,
                             message: "Số người ăn tối thiểu 1 người"
+                          },
+                          max:{
+                            value: 8,
+                            message:"Số người ăn tối đa 8 người"
                           },
                           valueAsNumber: true
                         })}
