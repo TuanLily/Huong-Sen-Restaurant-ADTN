@@ -16,10 +16,10 @@ export const canCancelReservation = (reservationDate) => {
   // Tính sự khác biệt giờ giữa thời gian đặt chỗ và thời gian hiện tại
   const hoursDifference = differenceInHours(zonedReservationDate, zonedNow);
 
-  console.log("UTC Reservation Date:", reservationDate);
-  console.log("Zoned Reservation Date:", zonedReservationDate);
-  console.log("Current Zoned Time:", zonedNow);
-  console.log("Hours Difference:", hoursDifference);
+  // console.log("UTC Reservation Date:", reservationDate);
+  // console.log("Zoned Reservation Date:", zonedReservationDate);
+  // console.log("Current Zoned Time:", zonedNow);
+  // console.log("Hours Difference:", hoursDifference);
 
   // Kiểm tra nếu thời gian còn hơn 2 giờ thì có thể hủy
   return hoursDifference >= 2;

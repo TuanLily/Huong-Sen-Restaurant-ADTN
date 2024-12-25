@@ -19,12 +19,12 @@ export const fetchSenFailure = (error) => ({
     payload: error,
 });
 
-export const sendEmail = (dishes, dishList, customerInfo) => {
+export const sendEmail = (dishes, dishList, customerInfo, currentTotal) => {
     return async (dispatch) => {
         dispatch(fetchSenRequest());
         try {
             // Gửi API
-            const response = await http.post(`${API_ENDPOINT}${API_DATA.sendEmail}`, { dishes, dishList, customerInfo });
+            const response = await http.post(`${API_ENDPOINT}${API_DATA.sendEmail}`, { dishes, dishList, customerInfo, currentTotal });
             
             // Dispatch hành động success
             dispatch(fetchSenSuccess(response.data));

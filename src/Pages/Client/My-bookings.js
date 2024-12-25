@@ -70,6 +70,8 @@ export default function MyBooking() {
   useEffect(() => {
     if (reservationDetailState && reservationDetailState.reservationDetail) {
       setSelectedDishes(reservationDetailState.reservationDetail);
+      console.log("Reservation Detail:", reservationDetailState.reservationDetail);
+      console.log("Danh sách món ăn được cập nhật:", reservationDetailState.reservationDetail);
     }
   }, [reservationDetailState]);
 
@@ -118,12 +120,12 @@ export default function MyBooking() {
     setSelectedReservation(reservationId); // Lưu id của đơn đặt
     setCustomerInfo(customerInfo);
     setShowChangeDishModal(true); // Mở modal
-  };  
+  };   
 
   // Hàm đóng modal
   const handleCloseChangeDishModal = () => {
     setShowChangeDishModal(false);
-    setSelectedDishes([]);  // Đặt lại món ăn
+    // setSelectedDishes([]);  // Đặt lại món ăn
   };
 
   // Hàm xác nhận thay đổi món ăn
@@ -300,9 +302,9 @@ export default function MyBooking() {
                           <p className="mb-2">
                             <strong>Ngày đặt:</strong> {formatDateTime(booking.reservation_date)}
                           </p>
-                          {/* <p className="mb-2">
+                          <p className="mb-2">
                             <strong>Số bàn:</strong> {booking.tableName ? booking.tableName : 'Chưa có'}
-                          </p> */}
+                          </p>
                         </div>
                       </div>
 
@@ -328,7 +330,7 @@ export default function MyBooking() {
                               Thanh toán
                             </button>
                           )}
-                          {(statusInfo.text === 'Chờ thanh toán toàn bộ đơn' || statusInfo.text === 'Đã thanh toán cọc') && (canCancelReservation(booking.reservation_date)) && (
+                          {(statusInfo.text === 'Chờ thanh toán toàn bộ đơn' || statusInfo.text === 'Đã thanh toán cọc') && (canCancelReservation(booking.reservation_date)) && (booking.number_change == 1) && (
                             <button
                               className="btn btn-outline-secondary btn-sm mt-2 ms-2"
                               style={{
@@ -342,7 +344,10 @@ export default function MyBooking() {
                                 fullname: booking.fullname,
                                 email: booking.email,
                                 tel: booking.tel,
-                                reservation_code: booking.reservation_code
+                                reservation_code: booking.reservation_code,
+                                total_amount: booking.total_amount,
+                                deposit: booking.deposit,
+                                id: booking.id
                               })}
                             >
                               Yêu cầu thay đổi món ăn

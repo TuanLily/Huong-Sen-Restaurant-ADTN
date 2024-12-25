@@ -24,10 +24,13 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
     dispatch(fetchMenu());
     dispatch(fetchListProductCategory());
   }, [dispatch]);
-
+  
   useEffect(() => {
-    setDishList(Array.isArray(dishes) ? dishes : []);
-  }, [dishes]);
+    if (show) {
+      setDishList(Array.isArray(dishes) ? dishes : []);
+    }
+  }, [show, dishes]);
+  
 
   const handleQuantityChange = (index, quantity) => {
     const updatedDishList = dishList.map((dish, idx) =>
@@ -68,11 +71,18 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
   };
 
   const handleConfirm = async () => {
+    // Kiểm tra xem có thay đổi món ăn không
+    const isDishChanged = JSON.stringify(dishes) !== JSON.stringify(dishList);
+    if (!isDishChanged) {
+      setErrorMessage("Vui lòng thay đổi món ăn trước khi gửi yêu cầu!");
+      return; // Dừng gửi email nếu không có thay đổi
+    }
+    
     try {
       setIsSending(true); // Bắt đầu hiển thị spinner
 
       // Gửi email qua API
-      await dispatch(sendEmail(dishes, dishList, customerInfo));
+      await dispatch(sendEmail(dishes, dishList, customerInfo, currentTotal));
   
       // Hiển thị thông báo thành công
       setOpenSuccess(true);
@@ -88,10 +98,20 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
     }
   };
 
+  const handleCloseModal = () => {
+    setDishList([]); // Reset danh sách món
+    setSelectedCategory(null); // Reset danh mục chọn
+    setPrivacyPolicyChecked(false); // Reset checkbox
+    onHide(); // Gọi hàm đóng modal
+  };  
+
   // Lọc sản phẩm theo category
   const filteredProducts = selectedCategory 
-    ? products.product.filter(product => product.categories_id === selectedCategory) 
-    : products.product;
+  ? products.product.filter(product => product.categories_id === selectedCategory) 
+  : products.product;
+
+  // Tính tổng tiền hiện tại
+  const currentTotal = dishList.reduce((sum, dish) => sum + dish.price * dish.quantity, 0);
 
   return (
     <div className={`modal ${show ? "d-block" : "d-none"}`} role="dialog">
@@ -215,6 +235,22 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
 
             <hr />
 
+            {/* Hiển thị tổng tiền */}
+            <div>
+              <h5 style={{ fontSize: '18px' }}>Tổng tiền</h5>
+              <div><strong>Tổng tiền ban đầu:</strong> {formatCurrency(customerInfo?.total_amount)}</div>
+              <div><strong>Tiền đã đặt cọc:</strong> {formatCurrency(customerInfo?.deposit)}</div>
+              <div><strong>Tổng tiền sau thay đổi:</strong> {formatCurrency(currentTotal)}</div>
+              {(currentTotal < customerInfo.deposit) && (
+                <div style={{ color: "red" }}>Tổng tiền hiện tại không được nhỏ hơn tiền đã cọc!</div>
+              )}
+              {(currentTotal > customerInfo.deposit) && (
+                <div><strong>Tiền phải trả sau khi đến ăn:</strong> {formatCurrency(currentTotal - (customerInfo.deposit ? customerInfo.deposit : 0))}</div>
+              )}
+            </div>
+
+            <hr />
+
             {/* Checkbox chính sách */}
             <div className="form-check">
               <input
@@ -225,23 +261,18 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
                 onChange={(e) => setPrivacyPolicyChecked(e.target.checked)}
               />
               <label className="form-check-label" htmlFor="privacyPolicy">
-                Tôi đã hiểu <span style= {{color: '#007bff'}}>Chỉ được yêu cầu đổi món trước ngày đặt 2h.</span>
+                Tôi đã hiểu <span style= {{color: '#007bff'}}>Quý khách chỉ có thể gửi yêu cầu 1 lần duy nhất và phải trước ngày đặt 2 tiếng.</span>
               </label>
             </div>
-            {dishList.length === 0 && !privacyPolicyChecked && (
-              <p style={{ color: "red", marginTop: "10px" }}>
-                Bạn phải chọn ít nhất một món và đồng ý với chính sách quyền riêng tư!
-              </p>
-            )}
 
           </div>
 
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onHide}>
+            <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
               Đóng
             </button>
-            <button type="button" className="btn btn-primary" disabled={dishList.length === 0 || !privacyPolicyChecked} onClick={handleConfirm}>
-              Xác nhận
+            <button type="button" className="btn btn-primary" disabled={(currentTotal < customerInfo.deposit) || !privacyPolicyChecked || JSON.stringify(dishes) === JSON.stringify(dishList)} onClick={handleConfirm}>
+              Gửi yêu cầu
             </button>
           </div>
         </div>
