@@ -162,14 +162,6 @@ export default function MyBooking() {
     }
   }
 
-  const payBalance = async (reservationId, amount) => {
-    const momoResponse = await dispatch(requestMomoPaymentBalance(reservationId, amount));
-
-    if (momoResponse && momoResponse.payUrl) {
-      window.location.href = momoResponse.payUrl;
-    }
-  }
-
   const formatCurrency = (value) => {
     return `${value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")} VND`;
   };
@@ -322,11 +314,6 @@ export default function MyBooking() {
                           </button>
                           {(statusInfo.text === 'Chờ thanh toán cọc') && (
                             <button className="btn btn-primary btn-sm mt-2 ms-2" onClick={() => pay(booking.id , booking.deposit)} style={{ padding: '0.25rem 0.75rem' }}>
-                              Thanh toán
-                            </button>
-                          )}
-                          {(statusInfo.text === 'Chờ thanh toán toàn bộ đơn') && (booking.deposit < booking.total_amount) && (
-                            <button className="btn btn-primary btn-sm mt-2 ms-2" onClick={() => payBalance(booking.id , booking.total_amount - booking.deposit)} style={{ padding: '0.25rem 0.75rem' }}>
                               Thanh toán
                             </button>
                           )}

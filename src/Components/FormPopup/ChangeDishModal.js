@@ -113,6 +113,13 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
   // Tính tổng tiền hiện tại
   const currentTotal = dishList.reduce((sum, dish) => sum + dish.price * dish.quantity, 0);
 
+  // Tính 150% của tổng tiền ban đầu (Tổng tiền ban đầu + 20%)
+  const maxAllowedTotal = 1.5 * (customerInfo?.total_amount || 0);
+
+  // Kiểm tra điều kiện tổng tiền thay đổi có vượt quá 120% tổng tiền ban đầu không
+  const isTotalExceeds120Percent = currentTotal > maxAllowedTotal;
+  const isDepositExceeded = currentTotal < (customerInfo?.deposit || 0);
+
   return (
     <div className={`modal ${show ? "d-block" : "d-none"}`} role="dialog">
       <div className="modal-dialog modal-lg modal-dialog-scrollable" role="document">
@@ -241,10 +248,15 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
               <div><strong>Tổng tiền ban đầu:</strong> {formatCurrency(customerInfo?.total_amount)}</div>
               <div><strong>Tiền đã đặt cọc:</strong> {formatCurrency(customerInfo?.deposit)}</div>
               <div><strong>Tổng tiền sau thay đổi:</strong> {formatCurrency(currentTotal)}</div>
-              {(currentTotal < customerInfo.deposit) && (
+              {isDepositExceeded && (
                 <div style={{ color: "red" }}>Tổng tiền hiện tại không được nhỏ hơn tiền đã cọc!</div>
               )}
-              {(currentTotal > customerInfo.deposit) && (
+              {isTotalExceeds120Percent && (
+                <div style={{ color: "red" }}>
+                  Tổng tiền sau thay đổi không được chênh lệch quá 50% so với tổng tiền ban đầu!
+                </div>
+              )}
+              {(currentTotal > customerInfo.deposit) && !isTotalExceeds120Percent && (
                 <div><strong>Tiền phải trả sau khi đến ăn:</strong> {formatCurrency(currentTotal - (customerInfo.deposit ? customerInfo.deposit : 0))}</div>
               )}
             </div>
@@ -271,7 +283,7 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
             <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
               Đóng
             </button>
-            <button type="button" className="btn btn-primary" disabled={(currentTotal < customerInfo.deposit) || !privacyPolicyChecked || JSON.stringify(dishes) === JSON.stringify(dishList)} onClick={handleConfirm}>
+            <button type="button" className="btn btn-primary" disabled={isTotalExceeds120Percent || isDepositExceeded || !privacyPolicyChecked || JSON.stringify(dishes) === JSON.stringify(dishList)} onClick={handleConfirm}>
               Gửi yêu cầu
             </button>
           </div>
