@@ -59,15 +59,20 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
       // Thêm món vào dishList nếu chưa có
       setDishList([
         ...dishList,
-        { product_name: product.name, price: priceAfterDiscount, quantity: 1 },
+        {
+          product_name: product.name,
+          price: priceAfterDiscount,
+          quantity: 1,
+          product_image: product.image, // Thêm hình ảnh vào danh sách món
+        },
       ]);
     }
-  };
+  };  
   
-
   const handleRemoveDish = (product) => {
-    const updatedDishList = dishList.filter(dish => dish.product_name !== product.product_name);
-    setDishList(updatedDishList);
+    setDishList((prevDishList) =>
+      prevDishList.filter((dish) => dish.product_name !== product.name)
+    );
   };
 
   const handleConfirm = async () => {
@@ -169,23 +174,50 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
                   filteredProducts.map(product => {
                     const dishInList = dishList.find(dish => dish.product_name === product.name);
                     return (
-                      <div key={product.id} className="d-flex justify-content-between align-items-center">
-                        <span>{product.name} - 
-                          {product.sale_price ? (
-                            <>
-                              <span style={{ textDecoration: 'line-through', marginRight: '8px', fontWeight: 'normal' }}>
-                              <span> </span>{formatCurrency(product.price)}
-                              </span>
-                              <span style={{ color: 'red', fontWeight: 'bold' }}>
-                                {formatCurrency(product.price - product.sale_price)}
-                              </span>
-                            </>
-                          ) : (
-                            <span style={{ fontWeight: 'bold' }}>
-                              <span> </span>{formatCurrency(product.price)}
+                      <div
+                        key={product.id}
+                        className="d-flex justify-content-between align-items-center mb-2"
+                        style={{ borderBottom: '1px solid #ddd', padding: '8px 0' }}
+                      >
+                        {/* Hình ảnh sản phẩm */}
+                        <div className="d-flex align-items-center">
+                          <img
+                            src={product.image || 'placeholder-image-url.jpg'} // Thay thế 'placeholder-image-url.jpg' bằng đường dẫn hình ảnh mặc định nếu không có hình ảnh
+                            alt={product.name}
+                            style={{
+                              width: '50px',
+                              height: '50px',
+                              objectFit: 'cover',
+                              borderRadius: '8px',
+                              marginRight: '12px',
+                            }}
+                          />
+                          <div>
+                            <span>
+                              {product.name} -{' '}
+                              {product.sale_price ? (
+                                <>
+                                  <span
+                                    style={{
+                                      textDecoration: 'line-through',
+                                      marginRight: '8px',
+                                      fontWeight: 'normal',
+                                    }}
+                                  >
+                                    {formatCurrency(product.price)}
+                                  </span>
+                                  <span style={{ color: 'red', fontWeight: 'bold' }}>
+                                    {formatCurrency(product.price - product.sale_price)}
+                                  </span>
+                                </>
+                              ) : (
+                                <span style={{ fontWeight: 'bold' }}>
+                                  {formatCurrency(product.price)}
+                                </span>
+                              )}
                             </span>
-                          )}
-                        </span>
+                          </div>
+                        </div>
                         <input
                           type="checkbox"
                           checked={!!dishInList}
@@ -211,19 +243,44 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
               <ul className="list-group">
                 {dishList.length > 0 ? (
                   dishList.map((dish, index) => (
-                    <li className="list-group-item d-flex justify-content-between align-items-center" key={index}>
-                      <div className="d-flex justify-content-between w-100">
-                        <span style={{ flex: 2 }}>{dish.product_name}</span>
+                    <li
+                      className="list-group-item d-flex justify-content-between align-items-center"
+                      key={index}
+                      style={{ padding: '10px 15px' }}
+                    >
+                      <div className="d-flex align-items-center w-100">
+                        {/* Hình ảnh món ăn */}
+                        <img
+                          src={dish.product_image || 'placeholder-image-url.jpg'} // Hình ảnh mặc định nếu không có
+                          alt={dish.product_name}
+                          style={{
+                            width: '50px',
+                            height: '50px',
+                            objectFit: 'cover',
+                            borderRadius: '8px',
+                            marginRight: '12px',
+                          }}
+                        />
+                        {/* Thông tin món ăn */}
+                        <div style={{ flex: 1 }}>
+                          <span style={{ fontWeight: 'bold' }}>{dish.product_name}</span>
+                        </div>
+                        {/* Số lượng */}
                         <input
                           type="number"
                           value={dish.quantity}
                           min="0"
                           onChange={(e) => handleQuantityChange(index, parseInt(e.target.value, 10))}
                           className="form-control"
-                          style={{ width: "80px", marginRight: "10px" }}
+                          style={{ width: '80px', marginRight: '10px' }}
                         />
-                        <span style={{ flex: 1 }}>{dish.quantity} x {formatCurrency(dish.price)}</span>
-                        <span style={{ flex: 1 }}>{formatCurrency(dish.quantity * dish.price)}</span>
+                        {/* Giá từng món */}
+                        <span style={{ flex: 1, textAlign: 'right' }}>{formatCurrency(dish.price)}</span>
+                        {/* Tổng giá */}
+                        <span style={{ flex: 1, textAlign: 'right' }}>
+                          {formatCurrency(dish.quantity * dish.price)}
+                        </span>
+                        {/* Nút xóa */}
                         <button
                           type="button"
                           className="btn btn-danger ms-2"
