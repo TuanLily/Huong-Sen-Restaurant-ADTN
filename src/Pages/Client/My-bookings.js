@@ -304,11 +304,11 @@ export default function MyBooking() {
                       <div className="col-md-4 col-sm-12 text-md-end text-left mt-3 mt-md-0">
                         <p className="mb-2" dangerouslySetInnerHTML={{ __html: monney(booking.status, booking.total_amount, booking.deposit) }} />
                         <div>
-                          {(statusInfo.text == 'Chờ thanh toán cọc') && (
+                          {/* {(statusInfo.text == 'Chờ thanh toán cọc') && (
                             <button className="btn btn-outline-secondary btn-sm mt-2 me-2" onClick={() => handleClickOpen(booking.id)} style={{ padding: '0.25rem 0.75rem' }}>
-                              Hủy Đơn
+                              Hủy thanh toán
                             </button>
-                          )}
+                          )} */}
                           <button className="btn btn-outline-success btn-sm mt-2" onClick={() => handleDetail(booking.id)} style={{ padding: '0.25rem 0.75rem' }}>
                             Xem chi tiết
                           </button>
@@ -382,7 +382,7 @@ export default function MyBooking() {
       )}
 
       <SuccessAlert open={openSuccess} onClose={handleSuccessClose} message="Thao tác thành công!" />
-      <DialogConfirm open={open} onClose={handleClose} onConfirm={() => handleUpdateStatus(0)} />
+      <DialogConfirm open={open} onClose={handleClose} onConfirm={() => handleUpdateStatus(2)} />
     </div>
   );
 }
