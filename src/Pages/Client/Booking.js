@@ -184,44 +184,52 @@ export default function Booking() {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div className="form-floating">
-                      <input
-                        type="datetime-local"
-                        className="form-control"
-                        id="reservation_date"
-                        placeholder="Date & Time"
-                        {...register("reservation_date", {
-                          required: "Thời gian là bắt buộc",
-                          validate: (value) => {
-                            const selectedDate = new Date(value);
-                            const now = new Date();
-                            const minTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-                            
-                            if (selectedDate < minTime) {
-                              return "Vui lòng đặt bàn trước ít nhất 2 giờ";
-                            }
-                            
-                            return true;
-                          }
-                        })}
-                        step={300}
-                        min={new Date(new Date().getTime() + 2 * 60 * 60 * 1000)
-                          .toISOString()
-                          .slice(0, 16)}
-                        max={new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
-                          .toISOString()
-                          .slice(0, 16)}
-                      />
-                      <label htmlFor="reservation_date">
-                        Thời gian dùng bữa
-                      </label>
-                      {errors.reservation_date && (
-                        <p className="text-danger">
-                          {errors.reservation_date.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+  <div className="form-floating">
+    <input
+      type="datetime-local"
+      className={`form-control ${
+        errors.reservation_date ? "is-invalid" : ""
+      }`}
+      id="reservation_date"
+      placeholder="Date & Time"
+      {...register("reservation_date", {
+        required: "Thời gian là bắt buộc",
+        validate: (value) => {
+          const selectedDate = new Date(value);
+          const now = new Date();
+          const minTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 giờ sau hiện tại
+          const maxTime = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 ngày sau hiện tại
+
+          if (selectedDate < now) {
+            return "Không thể chọn thời gian trong quá khứ";
+          }
+
+          if (selectedDate < minTime) {
+            return "Vui lòng đặt bàn trước ít nhất 2 giờ";
+          }
+
+          if (selectedDate > maxTime) {
+            return "Không thể đặt bàn quá 7 ngày kể từ hôm nay";
+          }
+
+          return true; // Nếu tất cả điều kiện đều hợp lệ
+        },
+      })}
+      step={300} // Bước thay đổi thời gian là 5 phút
+      min={new Date(new Date().getTime() + 2 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 16)} // Thời gian tối thiểu là 2 giờ sau hiện tại
+      max={new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 16)} // Thời gian tối đa là 7 ngày sau hiện tại
+    />
+    <label htmlFor="reservation_date">Thời gian dùng bữa</label>
+    {errors.reservation_date && (
+      <p className="text-danger">{errors.reservation_date.message}</p>
+    )}
+  </div>
+</div>
+
                   <div className="col-md-6">
                     <div className="form-floating">
                       <input
