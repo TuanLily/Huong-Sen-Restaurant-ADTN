@@ -295,7 +295,7 @@ export default function MyBooking() {
                             <strong>Ngày đặt:</strong> {formatDateTime(booking.reservation_date)}
                           </p>
                           <p className="mb-2">
-                            <strong>Số bàn:</strong> {booking.tableName ? booking.tableName : 'Chưa có'}
+                            <strong>Số bàn:</strong> {(booking.tableName && booking.status !== 1 && booking.status !== 2) ? booking.tableName : 'Chưa có'}
                           </p>
                         </div>
                       </div>
