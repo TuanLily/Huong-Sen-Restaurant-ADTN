@@ -60,6 +60,7 @@ export default function MyBooking() {
   const [showChangeDishModal, setShowChangeDishModal] = useState(false);
   const [customerInfo, setCustomerInfo] = useState();
   const [selectedDishes, setSelectedDishes] = useState([]);  // Dữ liệu các món ăn đã đặt
+  const [requestSent, setRequestSent] = useState(false);
 
   useEffect(() => {
     if (selectedReservation) {
@@ -91,11 +92,12 @@ export default function MyBooking() {
   }, []);
 
   useEffect(() => {
+    setRequestSent(false);
     const userIdFromToken = getUserIdFromToken();
     if (userIdFromToken) {
       dispatch(fetchReservations(userIdFromToken , nameSearch , phoneSearch , emailSearch , statusSearch , urlPage, reservationState.pageSize));
     }
-  }, [dispatch, urlPage, reservationState.pageSize, nameSearch, phoneSearch, emailSearch, statusSearch]);
+  }, [dispatch, urlPage, reservationState.pageSize, nameSearch, phoneSearch, emailSearch, statusSearch, requestSent]);
 
   useEffect(() => {
     navigate(`?page=${reservationState.currentPage}`);
@@ -377,6 +379,7 @@ export default function MyBooking() {
             dishes={selectedDishes} // Truyền danh sách món ăn đã chọn
             customerInfo={customerInfo}
             setOpenSuccess={setOpenSuccess}
+            setRequestSent={setRequestSent}
           />
         </>
       )}
