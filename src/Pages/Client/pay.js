@@ -9,7 +9,7 @@ import {
 } from "../../Actions/ReservationActions";
 import { addNewReservationDetail } from "../../Actions/Reservation_detailActions";
 import { useNavigate } from "react-router-dom";
-import { SuccessAlert, DangerAlert } from '../../Components/Alert/Alert';
+import { SuccessAlert, DangerAlert } from "../../Components/Alert/Alert";
 
 export default function Pay() {
   const navigate = useNavigate();
@@ -35,6 +35,7 @@ export default function Pay() {
   const [paymentMethod, setPaymentMethod] = useState(""); // State để lưu phương thức thanh toán
   const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
   const [openDangerAlert, setOpenDangerAlert] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   useEffect(() => {
     const savedCustomerInfo = localStorage.getItem("customerInfo");
@@ -114,10 +115,20 @@ export default function Pay() {
     );
 
     if (promotion) {
-      setDiscount(promotion.discount);
-      setSelectedPromotion(promotion.id);
-      setVoucherCode("");
-      setOpenSuccessAlert(true);
+      // Kiểm tra loại mã giảm giá (0: Bình thường, 1: Đặc biệt)
+      if (promotion.type === 1 && selectedPromotion !== promotion.id) {
+        setDiscount(promotion.discount);
+        setSelectedPromotion(promotion.id);
+        setVoucherCode(""); // Xóa mã nhập thủ công sau khi áp dụng thành công
+        setOpenSuccessAlert(true);
+      } else if (promotion.type === 0) {
+        setDiscount(promotion.discount);
+        setSelectedPromotion(promotion.id);
+        setVoucherCode("");
+        setOpenSuccessAlert(true);
+      } else {
+        setOpenDangerAlert(true);
+      }
     } else {
       setDiscount(0);
       setSelectedPromotion("");
@@ -126,25 +137,38 @@ export default function Pay() {
   };
 
   const handlePromotionSelect = (selectedCode) => {
-    setSelectedPromotion(selectedCode);
-    if (selectedCode) {
+    const promotion = promotions.find(
+      (promo) => promo.code_name === selectedCode
+    );
+
+    if (promotion?.type === 0) {
+      setSelectedPromotion(promotion.id);
       applyVoucher(selectedCode);
-      setVoucherCode("");
     } else {
       setDiscount(0);
-      setSelectedPromotion(""); // Reset if no promotion selected
+      setSelectedPromotion(""); // Reset nếu không chọn hoặc chọn sai loại
+      setVoucherCode(""); // Xóa mã nhập nếu chọn từ danh sách
     }
   };
 
+  // Lọc danh sách mã giảm giá hiển thị
   const validPromotions = promotions.filter(
-    (promo) => new Date(promo.valid_to) >= new Date() && promo.quantity > 0
+    (promo) =>
+      promo.type === 0 && // Chỉ hiển thị mã loại 0
+      new Date(promo.valid_to) >= new Date() &&
+      promo.quantity > 0
   );
 
- 
-      const deposit = finalTotal * 0.3;
-      const remaining = finalTotal * 0.7;
+  const deposit = finalTotal * 0.3;
+  const remaining = finalTotal * 0.7;
 
   const handleCompleteBooking = async () => {
+    if (!showConfirmDialog) {
+      // Hiển thị modal xác nhận nếu chưa hiển thị
+      setShowConfirmDialog(true);
+      return;
+    }
+
     try {
       const depositAmount = finalTotal * 0.3;
 
@@ -199,6 +223,8 @@ export default function Pay() {
     } catch (error) {
       console.error("Lỗi khi xác nhận đơn hàng:", error);
       alert("Có lỗi xảy ra khi đặt hàng, vui lòng thử lại.");
+    } finally {
+      setShowConfirmDialog(false); // Đóng modal sau khi đặt bàn xong
     }
   };
 
@@ -223,6 +249,58 @@ export default function Pay() {
               </li>
             </ol>
           </nav>
+        </div>
+      </div>
+
+      <div
+        className={`modal fade ${showConfirmDialog ? "show d-block" : ""}`}
+        tabIndex="-1"
+        style={{ background: "rgba(0,0,0,0.5)" }}
+      >
+        <div
+          className="modal-dialog"
+          style={{
+            marginTop: "200px", // Điều chỉnh vị trí modal
+          }}
+        >
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title d-flex align-items-center">
+                <i
+                  className="bi bi-exclamation-triangle-fill text-warning me-2"
+                  style={{ fontSize: "1.5rem" }}
+                ></i>
+                Xác nhận đặt bàn
+              </h5>
+              <button
+                type="button"
+                className="btn-close"
+                onClick={() => setShowConfirmDialog(false)}
+              ></button>
+            </div>
+            <div className="modal-body">
+              <p>
+                <strong>Lưu ý:</strong> Nếu quý khách đến trễ quá 30 phút, nhà
+                hàng sẽ huỷ bàn và không hoàn lại cọc.
+              </p>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setShowConfirmDialog(false)}
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleCompleteBooking}
+              >
+                Đồng ý
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -272,7 +350,13 @@ export default function Pay() {
               Đơn hàng ({Object.keys(selectedProducts).length} sản phẩm)
             </h5>
             <hr />
-            <div style={{ maxHeight: "550px", overflowY: "auto", scrollbarWidth: "none" }}>
+            <div
+              style={{
+                maxHeight: "550px",
+                overflowY: "auto",
+                scrollbarWidth: "none",
+              }}
+            >
               {Object.values(selectedProducts).map((product) => (
                 <div key={product.id} className="bg-white shadow-sm mb-2 p-3">
                   <div className="d-flex justify-content-between align-items-center">
@@ -382,10 +466,10 @@ export default function Pay() {
                 Phương thức thanh toán
               </label>
 
-                <div>
-                  <label>ㅤ- Cọc (30%) hóa đơn: {formatPrice(deposit)}</label>
-                  <label>ㅤ- Còn lại (70%): {formatPrice(remaining)}</label>
-                </div>
+              <div>
+                <label>Cọc (30%) hóa đơn: {formatPrice(deposit)}</label>
+                <label>Còn lại (70%): {formatPrice(remaining)}</label>
+              </div>
 
               <hr />
               <div>
@@ -413,8 +497,6 @@ export default function Pay() {
                 </div>
               </div>
               <hr />
-              <label><strong>Lưu ý:</strong> Nếu quý khách đến trễ quá 30 phút, nhà hàng sẽ
-                  huỷ bàn và không hoàn lại cọc.</label>
 
               {/* Buttons for confirmation and going back */}
               <div className="d-flex justify-content-between mt-3">
@@ -425,7 +507,6 @@ export default function Pay() {
                   className="btn btn-primary w-70"
                   onClick={handleCompleteBooking}
                   disabled={!paymentMethod}
-
                 >
                   Xác nhận thanh toán
                 </button>
@@ -434,9 +515,17 @@ export default function Pay() {
           </div>
         </div>
       </div>
-      <SuccessAlert open={openSuccessAlert} onClose={() => setOpenSuccessAlert(false)} message="Voucher đã được sử dụng!" />
-      <DangerAlert open={openDangerAlert} onClose={() => setOpenDangerAlert(false)} message="Mã giảm giá không hợp lệ hoặc đã hết hạn." />
-      <DangerAlert open={openDangerAlert} onClose={() => setOpenDangerAlert(false)} message="Tính năng VNPay hiện chưa được hỗ trợ." />
+      <SuccessAlert
+        open={openSuccessAlert}
+        onClose={() => setOpenSuccessAlert(false)}
+        message="Voucher đã được sử dụng!"
+      />
+      <DangerAlert
+        open={openDangerAlert}
+        onClose={() => setOpenDangerAlert(false)}
+        message="Mã giảm giá không hợp lệ hoặc đã hết hạn."
+      />
+      {/* <DangerAlert open={openDangerAlert} onClose={() => setOpenDangerAlert(false)} message="Tính năng VNPay hiện chưa được hỗ trợ." /> */}
     </div>
   );
 }

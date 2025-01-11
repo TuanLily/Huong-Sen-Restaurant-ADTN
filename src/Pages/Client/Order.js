@@ -43,15 +43,16 @@ export default function Order() {
     }
   }, [dispatch]);
 
-  const handleProductChange = (productId, price, image, name) => {
+  const handleProductChange = (productId, price, sale_price, image, name) => {
     setSelectedProducts((prev) => {
       const newSelection = { ...prev };
       if (newSelection[productId]) {
         delete newSelection[productId];
       } else {
+        const finalPrice = sale_price ? price - sale_price : price;
         newSelection[productId] = {
           id: productId,
-          price: parseFloat(price),
+          price: parseFloat(finalPrice),
           quantity: 1,
           image: image,
           name: name,
@@ -61,18 +62,26 @@ export default function Order() {
       return newSelection;
     });
   };
-
-  const handleQuantityChange = (productId, change, price, image, name) => {
+  
+  const handleQuantityChange = (
+    productId,
+    change,
+    price,
+    sale_price,
+    image,
+    name
+  ) => {
     setSelectedProducts((prev) => {
       const currentProduct = prev[productId] || { quantity: 0 };
       const newQuantity = Math.max(currentProduct.quantity + change, 0);
-
+  
       if (newQuantity > 0) {
+        const finalPrice = sale_price ? price - sale_price : price;
         const newSelection = {
           ...prev,
           [productId]: {
             id: productId,
-            price: parseFloat(price),
+            price: parseFloat(finalPrice),
             quantity: newQuantity,
             image: image,
             name: name,
@@ -88,6 +97,7 @@ export default function Order() {
       }
     });
   };
+  
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
@@ -265,6 +275,7 @@ export default function Order() {
                               product.id,
                               -1,
                               product.price,
+                              product.sale_price,
                               product.image,
                               product.name
                             )
@@ -287,6 +298,7 @@ export default function Order() {
                               product.id,
                               1,
                               product.price,
+                              product.sale_price,
                               product.image,
                               product.name
                             )
