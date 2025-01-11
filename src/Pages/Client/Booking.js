@@ -6,7 +6,12 @@ export default function Booking() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false); // State for controlling the modal visibility
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -57,27 +62,45 @@ export default function Booking() {
 
   const handleCancel = () => {
     setShowModal(false);
-    navigate("/");  // Điều hướng về trang chủ khi nhấn "Hủy"
+    navigate("/"); // Điều hướng về trang chủ khi nhấn "Hủy"
   };
 
   return (
     <div>
       {/* Popup Modal */}
       {showModal && (
-        <div className="modal show" tabIndex="-1" style={{ display: "block", background: "rgba(0, 0, 0, 0.5)" }}>
-          <div className="modal-dialog d-flex justify-content-center align-items-center" style={{ minHeight: '100vh' }}>
+        <div
+          className="modal show"
+          tabIndex="-1"
+          style={{ display: "block", background: "rgba(0, 0, 0, 0.5)" }}
+        >
+          <div
+            className="modal-dialog d-flex justify-content-center align-items-center"
+            style={{ minHeight: "100vh" }}
+          >
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Thông báo</h5>
               </div>
               <div className="modal-body">
-                <p>Bạn cần đăng nhập để tiếp tục. Bạn có muốn chuyển đến trang đăng nhập không?</p>
+                <p>
+                  Bạn cần đăng nhập để tiếp tục. Bạn có muốn chuyển đến trang
+                  đăng nhập không?
+                </p>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={handleCancel}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handleCancel}
+                >
                   Hủy
                 </button>
-                <button type="button" className="btn btn-primary" onClick={handleRedirectToLogin}>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleRedirectToLogin}
+                >
                   Đi đến đăng nhập
                 </button>
               </div>
@@ -96,7 +119,10 @@ export default function Booking() {
               <li className="breadcrumb-item">
                 <Link to="/">Trang chủ</Link>
               </li>
-              <li className="breadcrumb-item text-white active" aria-current="page">
+              <li
+                className="breadcrumb-item text-white active"
+                aria-current="page"
+              >
                 Đặt bàn
               </li>
             </ol>
@@ -184,51 +210,70 @@ export default function Booking() {
                     </div>
                   </div>
                   <div className="col-md-6">
-  <div className="form-floating">
-    <input
-      type="datetime-local"
-      className={`form-control ${
-        errors.reservation_date ? "is-invalid" : ""
-      }`}
-      id="reservation_date"
-      placeholder="Date & Time"
-      {...register("reservation_date", {
-        required: "Thời gian là bắt buộc",
-        validate: (value) => {
-          const selectedDate = new Date(value);
-          const now = new Date();
-          const minTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 giờ sau hiện tại
-          const maxTime = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 ngày sau hiện tại
+                    <div className="form-floating">
+                      <input
+                        type="datetime-local"
+                        className={`form-control ${
+                          errors.reservation_date ? "is-invalid" : ""
+                        }`}
+                        id="reservation_date"
+                        placeholder="Date & Time"
+                        {...register("reservation_date", {
+                          required: "Thời gian là bắt buộc",
+                          validate: (value) => {
+                            const selectedDate = new Date(value);
+                            const now = new Date();
+                            const minTime = new Date(
+                              now.getTime() + 2 * 60 * 60 * 1000
+                            ); // 2 giờ sau hiện tại
+                            const maxTime = new Date(
+                              now.getTime() + 7 * 24 * 60 * 60 * 1000
+                            ); // 7 ngày sau hiện tại
 
-          if (selectedDate < now) {
-            return "Không thể chọn thời gian trong quá khứ";
-          }
+                            // Kiểm tra nếu thời gian trong quá khứ
+                            if (selectedDate < now) {
+                              return "Không thể chọn thời gian trong quá khứ";
+                            }
 
-          if (selectedDate < minTime) {
-            return "Vui lòng đặt bàn trước ít nhất 2 giờ";
-          }
+                            // Kiểm tra nếu thời gian đặt bàn ít nhất 2 giờ sau
+                            if (selectedDate < minTime) {
+                              return "Vui lòng đặt bàn trước ít nhất 2 giờ";
+                            }
 
-          if (selectedDate > maxTime) {
-            return "Không thể đặt bàn quá 7 ngày kể từ hôm nay";
-          }
+                            // Kiểm tra nếu thời gian đặt bàn trong 7 ngày
+                            if (selectedDate > maxTime) {
+                              return "Không thể đặt bàn quá 7 ngày kể từ hôm nay";
+                            }
 
-          return true; // Nếu tất cả điều kiện đều hợp lệ
-        },
-      })}
-      step={300} // Bước thay đổi thời gian là 5 phút
-      min={new Date(new Date().getTime() + 2 * 60 * 60 * 1000)
-        .toISOString()
-        .slice(0, 16)} // Thời gian tối thiểu là 2 giờ sau hiện tại
-      max={new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .slice(0, 16)} // Thời gian tối đa là 7 ngày sau hiện tại
-    />
-    <label htmlFor="reservation_date">Thời gian dùng bữa</label>
-    {errors.reservation_date && (
-      <p className="text-danger">{errors.reservation_date.message}</p>
-    )}
-  </div>
-</div>
+                            // Lấy giờ và phút
+                            const selectedHours = selectedDate.getHours();
+                            if (selectedHours < 9 || selectedHours > 20) {
+                              return "Chỉ được đặt bàn trong khung giờ từ 9h sáng đến 8h tối";
+                            }
+
+                            return true; // Nếu tất cả điều kiện đều hợp lệ
+                          },
+                        })}
+                        step={300} // Bước thay đổi thời gian là 5 phút
+                        min={new Date(new Date().getTime() + 2 * 60 * 60 * 1000)
+                          .toISOString()
+                          .slice(0, 16)} // Thời gian tối thiểu là 2 giờ sau hiện tại
+                        max={new Date(
+                          new Date().getTime() + 7 * 24 * 60 * 60 * 1000
+                        )
+                          .toISOString()
+                          .slice(0, 16)} // Thời gian tối đa là 7 ngày sau hiện tại
+                      />
+                      <label htmlFor="reservation_date">
+                        Thời gian dùng bữa
+                      </label>
+                      {errors.reservation_date && (
+                        <p className="text-danger">
+                          {errors.reservation_date.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
                   <div className="col-md-6">
                     <div className="form-floating">
@@ -241,13 +286,13 @@ export default function Booking() {
                           required: "Số người ăn là bắt buộc",
                           min: {
                             value: 1,
-                            message: "Số người ăn tối thiểu 1 người"
+                            message: "Số người ăn tối thiểu 1 người",
                           },
-                          max:{
+                          max: {
                             value: 8,
-                            message:"Số người ăn tối đa 8 người"
+                            message: "Số người ăn tối đa 8 người",
                           },
-                          valueAsNumber: true
+                          valueAsNumber: true,
                         })}
                       />
                       <label htmlFor="party_size">Số người ăn</label>
