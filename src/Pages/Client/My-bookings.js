@@ -336,7 +336,8 @@ export default function MyBooking() {
                                 reservation_code: booking.reservation_code,
                                 total_amount: booking.total_amount,
                                 deposit: booking.deposit,
-                                id: booking.id
+                                id: booking.id,
+                                discount: booking.discount
                               })}
                             >
                               Yêu cầu thay đổi món ăn

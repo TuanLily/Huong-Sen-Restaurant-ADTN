@@ -87,7 +87,7 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
       setIsSending(true); // Bắt đầu hiển thị spinner
 
       // Gửi email qua API
-      await dispatch(sendEmail(dishes, dishList, customerInfo, currentTotal, VAT10));
+      await dispatch(sendEmail(dishes, dishList, customerInfo, currentTotal, VAT10, discount));
 
       // Cập nhật state để trigger lại useEffect trong component cha
       setRequestSent(true); // Kích hoạt lại useEffect
@@ -122,6 +122,8 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
   const currentTotal = dishList.reduce((sum, dish) => sum + dish.price * dish.quantity, 0);
 
   const VAT10 = currentTotal * 10 / 100;
+
+  const discount = customerInfo.discount ? currentTotal * customerInfo.discount / 100 : 0;
 
   // Tính 150% của tổng tiền ban đầu (Tổng tiền ban đầu + 20%)
   const maxAllowedTotal = 1.5 * (customerInfo?.total_amount || 0);
@@ -309,8 +311,8 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
               <h5 style={{ fontSize: '18px' }}>Tổng tiền</h5>
               <div><strong>Tổng tiền ban đầu:</strong> {formatCurrency(customerInfo?.total_amount)}</div>
               <div><strong>Tiền đã đặt cọc:</strong> {formatCurrency(customerInfo?.deposit)}</div>
-              <div><strong>Tạm tính:</strong> {formatCurrency(currentTotal)} <strong>Thuế(10%):</strong> {formatCurrency(VAT10)}</div>
-              <div><strong>Tổng tiền sau thay đổi:</strong> {formatCurrency(currentTotal + VAT10)}</div>
+              <div><strong>Tạm tính:</strong> {formatCurrency(currentTotal)} <strong>Thuế(10%):</strong> {formatCurrency(VAT10)} <strong>Giảm giá{customerInfo.discount ? '(' + customerInfo.discount + '%)' : '(' + 0 + '%)'}:</strong> {formatCurrency(discount)}</div>
+              <div><strong>Tổng tiền sau thay đổi:</strong> {formatCurrency(currentTotal + VAT10 - discount)}</div>
               {isDepositExceeded && (
                 <div style={{ color: "red" }}>Tổng tiền hiện tại không được nhỏ hơn tiền đã cọc!</div>
               )}
@@ -320,7 +322,7 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
                 </div>
               )}
               {(currentTotal > customerInfo.deposit) && !isTotalExceeds120Percent && (
-                <div><strong>Tiền phải trả sau khi đến ăn:</strong> {formatCurrency((currentTotal + VAT10) - (customerInfo.deposit ? customerInfo.deposit : 0))}</div>
+                <div><strong>Tiền phải trả sau khi đến ăn:</strong> {formatCurrency((currentTotal + VAT10 - discount) - (customerInfo.deposit ? customerInfo.deposit : 0))}</div>
               )}
             </div>
 
