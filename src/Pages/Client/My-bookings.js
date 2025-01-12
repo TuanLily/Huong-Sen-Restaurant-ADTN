@@ -7,11 +7,12 @@ import { requestMomoPayUrl, requestMomoPaymentBalance } from "../../Actions/Rese
 import DialogConfirm from '../../Components/Dialog/Dialog';
 import CustomPagination from '../../Components/Pagination/CustomPagination';
 import SpinnerSink from '../../Components/Client/SniperSink';
-import { SuccessAlert } from '../../Components/Alert/Alert';
+import { SuccessAlert, DangerAlert } from '../../Components/Alert/Alert';
 import { formatDateTime } from '../../Utils/FormatDateTime';
 import { ChangeDishModal } from '../../Components/FormPopup/ChangeDishModal';
 import { canCancelReservation } from '../../Components/FormPopup/canCancel';
 import { jwtDecode as jwt_decode } from 'jwt-decode';
+import http from "../../Utils/Http";
 
 export default function MyBooking() {
   const dispatch = useDispatch();
@@ -53,6 +54,7 @@ export default function MyBooking() {
   const urlPage = parseInt(query.get('page')) || 1;
 
   const [open, setOpen] = useState(false);
+  const [openDanger, setOpenDanger] = useState(false);
   const [openSuccess, setOpenSuccess] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
 
@@ -117,6 +119,10 @@ export default function MyBooking() {
     setOpenSuccess(false);
   };
 
+  const handleDangerClose = () => {
+    setOpenDanger(false);
+  };
+
   // Hàm mở modal thay đổi món ăn
   const handleChangeDish = (reservationId, customerInfo) => {
     setSelectedReservation(reservationId); // Lưu id của đơn đặt
@@ -161,6 +167,32 @@ export default function MyBooking() {
 
     if (momoResponse && momoResponse.payUrl) {
       window.location.href = momoResponse.payUrl;
+    }
+  }
+
+  const addTable = async (reservationID, reservationDate, depositAmount) => {
+    try {
+      // Gửi yêu cầu POST tới API
+      const response = await http.post("http://localhost:6969/api/reservations_t_admin/addTable", {
+        reservationID,
+        reservationDate,
+      });
+  
+      // Xử lý kết quả trả về từ API
+      const { message } = response.data;
+  
+      if (message == 'Ghép bàn thành công!') {
+        pay(reservationID, depositAmount);
+      } else {
+        setOpenDanger(true);
+      }
+    } catch (error) {
+      if (error.response) {
+        setOpenDanger(true);
+        console.error("Error response:", error.response.data.message);
+      } else {
+        console.error("Error:", error.message);
+      }
     }
   }
 
@@ -315,7 +347,7 @@ export default function MyBooking() {
                             Xem chi tiết
                           </button>
                           {(statusInfo.text === 'Chờ thanh toán cọc') && (
-                            <button className="btn btn-primary btn-sm mt-2 ms-2" onClick={() => pay(booking.id , booking.deposit)} style={{ padding: '0.25rem 0.75rem' }}>
+                            <button className="btn btn-primary btn-sm mt-2 ms-2" onClick={() => addTable(booking.id , booking.reservation_date, booking.deposit)} style={{ padding: '0.25rem 0.75rem' }}>
                               Thanh toán
                             </button>
                           )}
@@ -386,6 +418,7 @@ export default function MyBooking() {
       )}
 
       <SuccessAlert open={openSuccess} onClose={handleSuccessClose} message="Thao tác thành công!" />
+      <DangerAlert open={openDanger} onClose={handleDangerClose} message="Không có bàn trống!" />
       <DialogConfirm open={open} onClose={handleClose} onConfirm={() => handleUpdateStatus(2)} />
     </div>
   );
