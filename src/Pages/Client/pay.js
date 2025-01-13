@@ -36,6 +36,7 @@ export default function Pay() {
   const [openSuccessAlert, setOpenSuccessAlert] = useState(false);
   const [openDangerAlert, setOpenDangerAlert] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [errMasege, setErrMasege] = useState('');
 
   useEffect(() => {
     const savedCustomerInfo = localStorage.getItem("customerInfo");
@@ -61,7 +62,6 @@ export default function Pay() {
     if (userData) {
       const user = JSON.parse(userData);
       setUserId(user.id); // Lưu userId
-      // console.log("User ID:", user.id); // Log user ID để kiểm tra
     }
 
     setReservationCode(generateReservationCode());
@@ -127,11 +127,13 @@ export default function Pay() {
         setVoucherCode("");
         setOpenSuccessAlert(true);
       } else {
+        setErrMasege('Mã giảm giá không hợp lệ hoặt đã hết hạn');
         setOpenDangerAlert(true);
       }
     } else {
       setDiscount(0);
       setSelectedPromotion("");
+      setErrMasege('Mã giảm giá không hợp lệ hoặt đã hết hạn');
       setOpenDangerAlert(true);
     }
   };
@@ -169,62 +171,55 @@ export default function Pay() {
       return;
     }
 
-    try {
-      const depositAmount = finalTotal * 0.3;
-
-      const orderData = {
-        ...customerInfo,
-        reservation_code,
-        total_amount: finalTotal,
-        discount,
-        deposit: depositAmount,
-        promotion_id: selectedPromotion || null,
-        user_id: userId,
-      };
-
-      // console.log("Final Total Payment:", finalTotal);
-      // console.log("Selected Promotion ID:", selectedPromotion);
-      // console.log("Selected Table ID:", tableId);
-      // console.log("User ID:", userId);
-
-      // Dispatch reservation action
-      const reservation = await dispatch(addNewReservation(orderData));
-
-      localStorage.removeItem("customerInfo");
-      localStorage.removeItem("selectedProducts");
-
-      await Promise.all(
-        Object.values(selectedProducts).map((product) => {
-          const reservationDetail = {
-            reservation_id: reservation.id,
-            product_id: product.id,
-            quantity: product.quantity,
-            price: product.price,
-          };
-          return dispatch(addNewReservationDetail(reservationDetail));
-        })
-      );
-
-      if (paymentMethod === "MOMO") {
-        const momoResponse = await dispatch(
-          requestMomoPayment(reservation.id, depositAmount, reservation_code)
+    if (paymentMethod === "MOMO") {
+      try {
+        const depositAmount = finalTotal * 0.3;
+  
+        const orderData = {
+          ...customerInfo,
+          reservation_code,
+          total_amount: finalTotal,
+          discount,
+          deposit: depositAmount,
+          promotion_id: selectedPromotion || null,
+          user_id: userId,
+        };
+  
+        // Dispatch reservation action
+        const reservation = await dispatch(addNewReservation(orderData));
+  
+        localStorage.removeItem("customerInfo");
+        localStorage.removeItem("selectedProducts");
+  
+        await Promise.all(
+          Object.values(selectedProducts).map((product) => {
+            const reservationDetail = {
+              reservation_id: reservation.id,
+              product_id: product.id,
+              quantity: product.quantity,
+              price: product.price,
+            };
+            return dispatch(addNewReservationDetail(reservationDetail));
+          })
         );
-        if (momoResponse && momoResponse.payUrl) {
-          window.location.href = momoResponse.payUrl;
+  
+        if (paymentMethod === "MOMO") {
+          const momoResponse = await dispatch(
+            requestMomoPayment(reservation.id, depositAmount, reservation_code)
+          );
+          if (momoResponse && momoResponse.payUrl) {
+            window.location.href = momoResponse.payUrl;
+          }
         }
-      } else if (paymentMethod === "VNPay") {
-        alert("Tính năng VNPay hiện chưa được hỗ trợ.");
-      } else if (paymentMethod === "cash") {
-        alert(
-          "Thanh toán trực tiếp đã được xác nhận. Vui lòng thanh toán tại quầy."
-        );
-        navigate("/order-summary");
+      } catch (error) {
+        setErrMasege('Hiện không có bàn trống vui lòng thử lại');
+        setOpenDangerAlert(true)
+      } finally {
+        setShowConfirmDialog(false); // Đóng modal sau khi đặt bàn xong
       }
-    } catch (error) {
-      console.error("Lỗi khi xác nhận đơn hàng:", error);
-      alert("Có lỗi xảy ra khi đặt hàng, vui lòng thử lại.");
-    } finally {
-      setShowConfirmDialog(false); // Đóng modal sau khi đặt bàn xong
+    } else if (paymentMethod === "VNPay") {
+      setErrMasege('Tính năng thanh toán VNPAY chưa hỗ trợ');
+      setOpenDangerAlert(true)
     }
   };
 
@@ -523,7 +518,7 @@ export default function Pay() {
       <DangerAlert
         open={openDangerAlert}
         onClose={() => setOpenDangerAlert(false)}
-        message="Mã giảm giá không hợp lệ hoặc đã hết hạn."
+        message={errMasege}
       />
       {/* <DangerAlert open={openDangerAlert} onClose={() => setOpenDangerAlert(false)} message="Tính năng VNPay hiện chưa được hỗ trợ." /> */}
     </div>
