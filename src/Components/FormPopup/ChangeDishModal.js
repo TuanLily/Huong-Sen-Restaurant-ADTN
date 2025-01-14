@@ -76,6 +76,12 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
   };
 
   const handleConfirm = async () => {
+    // Kiểm tra nếu không có món nào được chọn
+    if (dishList.length === 0) {
+      setErrorMessage("Vui lòng chọn ít nhất một món ăn trước khi gửi yêu cầu!");
+      return; // Dừng lại nếu không có món nào được chọn
+    }
+
     // Kiểm tra xem có thay đổi món ăn không
     const isDishChanged = JSON.stringify(dishes) !== JSON.stringify(dishList);
     if (!isDishChanged) {
@@ -129,8 +135,8 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
   const maxAllowedTotal = 1.5 * (customerInfo?.total_amount || 0);
 
   // Kiểm tra điều kiện tổng tiền thay đổi có vượt quá 120% tổng tiền ban đầu không
-  const isTotalExceeds120Percent = currentTotal > maxAllowedTotal;
-  const isDepositExceeded = currentTotal < (customerInfo?.deposit || 0);
+  const isTotalExceeds120Percent = currentTotal + VAT10 - discount >= maxAllowedTotal;
+  const isDepositExceeded = currentTotal + VAT10 - discount < (customerInfo?.deposit || 0);
 
   return (
     <div className={`modal ${show ? "d-block" : "d-none"}`} role="dialog">
@@ -321,7 +327,7 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
                   Tổng tiền sau thay đổi không được chênh lệch quá 50% so với tổng tiền ban đầu!
                 </div>
               )}
-              {(currentTotal > customerInfo.deposit) && !isTotalExceeds120Percent && (
+              {(currentTotal + VAT10 - discount >= customerInfo.deposit) && !isTotalExceeds120Percent && (
                 <div><strong>Tiền phải trả sau khi đến ăn:</strong> {formatCurrency((currentTotal + VAT10 - discount) - (customerInfo.deposit ? customerInfo.deposit : 0))}</div>
               )}
             </div>

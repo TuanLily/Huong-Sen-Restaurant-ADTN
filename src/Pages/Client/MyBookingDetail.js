@@ -201,18 +201,24 @@ export default function MyBookingDetail() {
                                         <div>
                                             <h3>Thông tin thanh toán</h3>
                                             <p><strong>Tiền cọc:</strong> {formatCurrency(deposit)}</p>
-                                            <p><strong>Còn lại:</strong> {reservation.status == 5 ? 0 : formatCurrency(remaining)}</p>
+                                            {/* <p><strong>Còn lại:</strong> {reservation.status == 5 ? 0 : formatCurrency(remaining)}</p> */}
+                                            {remaining >= 0 && (
+                                                <p><strong>Còn lại:</strong> {reservation.status == 5 ? 0 : formatCurrency(remaining)}</p>
+                                            )}
+                                            {remaining < 0 && (
+                                                <p style={{ color: 'red' }}><strong>Nhà hàng thối lại:</strong> {formatCurrency(reservationState.reservation[0].deposit - reservationState.reservation[0].total_amount)}</p>
+                                            )}
                                             <p><strong>Trạng thái:</strong> {statusMapping[reservation.status].text}</p>
                                         </div>
                                     </div>
                                 );
                             })()}
 
-                            {reservationState.reservation[0].deposit > reservationState.reservation[0].total_amount && (
+                            {/* {reservationState.reservation[0].deposit > reservationState.reservation[0].total_amount && (
                                 <span style={{ fontSize: '15px', color: 'red' }}>
                                     Do bạn đã thanh toán cọc trước khi yêu cầu đổi món và tổng tiền hiện đang nhỏ hơn tiền cọc, khi bạn đến ăn nhà hàng sẽ trả lại bạn.
                                 </span>
-                            )}
+                            )} */}
 
                             {/* Nút in và quay lại */}
                             <div style={{ textAlign: 'center', marginTop: '20px' }} className="print-buttons">
