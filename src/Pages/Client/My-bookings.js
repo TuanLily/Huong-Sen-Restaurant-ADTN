@@ -219,12 +219,14 @@ export default function MyBooking() {
   };
 
   const monney = (status, total_amount, deposit) => {
-    if (status == 0 || status == 1 || status == 2) {
+    if (status == 1 || status == 2) {
       return "<strong>Số tiền thanh toán:</strong> " + formatCurrency (deposit);
-    } else if (status == 3) {
-      return "<strong>Số tiền còn lại:</strong> " + formatCurrency (total_amount - deposit);
-    } else if (status == 4) {
-      return "<strong>Số tiền còn lại:</strong> " + formatCurrency (total_amount - deposit);
+    } else if (status == 3 || status == 4 || status == 0) {
+      if (total_amount >= deposit) {
+        return "<strong>Số tiền còn lại:</strong> " + formatCurrency (total_amount - deposit);
+      } else {
+        return "<strong>Nhà hàng thối lại:</strong> " + formatCurrency (deposit - total_amount);
+      }
     } else {
       return "<strong>Số tiền còn lại:</strong> " + formatCurrency (0);
     }
@@ -351,7 +353,7 @@ export default function MyBooking() {
                               Thanh toán
                             </button>
                           )}
-                          {(statusInfo.text === 'Chờ thanh toán toàn bộ đơn' || statusInfo.text === 'Đã thanh toán cọc') && (canCancelReservation(booking.reservation_date)) && (booking.number_change == 1) && (
+                          {(statusInfo.text === 'Đã thanh toán cọc') && (canCancelReservation(booking.reservation_date)) && (booking.number_change == 1) && (
                             <button
                               className="btn btn-outline-secondary btn-sm mt-2 ms-2"
                               style={{
