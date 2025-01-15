@@ -64,6 +64,7 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
           price: priceAfterDiscount,
           quantity: 1,
           product_image: product.image, // Thêm hình ảnh vào danh sách món
+          product_id: product.id
         },
       ]);
     }
@@ -91,6 +92,8 @@ export const ChangeDishModal = ({ show, onHide, onConfirm, dishes, customerInfo,
     
     try {
       setIsSending(true); // Bắt đầu hiển thị spinner
+
+      console.log (dishList);
 
       // Gửi email qua API
       await dispatch(sendEmail(dishes, dishList, customerInfo, currentTotal, VAT10, discount));
